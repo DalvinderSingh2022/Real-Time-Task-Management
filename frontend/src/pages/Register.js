@@ -1,10 +1,15 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useContext } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 import styles from "./../styles/auth.module.css";
 
+import { AuthContext } from '../store/AuthContext';
+
 const Regiter = () => {
+    const { authState, login } = useContext(AuthContext);
+    const navigate = useNavigate();
+
     const handlesubmit = (e) => {
         e.preventDefault();
         const user = {
@@ -13,13 +18,21 @@ const Regiter = () => {
             password: e.target.password.value
         }
 
-        axios.get("http://localhost:4000/api/users/regiter", user)
-            .then(() => {
-                console.log({ message: 'successfully' });
+        axios.post("http://localhost:4000/api/users/register", user)
+            .then(({ data }) => {
+                const { name, email } = data.user;
+                login({ name, email });
+                localStorage.setItem("jwt", data.token);
+                navigate("/");
             })
             .catch((error) => {
                 console.error(error);
             });
+    }
+
+
+    if (authState.authenticated) {
+        return <Navigate to="/" />
     }
 
     return (
