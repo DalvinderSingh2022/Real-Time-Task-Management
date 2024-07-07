@@ -1,0 +1,45 @@
+.container {
+    background-color: var(--background-color-1);
+    border-radius: 8px;
+    padding: 4em 1em;
+    width: min(420px, 100%);
+
+}
+
+.container .heading {
+    color: var(--text);
+    font-weight: 700;
+    font-size: 2.2em;
+    line-height: 1em;
+    text-align: center;
+}
+
+.container .sub_heading {
+    color: var(--text-sec);
+    text-align: center;
+}
+
+.container .group {
+    align-items: stretch;
+}
+
+.container .form {
+    width: min(320px, 100%);
+}
+
+.container button[type="submit"] {
+    margin: 16px auto -12px;
+}
+
+.container .link .submit_button {
+    background-color: inherit;
+    margin: 0 .4em;
+}
+
+.container .link .submit_button:hover {
+    text-decoration: underline;
+}
+
+.container .link .submit_button:active {
+    color: var(--purple-dark);
+}
