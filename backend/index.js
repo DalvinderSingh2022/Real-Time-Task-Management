@@ -1,9 +1,14 @@
 const express = require("express");
+const routes = require("./routes/index");
+const cors = require("cors");
+const dotenv = require("dotenv").config();
+const connectMongo = require("./config/Database.js");
 
+connectMongo();
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
-app.listen(4000, () => {
-    console.log(`listening to port: ${4000}`)
-});
+app.use(routes);
+app.listen(process.env.PORT);
