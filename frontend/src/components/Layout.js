@@ -1,8 +1,8 @@
 import React, { useContext } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 
-// import Topbar from './Topbar';
-// import Sidebar from './Sidebar';
+import Topbar from './Topbar';
+import Sidebar from './Sidebar';
 import { AuthContext } from '../store/AuthContext';
 
 const Layout = () => {
@@ -14,8 +14,8 @@ const Layout = () => {
 
     return (
         <main>
-            {/* <Sidebar /> */}
-            {/* <Topbar /> */}
+            <Sidebar />
+            <Topbar />
             <article>
                 <Outlet />
             </article>

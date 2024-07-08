@@ -34,15 +34,15 @@ const Login = () => {
     }
 
     return (
-        <div className="flex full-container">
+        <div className="flex full_container">
             <section className={`flex col gap ${styles.container}`}>
                 <div>
-                    <div className={`w-full ${styles.heading}`}>Welcome back</div>
-                    <div className={`w-full ${styles.sub_heading}`}>Please enter your details.</div>
+                    <div className={`w_full text_primary ${styles.heading}`}>Welcome back</div>
+                    <div className={`w_full text_secondary ${styles.sub_heading}`}>Please enter your details.</div>
                 </div>
-                <form className={`flex col gap w-full ${styles.form}`} onSubmit={(e) => handlesubmit(e)}>
-                    <div className={`flex col w-full ${styles.group}`}>
-                        <label htmlFor="email">Email</label>
+                <form className={`flex col gap w_full ${styles.form}`} onSubmit={(e) => handlesubmit(e)}>
+                    <div className={`flex col w_full ${styles.group}`}>
+                        <label htmlFor="email" className='text_primary'>Email</label>
                         <input
                             type="email"
                             id='email'
@@ -50,8 +50,8 @@ const Login = () => {
                             placeholder='exapmle@domain.com'
                         />
                     </div>
-                    <div className={`flex col w-full ${styles.group}`}>
-                        <label htmlFor="password">Password</label>
+                    <div className={`flex col w_full ${styles.group}`}>
+                        <label htmlFor="password" className='text_primary'>Password</label>
                         <input
                             type="password"
                             id='password'
@@ -60,8 +60,8 @@ const Login = () => {
                         />
                     </div>
 
-                    <div className={`flex col w-full ${styles.group}`}>
-                        <button type='submit' className={`btn primary ${styles.submit_button}`}>Log In</button>
+                    <div className={`flex col w_full ${styles.group}`}>
+                        <button type='submit' className={`button primary ${styles.submit_button}`}>Log In</button>
                     </div>
 
                     <div className={styles.link}>

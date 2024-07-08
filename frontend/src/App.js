@@ -31,6 +31,9 @@ const App = () => {
         const { name, email } = data;
         login({ name, email });
       })
+      .catch((err) => {
+        console.error(err);
+      })
       .finally(() => setLoadingMsg(''));
 
   }, [login, authState]);

@@ -2,7 +2,7 @@ import React from 'react';
 
 const Loading = ({ message }) => {
     return (
-        <div className='full-container flex'>
+        <div className='full_container flex'>
             <div>{message}</div>
         </div>
     )

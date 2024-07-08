@@ -1,13 +1,12 @@
 .container {
-    background-color: var(--background-color-1);
+    background-color: var(--white);
     border-radius: 8px;
     padding: 4em 1em;
     width: min(420px, 100%);
-
+    box-shadow: 0px 10px 20px 4px var(--shadow-color);
 }
 
 .container .heading {
-    color: var(--text);
     font-weight: 700;
     font-size: 2.2em;
     line-height: 1em;
@@ -15,7 +14,6 @@
 }
 
 .container .sub_heading {
-    color: var(--text-sec);
     text-align: center;
 }
 
@@ -38,8 +36,4 @@
 
 .container .link .submit_button:hover {
     text-decoration: underline;
-}
-
-.container .link .submit_button:active {
-    color: var(--purple-dark);
 }
