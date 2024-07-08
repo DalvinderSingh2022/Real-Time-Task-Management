@@ -7,9 +7,8 @@ const validationHandler = require('../middleware/validationHandler');
 const register = async (req, res) => {
     const { name, email, password } = req.body;
 
-    let hashedPassword;
     if (password) {
-        hashedPassword = await bcrypt.hash(password, 10);
+        var hashedPassword = await bcrypt.hash(password, 10);
     }
     const user = new User({ name, email, password: hashedPassword });
 
@@ -50,17 +49,22 @@ const currentUser = async (req, res) => {
         return res.status(401).json({ message: "User is not authorized or token is missing" });
     }
 
-    const validUser = jwt.verify(token, process.env.SECRET_KEY);
-    if (!validUser) {
-        return res.status(401).json({ message: "User is not authorized" });
-    }
+    try {
+        const validUser = jwt.verify(token, process.env.SECRET_KEY);
+        if (!validUser) {
+            return res.status(401).json({ message: "User is not authorized" });
+        }
 
-    const user = await User.findById(validUser.id);
-    if (!user) {
-        return res.status(401).json({ message: 'User is not authorized or token is missing' });
-    }
+        const user = await User.findById(validUser.id);
+        if (!user) {
+            return res.status(401).json({ message: 'User is not authorized or token is missing' });
+        }
 
-    return res.status(200).json(user);
+        return res.status(200).json(user);
+
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
 }
 
 module.exports = { register, login, currentUser };
