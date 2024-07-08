@@ -69,7 +69,7 @@ main {
 }
 
 main.close {
-    grid-template-columns: 1fr;
+    grid-template-columns: 80px auto;
 }
 
 main :is(nav, aside) {
@@ -160,6 +160,7 @@ main .top_nav {
     grid-column-end: -1;
     justify-content: space-between;
     padding-inline: 1em;
+    z-index: 9;
 }
 
 .top_nav .greeting {
@@ -180,31 +181,14 @@ main .top_nav {
     align-self: flex-start;
 }
 
-.top_nav .menu_toggle {
-    display: none;
-}
-
-main.close .top_nav .menu_toggle {
-    padding-top: 4px;
-    font-size: 1.2em;
-    display: block;
-}
-
 main .side_nav {
     box-sizing: border-box;
     grid-row: 1 / -1;
     height: 100vh;
     justify-content: space-between;
     padding-block: 2em;
-    position: relative;
     transition: 200ms ease;
-}
-
-main.close .side_nav {
-    width: 0;
-    padding: 0;
-    overflow: hidden;
-    position: fixed;
+    z-index: 99;
 }
 
 .side_nav .menu_toggle {
@@ -212,7 +196,12 @@ main.close .side_nav {
     position: absolute;
     right: -20px;
     top: 60px;
-    z-index: 99;
+}
+
+.side_nav .logo img {
+    height: 40px;
+    display: block;
+    margin-bottom: -16px;
 }
 
 .side_nav .logo {
@@ -223,7 +212,7 @@ main.close .side_nav {
     margin-bottom: 1em;
 }
 
-.side_nav .logo::before {
+.side_nav .logo p::before {
     content: '';
     position: absolute;
     bottom: -4px;
@@ -247,6 +236,17 @@ main.close .side_nav {
     font-size: 1em;
     background-color: inherit;
     margin-inline: 1.5em;
+}
+
+.top_nav .menu_toggle,
+main.close p {
+    display: none;
+}
+
+main.close .side_nav .link {
+    padding: 14px;
+    font-size: 20px;
+    margin-inline: auto;
 }
 
 .side_nav .link:hover {
@@ -273,13 +273,18 @@ article {
         position: fixed;
         left: 0;
         top: 0;
-        width: 320px;
+        width: 360px;
         grid-row: none;
-        z-index: 9;
     }
 
     main.close .side_nav {
         left: -100%;
+    }
+
+    main.close .top_nav .menu_toggle {
+        padding-top: 4px;
+        font-size: 1.2em;
+        display: block;
     }
 
     .top_nav .greeting {

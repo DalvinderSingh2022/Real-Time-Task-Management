@@ -9,6 +9,8 @@ import { TbLogout } from "react-icons/tb";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { RiCloseLine } from "react-icons/ri";
 
+import Logo from "../assects/logo.png";
+
 import { AuthContext } from '../store/AuthContext';
 
 const Sidebar = () => {
@@ -33,26 +35,29 @@ const Sidebar = () => {
                 <RiCloseLine />
             </button>
             <div className="side_nav_links flex col gap w_full">
-                <div className='logo'>Task Manager</div>
-                <NavLink to='/' className="button flex link gap2">
+                <div className='logo flex gap2' title='Task Manager'>
+                    <img src={Logo} alt="task manager" className='logo_image' />
+                    <p>Task Manager</p>
+                </div>
+                <NavLink to='/' className="button flex link gap2" title='Home'>
                     <GoHomeFill />
                     <p>Home</p>
                 </NavLink>
-                <NavLink to='/tasks' className="button flex link gap2">
+                <NavLink to='/tasks' className="button flex link gap2" title='All Tasks'>
                     <RiTodoFill />
                     <p>All Tasks</p>
                 </NavLink>
-                <NavLink to='/users' className="button flex link gap2">
+                <NavLink to='/users' className="button flex link gap2" title='Users'>
                     <FaUsers />
                     <p>Users</p>
                 </NavLink>
             </div>
             <div className="flex col gap2 w_full">
-                <button className='button flex gap2 link' onClick={handleLogout}>
+                <button className='button flex gap2 link' title='Logout' onClick={handleLogout}>
                     <TbLogout />
                     <p>Logout</p>
                 </button>
-                <button className='button flex gap2 link' onClick={handleDelete}>
+                <button className='button flex gap2 link' title='Delete Account' onClick={handleDelete}>
                     <AiOutlineUserDelete />
                     <p>Delete Account</p>
                 </button>
