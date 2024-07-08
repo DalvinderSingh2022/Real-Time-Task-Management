@@ -1,9 +1,12 @@
 import { AuthProvider } from './AuthContext';
+import { TasksProvider } from './TasksContext';
 
 const AppProvider = ({ children }) => {
     return (
         <AuthProvider>
-            {children}
+            <TasksProvider>
+                {children}
+            </TasksProvider>
         </AuthProvider>
     );
 };

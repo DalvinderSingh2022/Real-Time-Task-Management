@@ -11,17 +11,18 @@ import Layout from './components/Layout';
 import Loading from './components/Loading';
 
 import { AuthContext } from './store/AuthContext';
+import { TasksContext } from './store/TasksContext';
 
 const App = () => {
   const [loadingMsg, setLoadingMsg] = useState('');
   const { authState, login } = useContext(AuthContext);
+  const { tasksState, loadTasks } = useContext(TasksContext);
 
   useEffect(() => {
     if (authState.authenticated)
       return;
 
     setLoadingMsg("Fetching your details, please wait...");
-
     axios.get("http://localhost:4000/api/users/current", {
       headers: {
         Authorization: localStorage.getItem("jwt")
@@ -37,6 +38,23 @@ const App = () => {
       .finally(() => setLoadingMsg(''));
 
   }, [login, authState]);
+
+  useEffect(() => {
+    if (tasksState.loaded)
+      return;
+
+    setLoadingMsg("Fetching your tasks, please wait...");
+    axios.get("http://localhost:4000/api/tasks")
+      .then(({ data }) => {
+        loadTasks(data);
+      })
+      .catch((err) => {
+        console.error(err);
+        loadTasks([]);
+      })
+      .finally(() => setLoadingMsg(''));
+
+  }, [loadTasks, tasksState]);
 
   if (loadingMsg) {
     return <Loading message={loadingMsg} />
