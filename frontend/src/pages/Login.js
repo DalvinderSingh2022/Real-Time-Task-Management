@@ -19,8 +19,8 @@ const Login = () => {
 
         axios.put("http://localhost:4000/api/users/login", user)
             .then(({ data }) => {
-                const { name, email } = data.user;
-                login({ name, email });
+                const { name, email, _id: id } = data.user;
+                login({ name, email, id });
                 localStorage.setItem("jwt", data.token);
                 navigate("/");
             })

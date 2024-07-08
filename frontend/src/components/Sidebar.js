@@ -1,5 +1,6 @@
 import React, { useContext } from 'react';
 import { NavLink } from 'react-router-dom';
+import axios from 'axios';
 
 import { GoHomeFill } from "react-icons/go";
 import { FaUsers } from "react-icons/fa";
@@ -11,11 +12,19 @@ import { RiCloseLine } from "react-icons/ri";
 import { AuthContext } from '../store/AuthContext';
 
 const Sidebar = () => {
-    const { logout } = useContext(AuthContext);
+    const { logout, authState } = useContext(AuthContext);
 
     const handleLogout = () => {
         localStorage.removeItem("jwt");
         logout();
+    }
+
+    const handleDelete = () => {
+        axios.delete(`http://localhost:4000/api/users/${authState.user.id}`)
+            .then(() => handleLogout())
+            .catch((error) => {
+                console.error(error);
+            });
     }
 
     return (
@@ -43,7 +52,7 @@ const Sidebar = () => {
                     <TbLogout />
                     <p>Logout</p>
                 </button>
-                <button className='button flex gap2 link' onClick={handleLogout}>
+                <button className='button flex gap2 link' onClick={handleDelete}>
                     <AiOutlineUserDelete />
                     <p>Delete Account</p>
                 </button>

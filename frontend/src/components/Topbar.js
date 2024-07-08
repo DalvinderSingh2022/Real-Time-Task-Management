@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 
 import { CgMenuRightAlt } from "react-icons/cg";
+
+import { AuthContext } from '../store/AuthContext';
 
 const greeting = () => {
     const currentTime = new Date().getHours();
@@ -12,6 +14,8 @@ const greeting = () => {
 };
 
 const Topbar = () => {
+    const { authState } = useContext(AuthContext);
+
     return (
         <nav className='top_nav flex'>
             <div className="flex gap">
@@ -22,8 +26,8 @@ const Topbar = () => {
             </div>
             <div className="user_profile flex gap2">
                 <div className="flex col">
-                    <div className="name">Dalvinder Singh</div>
-                    <div className="email">dalvindersingh201999@gmail.com</div>
+                    <div className="name">{authState.user.name}</div>
+                    <div className="email">{authState.user.email}</div>
                 </div>
             </div>
         </nav>

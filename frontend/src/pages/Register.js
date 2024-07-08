@@ -6,7 +6,7 @@ import styles from "./../styles/auth.module.css";
 
 import { AuthContext } from '../store/AuthContext';
 
-const Regiter = () => {
+const Register = () => {
     const { authState, login } = useContext(AuthContext);
     const navigate = useNavigate();
 
@@ -20,8 +20,9 @@ const Regiter = () => {
 
         axios.post("http://localhost:4000/api/users/register", user)
             .then(({ data }) => {
-                const { name, email } = data.user;
-                login({ name, email });
+                const { name, email, _id: id } = data.user;
+                console.log(data.user);
+                login({ name, email, id });
                 localStorage.setItem("jwt", data.token);
                 navigate("/");
             })
@@ -85,4 +86,4 @@ const Regiter = () => {
     )
 }
 
-export default Regiter;
+export default Register;

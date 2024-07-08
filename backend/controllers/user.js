@@ -67,4 +67,15 @@ const currentUser = async (req, res) => {
     }
 }
 
-module.exports = { register, login, currentUser };
+const removeUser = async (req, res) => {
+    try {
+        console.log(req.params);
+        await User.deleteOne({ _id: req.params.id });
+
+        return res.status(201).json({ messgae: "Account deleted Succesfully" });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
+module.exports = { register, login, currentUser, removeUser };

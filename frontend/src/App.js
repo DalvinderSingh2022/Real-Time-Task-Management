@@ -28,8 +28,8 @@ const App = () => {
       }
     })
       .then(({ data }) => {
-        const { name, email } = data;
-        login({ name, email });
+        const { name, email, _id: id } = data;
+        login({ name, email, id });
       })
       .catch((err) => {
         console.error(err);
