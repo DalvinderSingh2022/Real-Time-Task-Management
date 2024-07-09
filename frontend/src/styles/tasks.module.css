@@ -4,6 +4,10 @@
     padding-bottom: 1em;
 }
 
+.filters.wrap {
+    flex-wrap: wrap;
+}
+
 .filters input {
     font-size: 1.01em;
     border-radius: 40px;
@@ -21,6 +25,7 @@
     grid-template: auto / repeat(auto-fit, minmax(320px, 1fr));
     background-color: var(--background-color-2);
     gap: 1em;
+    min-height: 75vh;
 }
 
 .container .wrapper {
@@ -99,7 +104,7 @@
 }
 
 @media screen and (max-width:540px) {
-    .filters button {
+    .filters button.round {
         padding: 14px;
     }
 

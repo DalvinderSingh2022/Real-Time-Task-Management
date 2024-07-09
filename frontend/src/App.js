@@ -14,6 +14,7 @@ import Loading from './components/Loading';
 import { AuthContext } from './store/AuthContext';
 import { TasksContext } from './store/TasksContext';
 import { UsersContext } from './store/UsersContext';
+import Users from './pages/Users';
 
 const App = () => {
   const [loadingMsg, setLoadingMsg] = useState('');
@@ -87,8 +88,9 @@ const App = () => {
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
           <Route path='tasks' element={<Tasks />} />
+          <Route path="/users" element={<Users />} />
+          <Route path='*' element={<Notfound />} />
         </Route>
-        <Route path='*' element={<Notfound />} />
       </Routes>
     </BrowserRouter>
   )

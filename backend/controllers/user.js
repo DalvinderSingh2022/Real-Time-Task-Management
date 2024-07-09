@@ -97,12 +97,12 @@ const followUser = async (req, res) => {
     }
 
     try {
-        const userToFollow = await User.findById(userId);
+        const userToFollow = await User.findById(userId).populate(['followers', 'following']);;
         if (!userToFollow) {
             return res.status(404).send({ message: 'User not found' });
         }
 
-        const authUser = await User.findById(authUserId);
+        const authUser = await User.findById(authUserId).populate(['followers', 'following']);;
         if (!authUser) {
             return res.status(404).send({ message: 'Auth user not found' });
         }
@@ -111,16 +111,44 @@ const followUser = async (req, res) => {
             return res.status(400).send({ message: 'Already following this user' });
         }
 
-        authUser.following.push(userId);
+        authUser.following.push(userToFollow);
         await authUser.save();
 
-        userToFollow.followers.push(authUserId);
+        userToFollow.followers.push(authUser);
         await userToFollow.save();
 
-        res.send({ message: 'Followed successfully' });
+        res.json({ message: 'Followed user successfully', data: { authUser, userToFollow } });
     } catch (err) {
-        res.status(500).send({ message: "Internal Server Error" });
+        res.status(500).send({ message: "Error following user" });
     }
 };
 
-module.exports = { register, login, currentUser, removeUser, allUsers, followUser };
+const unfolloweUser = async (req, res) => {
+    try {
+        const userId = req.params.userId;
+        const authUserId = req.body.userId;
+
+        const userToUnfollow = await User.findById(userId).populate(['followers', 'following']);;
+        if (!userToUnfollow) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        const authUser = await User.findById(authUserId).populate(['followers', 'following']);;
+        if (!authUser) {
+            return res.status(404).send({ message: 'Auth user not found' });
+        }
+
+        authUser.following.pull(userId);
+        await authUser.save();
+
+        userToUnfollow.followers.pull(authUserId);
+        await userToUnfollow.save();
+
+        res.json({ message: 'Unfollowed user successfully', data: { authUser, userToUnfollow } });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error unfollowing user' });
+    }
+};
+
+module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser };

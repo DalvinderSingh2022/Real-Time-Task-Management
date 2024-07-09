@@ -1,0 +1,33 @@
+.container {
+    min-height: 75vh;
+    background-color: var(--white);
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1em;
+    padding: 1em 2em;
+    border-radius: 12px;
+}
+
+.wrapper .user {
+    background-color: var(--background-color-1);
+    padding: 1em;
+    height: fit-content;
+    border-radius: 8px;
+    transition: 200ms ease;
+    max-width: 480px;
+    justify-content: space-between;
+}
+
+.wrapper .user:hover {
+    box-shadow: 0 0 24px 4px var(--shadow-color);
+    border-bottom: 1px solid var(--purple-light);
+    transform: scale(1.02);
+}
+
+.wrapper .user button {
+    margin-top: 1em;
+    padding: 4px 16px;
+}

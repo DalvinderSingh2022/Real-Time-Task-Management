@@ -13,6 +13,16 @@ const usersReducer = (state, action) => {
             return { ...state, users: [...state.users, action.payload.user] };
         case 'DELETE_USER':
             return { ...state, users: state.users.filter((user) => user._id !== action.payload.userId) };
+        case 'UPDATE_USER':
+            return {
+                ...state,
+                users: state.users.map((user) => {
+                    if (user._id === action.payload.user._id) {
+                        return { ...state.user, ...action.payload.user };
+                    }
+                    return user;
+                })
+            };
         default:
             return state;
     }
@@ -35,8 +45,12 @@ const UsersProvider = ({ children }) => {
         dispatch({ type: 'DELETE_USER', payload: { userId } });
     };
 
+    const updateUser = (user) => {
+        dispatch({ type: 'UPDATE_USER', payload: { user } });
+    };
+
     return (
-        <UsersContext.Provider value={{ usersState, loadUsers, deleteUser, addUser }}>
+        <UsersContext.Provider value={{ usersState, loadUsers, deleteUser, addUser, updateUser }}>
             {children}
         </UsersContext.Provider>
     );

@@ -294,8 +294,8 @@ main.close .side_nav .link {
     border: 5px solid var(--grey);
     border-bottom-color: var(--purple-light);
     border-radius: 50%;
-    margin: 1em;
-    animation: rotate 500ms infinite linear;
+    margin: 1em auto;
+    animation: rotate 600ms infinite linear;
 }
 
 @keyframes rotate {
