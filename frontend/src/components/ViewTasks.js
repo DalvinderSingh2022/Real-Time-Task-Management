@@ -5,11 +5,11 @@ import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
 
 import { AuthContext } from '../store/AuthContext';
-import { TasksContext } from '../store/TasksContext';
+import { SocketContext } from '../store/SocketContext';
 
 const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy, status, _id }) => {
     const { authState } = useContext(AuthContext);
-    const { updateTask, deleteTask } = useContext(TasksContext);
+    const { socketState } = useContext(SocketContext);
     const [task, setTask] = useState({
         title,
         description,
@@ -29,7 +29,9 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
         e.preventDefault();
 
         axios.put(`http://localhost:4000/api/tasks/${_id}`, task)
-            .then(({ data }) => updateTask(data))
+            .then(({ data }) => {
+                socketState.socket.emit('task_updated', data);
+            })
             .catch((error) => {
                 console.error(error);
             })
@@ -38,7 +40,9 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
     const handelDelete = () => {
         axios.delete(`http://localhost:4000/api/tasks/${_id}`)
-            .then(() => deleteTask(_id))
+            .then(() => {
+                socketState.socket.emit('task_deleted', _id, assignedTo, assignedBy);
+            })
             .catch((error) => {
                 console.error(error);
             })

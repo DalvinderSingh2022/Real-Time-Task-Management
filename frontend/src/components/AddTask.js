@@ -5,11 +5,11 @@ import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
 
 import { AuthContext } from '../store/AuthContext';
-import { TasksContext } from '../store/TasksContext';
+import { SocketContext } from '../store/SocketContext';
 
 const AddTask = ({ remove }) => {
     const { authState } = useContext(AuthContext);
-    const { createTask } = useContext(TasksContext);
+    const { socketState } = useContext(SocketContext);
 
     const handlesubmit = (e) => {
         e.preventDefault();
@@ -23,7 +23,7 @@ const AddTask = ({ remove }) => {
 
         axios.post("http://localhost:4000/api/tasks", task)
             .then(({ data }) => {
-                createTask(data.task);
+                socketState.socket.emit('task_created', data.task);
                 remove();
             })
             .catch((error) => {

@@ -5,9 +5,11 @@ import axios from "axios";
 import styles from "./../styles/auth.module.css";
 
 import { AuthContext } from '../store/AuthContext';
+import { SocketContext } from '../store/SocketContext';
 
 const Login = () => {
-    const { authState, login } = useContext(AuthContext);
+    const { authState } = useContext(AuthContext);
+    const { socketState } = useContext(SocketContext);
     const navigate = useNavigate();
 
     const handlesubmit = (e) => {
@@ -19,8 +21,7 @@ const Login = () => {
 
         axios.put("http://localhost:4000/api/users/login", user)
             .then(({ data }) => {
-                login(data.user);
-                localStorage.setItem("jwt", data.token);
+                socketState.socket.emit("user_connected", data.user, data.token);
                 navigate("/");
             })
             .catch((error) => {

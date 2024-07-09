@@ -12,13 +12,14 @@ import { RiCloseLine } from "react-icons/ri";
 import Logo from "../assects/logo.png";
 
 import { AuthContext } from '../store/AuthContext';
+import { SocketContext } from '../store/SocketContext';
 
 const Sidebar = () => {
-    const { logout, authState } = useContext(AuthContext);
+    const { authState } = useContext(AuthContext);
+    const { socketState } = useContext(SocketContext);
 
     const handleLogout = () => {
-        localStorage.removeItem("jwt");
-        logout();
+        socketState.socket.emit("user_disconnected", authState.user._id);
     }
 
     const handleDelete = () => {
