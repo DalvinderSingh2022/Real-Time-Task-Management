@@ -13,11 +13,13 @@ import Loading from './components/Loading';
 
 import { AuthContext } from './store/AuthContext';
 import { TasksContext } from './store/TasksContext';
+import { UsersContext } from './store/UsersContext';
 
 const App = () => {
   const [loadingMsg, setLoadingMsg] = useState('');
   const { authState, login } = useContext(AuthContext);
   const { tasksState, loadTasks } = useContext(TasksContext);
+  const { usersState, loadUsers } = useContext(UsersContext);
 
   useEffect(() => {
     if (authState.authenticated)
@@ -49,12 +51,29 @@ const App = () => {
         loadTasks(data);
       })
       .catch((err) => {
-        console.error(err);
         loadTasks([]);
+        console.error(err);
       })
       .finally(() => setLoadingMsg(''));
 
   }, [loadTasks, tasksState, authState]);
+
+  useEffect(() => {
+    if (usersState.loaded)
+      return;
+
+    setLoadingMsg("Fetching Users details, please wait...");
+    axios.get("http://localhost:4000/api/users")
+      .then(({ data }) => {
+        loadUsers(data);
+      })
+      .catch((err) => {
+        loadUsers([]);
+        console.error(err);
+      })
+      .finally(() => setLoadingMsg(''));
+
+  }, [usersState, loadUsers]);
 
   if (loadingMsg) {
     return <Loading message={loadingMsg} />
