@@ -52,8 +52,10 @@
     background-color: #3cc66a;
 }
 
-.tasks_container {
+.wrapper .tasks_container {
     padding: 0.5em;
+    align-items: stretch;
+    align-self: stretch;
 }
 
 .tasks_container .task {
@@ -63,8 +65,8 @@
     gap: 4px;
     align-items: stretch;
     background-color: #f1f8ff;
-    border-bottom: 2px solid #6dadf0;
-    transition: all 200ms ease-in-out;
+    border-bottom: 0 solid #6dadf0;
+    transition: transform 200ms ease;
 }
 
 .tasks_container .loading {
@@ -73,7 +75,7 @@
 
 .wrapper:first-child .task {
     background-color: #faf8ff;
-    border-bottom: 2px solid #b6b9bd;
+    border-bottom: 0 solid #b6b9bd;
 }
 
 .wrapper:first-child .loading {
@@ -82,7 +84,7 @@
 
 .wrapper:last-child .task {
     background-color: #e8feef;
-    border-bottom: 2px solid #3cc66a;
+    border-bottom: 0 solid #3cc66a;
 }
 
 .wrapper:last-child .loading {
@@ -98,9 +100,10 @@
     max-height: 100px;
 }
 
-.task:hover {
-    box-shadow: 0 0 24px 8px var(--shadow-color);
-    transform: scale(.98);
+.wrapper .task:hover {
+    box-shadow: 0 0 24px 4px var(--shadow-color);
+    transform: scale(1.02);
+    border-bottom-width: 2px;
 }
 
 @media screen and (max-width:540px) {

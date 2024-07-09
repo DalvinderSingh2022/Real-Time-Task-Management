@@ -5,10 +5,11 @@ const validationHandler = require('../middleware/validationHandler');
 const addTask = async (req, res) => {
     const { title, description, dueDate, assignedBy, assignedTo } = req.body;
 
-    const task = new Task({ title, description, dueDate, assignedTo, assignedBy });
+    const newTask = new Task({ title, description, dueDate, assignedTo, assignedBy });
 
     try {
-        await task.save();
+        await newTask.save();
+        const task = await newTask.populate(['assignedBy', 'assignedTo']);
         return res.status(201).json({ message: 'Task created successfully', task });
     } catch (err) {
         validationHandler(err, res);

@@ -87,7 +87,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                 id='dueDate'
                                 name='dueDate'
                                 placeholder='dueDate'
-                                value={task.dueDate}
+                                value={(task.dueDate).substring(0, 10)}
                                 onChange={e => handlechange(e)}
                             />
                         </div>
@@ -125,7 +125,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                 disabled={authState.user._id !== task.assignedBy._id}
                                 name="assignedTo"
                                 id="assignedTo"
-                                value={task.assignedTo._id}
+                                defaultValue={task.assignedTo._id}
                             >
                                 <option value={authState.user._id}>Self</option>
                                 {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}

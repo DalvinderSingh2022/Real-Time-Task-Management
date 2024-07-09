@@ -24,6 +24,7 @@ const AddTask = ({ remove }) => {
         axios.post("http://localhost:4000/api/tasks", task)
             .then(({ data }) => {
                 createTask(data.task);
+                remove();
             })
             .catch((error) => {
                 console.error(error);
@@ -72,6 +73,7 @@ const AddTask = ({ remove }) => {
                             <select
                                 name="assignedTo"
                                 id="assignedTo"
+                                defaultValue={authState.user._id}
                             >
                                 <option value={authState.user._id}>Self</option>
                                 {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}

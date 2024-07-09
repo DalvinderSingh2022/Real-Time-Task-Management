@@ -20,9 +20,7 @@ const Task = (task) => {
                 <div className={styles.task_assignTo} title={`Assigned To: ${task.assignedTo.name}`}>
                     <span>{task.assignedTo.name}{authState.user._id === task.assignedTo._id ? "(You)" : ""}</span>
                 </div>
-                <span className='flex gap2'>
-                    <LuCalendarClock />{new Date(task.dueDate).toDateString()}
-                </span>
+                <span>{new Date(task.dueDate).toDateString()}</span>
             </div>
         </>
     )
