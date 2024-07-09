@@ -30,8 +30,8 @@ const App = () => {
       }
     })
       .then(({ data }) => {
-        const { name, email, _id: id } = data;
-        login({ name, email, id });
+        const { name, email, _id } = data;
+        login({ name, email, _id });
       })
       .catch((err) => {
         console.error(err);
