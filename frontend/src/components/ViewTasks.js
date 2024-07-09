@@ -10,7 +10,6 @@ import { TasksContext } from '../store/TasksContext';
 const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy, status, _id }) => {
     const { authState } = useContext(AuthContext);
     const { updateTask, deleteTask } = useContext(TasksContext);
-    const [users] = useState([]);
     const [task, setTask] = useState({
         title,
         description,
@@ -126,10 +125,10 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                 disabled={authState.user._id !== task.assignedBy._id}
                                 name="assignedTo"
                                 id="assignedTo"
-                                value={`${task.assignedTo.name} ${authState.user._id === task.assignedTo._id ? "(You)" : ""}`}
+                                value={task.assignedTo._id}
                             >
-                                <option value={task.assignedTo._id}>{task.assignedTo.name}</option>
-                                {users && users.map(user => user._id !== authState.user._id && <option key={user._id} value={user._id}>{user.name}</option>)}
+                                <option value={authState.user._id}>Self</option>
+                                {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
                             </select>
                         </div>
                     </div>

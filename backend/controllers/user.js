@@ -27,7 +27,7 @@ const login = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ email }).populate(['followers', 'following']);
     if (!user) {
         return res.status(401).json({ message: 'Invalid username or password' });
     }
@@ -55,7 +55,7 @@ const currentUser = async (req, res) => {
             return res.status(401).json({ message: "User is not authorized" });
         }
 
-        const user = await User.findById(validUser.id);
+        const user = await User.findById(validUser.id).populate(['followers', 'following']);
         if (!user) {
             return res.status(401).json({ message: 'User is not authorized or token is missing' });
         }
@@ -78,4 +78,49 @@ const removeUser = async (req, res) => {
     }
 };
 
-module.exports = { register, login, currentUser, removeUser };
+const allUsers = async (req, res) => {
+    try {
+        const users = await User.find().populate(['followers', 'following']);
+
+        res.status(200).json(users);
+    } catch (error) {
+        return res.status(500).json(error);
+    }
+}
+
+const followUser = async (req, res) => {
+    const userId = req.params.userId;
+    const authUserId = req.body.userId;
+
+    if (userId === authUserId) {
+        return res.status(400).send({ message: 'you Can`t follow yourself' });
+    }
+
+    try {
+        const userToFollow = await User.findById(userId);
+        if (!userToFollow) {
+            return res.status(404).send({ message: 'User not found' });
+        }
+
+        const authUser = await User.findById(authUserId);
+        if (!authUser) {
+            return res.status(404).send({ message: 'Auth user not found' });
+        }
+
+        if (authUser.following.includes(userId)) {
+            return res.status(400).send({ message: 'Already following this user' });
+        }
+
+        authUser.following.push(userId);
+        await authUser.save();
+
+        userToFollow.followers.push(authUserId);
+        await userToFollow.save();
+
+        res.send({ message: 'Followed successfully' });
+    } catch (err) {
+        res.status(500).send({ message: "Internal Server Error" });
+    }
+};
+
+module.exports = { register, login, currentUser, removeUser, allUsers, followUser };

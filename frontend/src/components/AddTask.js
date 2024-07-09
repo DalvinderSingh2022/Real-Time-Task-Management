@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext } from 'react';
 import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
@@ -10,7 +10,6 @@ import { TasksContext } from '../store/TasksContext';
 const AddTask = ({ remove }) => {
     const { authState } = useContext(AuthContext);
     const { createTask } = useContext(TasksContext);
-    const [users] = useState([]);
 
     const handlesubmit = (e) => {
         e.preventDefault();
@@ -74,8 +73,8 @@ const AddTask = ({ remove }) => {
                                 name="assignedTo"
                                 id="assignedTo"
                             >
-                                <option value={authState.user._id}>You</option>
-                                {users && users.map(user => user._id !== authState.user._id && <option key={user._id} value={user._id}>{user.name}</option>)}
+                                <option value={authState.user._id}>Self</option>
+                                {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
                             </select>
                         </div>
                     </div>
