@@ -20,9 +20,8 @@ const Register = () => {
 
         axios.post("http://localhost:4000/api/users/register", user)
             .then(({ data }) => {
-                const { name, email, _id: id } = data.user;
-                console.log(data.user);
-                login({ name, email, id });
+                const { name, email, _id } = data.user;
+                login({ name, email, _id });
                 localStorage.setItem("jwt", data.token);
                 navigate("/");
             })

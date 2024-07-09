@@ -56,7 +56,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                     <div className={`flex col w_full ${authStyles.group}`}>
                         <label htmlFor="title" className='text_primary'>Title</label>
                         <input
-                            disabled={authState.user.id !== task.assignedBy._id}
+                            disabled={authState.user._id !== task.assignedBy._id}
                             type="text"
                             id='title'
                             name='title'
@@ -68,7 +68,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                     <div className={`flex col w_full ${authStyles.group}`}>
                         <label htmlFor="description" className='text_primary'>Description</label>
                         <textarea
-                            disabled={authState.user.id !== task.assignedBy._id}
+                            disabled={authState.user._id !== task.assignedBy._id}
                             rows='5'
                             cols='5'
                             id='description'
@@ -83,7 +83,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="dueDate" className='text_primary'>DueDate</label>
                             <input
-                                disabled={authState.user.id !== task.assignedBy._id}
+                                disabled={authState.user._id !== task.assignedBy._id}
                                 type='date'
                                 id='dueDate'
                                 name='dueDate'
@@ -96,8 +96,8 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                             <label htmlFor="status" className='text_primary'>Status</label>
                             <select
                                 disabled={
-                                    authState.user.id !== task.assignedBy._id &&
-                                    authState.user.id !== task.assignedTo._id
+                                    authState.user._id !== task.assignedBy._id &&
+                                    authState.user._id !== task.assignedTo._id
                                 }
                                 name="status"
                                 id="status"
@@ -117,25 +117,25 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                 disabled={true}
                                 name="assignedBy"
                                 id="assignedBy"
-                                value={`${task.assignedBy.name} ${authState.user.id === task.assignedBy._id ? "(You)" : ""}`}
+                                value={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
                             />
                         </div>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="assignedTo" className='text_primary'>Assign To</label>
                             <select
-                                disabled={authState.user.id !== task.assignedBy._id}
+                                disabled={authState.user._id !== task.assignedBy._id}
                                 name="assignedTo"
                                 id="assignedTo"
-                                value={`${task.assignedTo.name} ${authState.user.id === task.assignedTo._id ? "(You)" : ""}`}
+                                value={`${task.assignedTo.name} ${authState.user._id === task.assignedTo._id ? "(You)" : ""}`}
                             >
                                 <option value={task.assignedTo._id}>{task.assignedTo.name}</option>
-                                {users && users.map(user => user._id !== authState.user.id && <option key={user._id} value={user._id}>{user.name}</option>)}
+                                {users && users.map(user => user._id !== authState.user._id && <option key={user._id} value={user._id}>{user.name}</option>)}
                             </select>
                         </div>
                     </div>
 
                     <div className={`flex gap ${modalStyles.group}`}>
-                        {authState.user.id === task.assignedBy._id &&
+                        {authState.user._id === task.assignedBy._id &&
                             <button type='button' className={`button ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete</button>
                         }
                         <button type='submit' className={`button primary ${authStyles.submit_button}`}>Save</button>

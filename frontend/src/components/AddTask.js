@@ -19,7 +19,7 @@ const AddTask = ({ remove }) => {
             description: e.target.description.value,
             dueDate: e.target.dueDate.value,
             assignedTo: e.target.assignedTo.value,
-            assignedBy: authState.user.id
+            assignedBy: authState.user._id
         }
 
         axios.post("http://localhost:4000/api/tasks", task)
@@ -74,8 +74,8 @@ const AddTask = ({ remove }) => {
                                 name="assignedTo"
                                 id="assignedTo"
                             >
-                                <option value={authState.user.id}>You</option>
-                                {users && users.map(user => user._id !== authState.user.id && <option key={user._id} value={user._id}>{user.name}</option>)}
+                                <option value={authState.user._id}>You</option>
+                                {users && users.map(user => user._id !== authState.user._id && <option key={user._id} value={user._id}>{user.name}</option>)}
                             </select>
                         </div>
                     </div>

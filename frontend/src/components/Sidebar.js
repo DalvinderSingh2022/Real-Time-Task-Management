@@ -22,7 +22,7 @@ const Sidebar = () => {
     }
 
     const handleDelete = () => {
-        axios.delete(`http://localhost:4000/api/users/${authState.user.id}`)
+        axios.delete(`http://localhost:4000/api/users/${authState.user._id}`)
             .then(() => handleLogout())
             .catch((error) => {
                 console.error(error);
