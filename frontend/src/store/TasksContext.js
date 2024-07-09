@@ -10,9 +10,19 @@ const tasksReducer = (state, action) => {
         case 'LOAD_TASKS':
             return { tasks: action.payload.tasks, loaded: true }
         case 'CREATE_TASK':
-            return { tasks: [...state.tasks, action.payload.task] };
+            return { ...state, tasks: [...state.tasks, action.payload.task] };
         case 'DELETE_TASK':
-            return { tasks: state.tasks.filter((task) => task.id !== action.payload.taskId) };
+            return { ...state, tasks: state.tasks.filter((task) => task._id !== action.payload.taskId) };
+        case 'UPDATE_TASK':
+            return {
+                ...state,
+                tasks: state.tasks.map((task) => {
+                    if (task._id === action.payload.task._id) {
+                        return { ...state.tasks, ...action.payload.task };
+                    }
+                    return task;
+                })
+            };
         default:
             return state;
     }
@@ -35,8 +45,12 @@ const TasksProvider = ({ children }) => {
         dispatch({ type: 'DELETE_TASK', payload: { taskId } });
     };
 
+    const updateTask = (task) => {
+        dispatch({ type: 'UPDATE_TASK', payload: { task } });
+    };
+
     return (
-        <TasksContext.Provider value={{ tasksState, createTask, deleteTask, loadTasks }}>
+        <TasksContext.Provider value={{ tasksState, createTask, deleteTask, loadTasks, updateTask }}>
             {children}
         </TasksContext.Provider>
     );

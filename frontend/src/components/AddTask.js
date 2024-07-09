@@ -74,12 +74,13 @@ const AddTask = ({ remove }) => {
                                 name="assignedTo"
                                 id="assignedTo"
                             >
-                                {users && users.map(user => user.id !== authState.user.id && <option key={user.id} value={user.id}>{user.name}</option>)}
+                                <option value={authState.user.id}>You</option>
+                                {users && users.map(user => user._id !== authState.user.id && <option key={user._id} value={user._id}>{user.name}</option>)}
                             </select>
                         </div>
                     </div>
                     <div className={`flex gap ${modalStyles.group}`}>
-                        <button type='submit' className={`button primary ${authStyles.submit_button}`}>Save</button>
+                        <button type='submit' className={`button primary ${authStyles.submit_button}`}>Add</button>
                         <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                     </div>
                 </form>

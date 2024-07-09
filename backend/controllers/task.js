@@ -17,7 +17,12 @@ const addTask = async (req, res) => {
 
 const allTasks = async (req, res) => {
     try {
-        const tasks = await Task.find().populate(['assignedBy', 'assignedTo']);
+        const tasks = await Task.find({
+            $or: [
+                { assignedTo: req.params.userId },
+                { assignedBy: req.params.userId }
+            ]
+        }).populate(['assignedBy', 'assignedTo']);
 
         res.status(200).json(tasks);
     } catch (error) {
@@ -46,7 +51,7 @@ const updateTask = async (req, res) => {
         req.params.id,
         req.body,
         { new: true }
-    );
+    ).populate(['assignedBy', 'assignedTo']);
 
     return res.status(200).json(updatedTask);
 };

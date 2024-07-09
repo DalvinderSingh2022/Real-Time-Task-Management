@@ -41,11 +41,11 @@ const App = () => {
   }, [login, authState]);
 
   useEffect(() => {
-    if (tasksState.loaded)
+    if (!authState.authenticated || tasksState.loaded)
       return;
 
     setLoadingMsg("Fetching your tasks, please wait...");
-    axios.get("http://localhost:4000/api/tasks")
+    axios.get(`http://localhost:4000/api/tasks/${authState.user._id}`)
       .then(({ data }) => {
         loadTasks(data);
       })
@@ -55,7 +55,7 @@ const App = () => {
       })
       .finally(() => setLoadingMsg(''));
 
-  }, [loadTasks, tasksState]);
+  }, [loadTasks, tasksState, authState]);
 
   if (loadingMsg) {
     return <Loading message={loadingMsg} />

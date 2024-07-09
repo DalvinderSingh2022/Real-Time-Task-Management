@@ -7,3 +7,9 @@
 .group {
     align-self: flex-end;
 }
+
+button.delete_button {
+    background-color: var(--red);
+    color: var(--white);
+    border-color: var(--red);
+}

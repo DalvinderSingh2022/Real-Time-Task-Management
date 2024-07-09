@@ -56,6 +56,14 @@ form :where(input, textarea, select) {
     border-radius: 12px;
 }
 
+form :where(input, textarea, select):disabled {
+    background-color: var(--white);
+    border: none;
+    font-weight: 500;
+    font-size: 1.01em;
+    padding: 0;
+}
+
 form :where(input:not(:disabled), textarea, select):focus {
     border-color: var(--grey);
     border-bottom-color: var(--purple-light);
