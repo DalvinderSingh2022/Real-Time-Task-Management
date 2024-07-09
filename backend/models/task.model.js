@@ -20,10 +20,12 @@ const taskSchema = new mongoose.Schema({
     assignedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        required: [true, 'Assigning User is required']
     },
-    completed: {
-        type: Boolean,
-        default: false
+    status: {
+        type: String,
+        enum: ["Not Started", "In Progress", "Completed"],
+        default: "Not Started"
     }
 }, {
     timestamps: true

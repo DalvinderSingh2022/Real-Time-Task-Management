@@ -16,9 +16,7 @@ const Layout = () => {
         <main>
             <Sidebar />
             <Topbar />
-            <article>
-                <Outlet />
-            </article>
+            <Outlet />
         </main>
     )
 }

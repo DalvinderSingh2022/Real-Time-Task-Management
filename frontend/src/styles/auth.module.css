@@ -1,5 +1,5 @@
 .container {
-    background-color: var(--white);
+    background-color: var(--background-color-1);
     border-radius: 8px;
     padding: 4em 1em;
     width: min(420px, 100%);

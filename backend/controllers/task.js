@@ -3,9 +3,9 @@ const Task = require('../models/task.model');
 const validationHandler = require('../middleware/validationHandler');
 
 const addTask = async (req, res) => {
-    const { title, description, dueDate, assignto, assignby } = req.body;
+    const { title, description, dueDate, assignedBy, assignedTo } = req.body;
 
-    const task = new Task({ title, description, dueDate, assignto, assignby });
+    const task = new Task({ title, description, dueDate, assignedTo, assignedBy });
 
     try {
         await task.save();
@@ -17,9 +17,9 @@ const addTask = async (req, res) => {
 
 const allTasks = async (req, res) => {
     try {
-        const projects = await Task.find();
+        const tasks = await Task.find().populate(['assignedBy', 'assignedTo']);
 
-        res.status(200).json(projects);
+        res.status(200).json(tasks);
     } catch (error) {
         return res.status(500).json(error);
     }

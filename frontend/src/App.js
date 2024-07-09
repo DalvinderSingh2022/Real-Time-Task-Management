@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Notfound from './pages/NotFound';
 import Login from './pages/Login';
 import Home from './pages/Home';
+import Tasks from './pages/Tasks';
 
 import Layout from './components/Layout';
 import Loading from './components/Loading';
@@ -67,6 +68,7 @@ const App = () => {
         <Route path='/register' element={<Register />} />
         <Route path='/' element={<Layout />}>
           <Route index element={<Home />} />
+          <Route path='tasks' element={<Tasks />} />
         </Route>
         <Route path='*' element={<Notfound />} />
       </Routes>
