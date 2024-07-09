@@ -1,4 +1,5 @@
 import { AuthProvider } from './AuthContext';
+import { SocketProvider } from './SocketContext';
 import { TasksProvider } from './TasksContext';
 import { UsersProvider } from './UsersContext';
 
@@ -7,7 +8,9 @@ const AppProvider = ({ children }) => {
         <AuthProvider>
             <UsersProvider>
                 <TasksProvider>
-                    {children}
+                    <SocketProvider>
+                        {children}
+                    </SocketProvider>
                 </TasksProvider>
             </UsersProvider>
         </AuthProvider>
