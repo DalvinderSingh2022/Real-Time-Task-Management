@@ -11,7 +11,7 @@ const TaskSection = ({ tasks, status }) => {
             <div className={`flex col gap ${styles.tasks_container}`}>
                 {tasks?.length > 0
                     ? tasks.map(task => <Task {...task} key={task._id} />)
-                    : (tasks?.length !== 0 ? <div className="loading"></div> : <div>There is no task</div>)}
+                    : (tasks?.length !== 0 ? <div className={`loading ${styles.loading}`}></div> : <div>There is no task</div>)}
             </div>
         </section>
     )

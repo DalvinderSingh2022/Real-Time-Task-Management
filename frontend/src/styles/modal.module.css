@@ -1,0 +1,9 @@
+.container {
+    padding: 2em 2em 0;
+    border-bottom: 2px solid var(--purple-light);
+    max-width: calc(100% - 3em);
+}
+
+.group {
+    align-self: flex-end;
+}

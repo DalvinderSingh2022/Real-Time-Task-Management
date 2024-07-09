@@ -1,3 +1,21 @@
+.filters {
+    display: flex;
+    gap: 1em;
+    padding-bottom: 1em;
+}
+
+.filters input {
+    font-size: 1.01em;
+    border-radius: 40px;
+    width: min(360px, 100%);
+    padding-inline: 18px;
+}
+
+.filters button {
+    text-wrap: nowrap;
+    font-size: 1.01em;
+}
+
 .container {
     display: grid;
     grid-template: auto / repeat(auto-fit, minmax(320px, 1fr));
@@ -34,14 +52,18 @@
 }
 
 .tasks_container .task {
-    background-color: #f1f8ff;
     border-radius: 12px;
     padding: 12px;
     cursor: pointer;
     gap: 4px;
     align-items: stretch;
+    background-color: #f1f8ff;
     border-bottom: 2px solid #6dadf0;
     transition: all 200ms ease-in-out;
+}
+
+.tasks_container .loading {
+    border-bottom-color: #6dadf0;
 }
 
 .wrapper:first-child .task {
@@ -49,9 +71,17 @@
     border-bottom: 2px solid #b6b9bd;
 }
 
+.wrapper:first-child .loading {
+    border-bottom-color: #b6b9bd;
+}
+
 .wrapper:last-child .task {
     background-color: #e8feef;
     border-bottom: 2px solid #3cc66a;
+}
+
+.wrapper:last-child .loading {
+    border-bottom-color: #3cc66a;
 }
 
 .task_title {
@@ -66,4 +96,14 @@
 .task:hover {
     box-shadow: 0 0 24px 8px var(--shadow-color);
     transform: scale(.98);
+}
+
+@media screen and (max-width:540px) {
+    .filters button {
+        padding: 14px;
+    }
+
+    .filters button span {
+        display: none;
+    }
 }
