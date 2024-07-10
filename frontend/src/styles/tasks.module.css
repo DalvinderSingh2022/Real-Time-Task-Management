@@ -53,7 +53,7 @@
 }
 
 .wrapper .tasks_container {
-    padding: 1em 0.5em;
+    padding: 0.5em;
     align-items: stretch;
     align-self: stretch;
 }
@@ -65,7 +65,7 @@
     gap: 4px;
     align-items: stretch;
     background-color: #f1f8ff;
-    border-bottom: 0 solid #6dadf0;
+    border-bottom: 2px solid #6dadf0;
     transition: transform 200ms ease;
     max-width: 420px;
 }
@@ -125,7 +125,7 @@
 .tasks_container .task:hover {
     box-shadow: 0 0 14px 2px var(--shadow-color);
     transform: scale(1.01);
-    border-bottom-width: 2px;
+    border-radius: 6px;
 }
 
 @media screen and (max-width:540px) {

@@ -18,7 +18,7 @@ const Home = () => {
     const [progress, setProgress] = useState(0);
     const [completed, setCompleted] = useState(0);
     const [bySelf, setBySelf] = useState(0);
-    const [byFollowers, setByFollowers] = useState(0);
+    const [byOthers, setByOthers] = useState(0);
 
     useEffect(() => {
         setNotStarted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted').length);
@@ -27,7 +27,7 @@ const Home = () => {
 
 
         setBySelf(tasksState.tasks.filter(task => task.assignedBy._id === authState.user._id).length);
-        setByFollowers(tasksState.tasks.filter(task => task.assignedBy._id !== authState.user._id).length);
+        setByOthers(tasksState.tasks.filter(task => task.assignedBy._id !== authState.user._id).length);
     }, [tasksState, authState]);
 
     const navigate = useNavigate();
@@ -69,7 +69,7 @@ const Home = () => {
             <section className={styles.graph}>
                 <header>
                     <h2 className='text_primary'>Tasks</h2>
-                    <h4 className='text_secondary'>Task Assigned by Followering</h4>
+                    <h4 className='text_secondary'>Task Allocation by users</h4>
                 </header>
                 <div className={`flex col gap ${styles.graph_wrapper}`}>
                     <div className="total">
@@ -77,8 +77,8 @@ const Home = () => {
                         <h4>Total</h4>
                     </div>
                     <div className={`flex ${styles.graph_bar}`}>
-                        <div className={styles.bar_child} style={{ width: `${(bySelf / (bySelf + byFollowers)) * 100}%`, backgroundColor: 'var(--purple-light)' }}></div>
-                        <div className={styles.bar_child} style={{ width: `${(byFollowers / (byFollowers + bySelf)) * 100}%`, backgroundColor: 'var(--purple-dark)' }}></div>
+                        <div className={styles.bar_child} style={{ width: `${(bySelf / (bySelf + byOthers)) * 100}%`, backgroundColor: 'var(--purple-light)' }}></div>
+                        <div className={styles.bar_child} style={{ width: `${(byOthers / (byOthers + bySelf)) * 100}%`, backgroundColor: 'var(--purple-dark)' }}></div>
                     </div>
                     <div className={`flex col gap2`}>
                         <div className={`flex gap2 ${styles.legend}`}>
@@ -87,7 +87,7 @@ const Home = () => {
                         </div>
                         <div className={`flex gap2 ${styles.legend}`}>
                             <div style={{ backgroundColor: 'var(--purple-dark)' }}></div>
-                            <span>Following : {byFollowers}</span>
+                            <span>Others : {byOthers}</span>
                         </div>
                     </div>
                 </div>

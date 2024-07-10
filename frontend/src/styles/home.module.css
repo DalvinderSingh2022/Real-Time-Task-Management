@@ -9,6 +9,7 @@
     border-radius: 8px;
     background-color: var(--background-color-1);
     padding: 1em;
+    box-shadow: 0 0 24px 2px var(--shadow-color);
 }
 
 .article .header {
@@ -40,7 +41,7 @@
 }
 
 .graph .graph_wrapper .graph_total {
-    font-size: 2.4em;
+    font-size: 2.8em;
     font-weight: bold;
     line-height: .9em;
 }
@@ -63,6 +64,10 @@
 .article .tasks .tasks_wrapper {
     align-items: stretch;
     padding-top: 1em;
+}
+
+.article .tasks .tasks_wrapper div {
+    cursor: default;
 }
 
 .article .followers {
