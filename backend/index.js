@@ -23,32 +23,24 @@ app.use(routes);
 io.on("connection", (socket) => {
     console.log("user connected : " + socket.id);
 
-    socket.on('user_followed', (authUser, userToFollow) => {
-        io.emit('user_followed', authUser, userToFollow);
+    socket.on('user_followed', (authUser, userToFollow, message) => {
+        io.emit('user_followed', authUser, userToFollow, message);
     });
 
-    socket.on('user_unfollowed', (authUser, userToUnfollow) => {
-        io.emit('user_unfollowed', authUser, userToUnfollow);
+    socket.on('user_unfollowed', (authUser, userToUnfollow, message) => {
+        io.emit('user_unfollowed', authUser, userToUnfollow, message);
     });
 
-    socket.on('task_created', (task) => {
-        io.emit('task_created', task);
+    socket.on('task_created', (task, message) => {
+        io.emit('task_created', task, message);
     });
 
-    socket.on('task_updated', (task) => {
-        io.emit('task_updated', task);
+    socket.on('task_updated', (task, message) => {
+        io.emit('task_updated', task, message);
     });
 
-    socket.on('task_deleted', (taskId, assignedTo, assignedBy) => {
-        io.emit('task_deleted', taskId, assignedTo, assignedBy);
-    });
-
-    socket.on('user_disconnected', (userId) => {
-        socket.emit('user_disconnected', userId);
-    });
-
-    socket.on('user_connected', (user, token) => {
-        socket.emit('user_connected', user, token);
+    socket.on('task_deleted', (taskId, assignedTo, assignedBy, message) => {
+        io.emit('task_deleted', taskId, assignedTo, assignedBy, message);
     });
 
     socket.on("disconnect", () => {

@@ -53,7 +53,7 @@ const login = async (req, res) => {
 
         return res.status(200).json({ message: 'Logged in successfully', user, token });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -83,7 +83,7 @@ const currentUser = async (req, res) => {
         return res.status(200).json({ message: "Current user data fetched successfully", user });
 
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -95,7 +95,7 @@ const removeUser = async (req, res) => {
 
         return res.status(201).json({ messgae: "Account deleted successfully" });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -109,7 +109,7 @@ const allUsers = async (req, res) => {
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 }
 
@@ -146,7 +146,7 @@ const followUser = async (req, res) => {
 
         res.json({ message: 'Followed user successfully', authUser, userToFollow });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -184,7 +184,7 @@ const unfolloweUser = async (req, res) => {
 
         res.json({ message: 'Unfollowed user successfully', authUser, userToUnfollow });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 

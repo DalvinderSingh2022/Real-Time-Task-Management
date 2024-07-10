@@ -4,10 +4,13 @@ import axios from "axios";
 
 import styles from "./../styles/auth.module.css";
 
+import Toast from '../components/Toast';
 import { AuthContext } from '../store/AuthContext';
+import { AppContext } from '../store/AppContext';
 
 const Register = () => {
     const { authState, login } = useContext(AuthContext);
+    const { addToast } = useContext(AppContext);
     const navigate = useNavigate();
 
     const handlesubmit = (e) => {
@@ -25,6 +28,7 @@ const Register = () => {
                 navigate("/");
             })
             .catch((error) => {
+                addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
             });
     }
@@ -35,52 +39,55 @@ const Register = () => {
     }
 
     return (
-        <div className="flex full_container">
-            <section className={`flex col gap ${styles.container}`}>
-                <div>
-                    <div className={`w_full text_primary ${styles.heading}`}>Welcome</div>
-                    <div className={`w_full text_secondary ${styles.sub_heading}`}>Please enter your details.</div>
-                </div>
-                <form className={`flex col gap w_full ${styles.form}`} onSubmit={(e) => handlesubmit(e)}>
-                    <div className={`flex col w_full ${styles.group}`}>
-                        <label htmlFor="name" className='text_primary'>Name</label>
-                        <input
-                            type="text"
-                            id='name'
-                            name='name'
-                            placeholder='batman'
-                        />
+        <>
+            <Toast />
+            <div className="flex full_container">
+                <section className={`flex col gap ${styles.container}`}>
+                    <div>
+                        <div className={`w_full text_primary ${styles.heading}`}>Welcome</div>
+                        <div className={`w_full text_secondary ${styles.sub_heading}`}>Please enter your details.</div>
                     </div>
-                    <div className={`flex col w_full ${styles.group}`}>
-                        <label htmlFor="email" className='text_primary'>Email</label>
-                        <input
-                            type="email"
-                            id='email'
-                            name='email'
-                            placeholder='exapmle@domain.com'
-                        />
-                    </div>
-                    <div className={`flex col w_full ${styles.group}`}>
-                        <label htmlFor="password" className='text_primary'>Password</label>
-                        <input
-                            type="password"
-                            id='password'
-                            name='password'
-                            placeholder='12345678'
-                        />
-                    </div>
+                    <form className={`flex col gap w_full ${styles.form}`} onSubmit={(e) => handlesubmit(e)}>
+                        <div className={`flex col w_full ${styles.group}`}>
+                            <label htmlFor="name" className='text_primary'>Name</label>
+                            <input
+                                type="text"
+                                id='name'
+                                name='name'
+                                placeholder='batman'
+                            />
+                        </div>
+                        <div className={`flex col w_full ${styles.group}`}>
+                            <label htmlFor="email" className='text_primary'>Email</label>
+                            <input
+                                type="email"
+                                id='email'
+                                name='email'
+                                placeholder='exapmle@domain.com'
+                            />
+                        </div>
+                        <div className={`flex col w_full ${styles.group}`}>
+                            <label htmlFor="password" className='text_primary'>Password</label>
+                            <input
+                                type="password"
+                                id='password'
+                                name='password'
+                                placeholder='12345678'
+                            />
+                        </div>
 
-                    <div className={`flex col w_full ${styles.group}`}>
-                        <button type='submit' className={`button primary ${styles.submit_button}`}>Register</button>
-                    </div>
+                        <div className={`flex col w_full ${styles.group}`}>
+                            <button type='submit' className={`button primary ${styles.submit_button}`}>Register</button>
+                        </div>
 
-                    <div className={styles.link}>
-                        Already have an account?
-                        <Link className={styles.submit_button} to='/login'>login</Link>
-                    </div>
-                </form>
-            </section>
-        </div>
+                        <div className={styles.link}>
+                            Already have an account?
+                            <Link className={styles.submit_button} to='/login'>login</Link>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </>
     )
 }
 

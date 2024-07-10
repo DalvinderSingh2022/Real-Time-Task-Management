@@ -12,20 +12,22 @@ import { RiCloseLine } from "react-icons/ri";
 import Logo from "../assects/logo.png";
 
 import { AuthContext } from '../store/AuthContext';
-import { SocketContext } from '../store/SocketContext';
+import { AppContext } from '../store/AppContext';
 
 const Sidebar = () => {
-    const { authState } = useContext(AuthContext);
-    const { socketState } = useContext(SocketContext);
+    const { authState, logout } = useContext(AuthContext);
+    const { addToast } = useContext(AppContext);
 
-    const handleLogout = () => {
-        socketState.socket.emit("user_disconnected", authState.user._id);
+    const handleLogout = (message) => {
+        localStorage.removeItem("jwt");
+        logout();
     }
 
     const handleDelete = () => {
         axios.delete(`http://localhost:4000/api/users/${authState.user._id}`)
-            .then(() => handleLogout())
+            .then(({ data }) => handleLogout(data.message))
             .catch((error) => {
+                addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
             });
     }

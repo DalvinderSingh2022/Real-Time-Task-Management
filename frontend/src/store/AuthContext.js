@@ -2,15 +2,18 @@ import { createContext, useReducer } from 'react';
 
 const initialState = {
     user: {},
-    authenticated: false
+    authenticated: false,
+    verified: false,
 };
 
 const authReducer = (state, action) => {
     switch (action.type) {
         case 'LOGIN':
-            return { user: action.payload.user, authenticated: true };
+            return { user: action.payload.user, authenticated: true, verified: true };
         case 'LOGOUT':
-            return { user: null, authenticated: false };
+            return { user: null, authenticated: false, verified: false };
+        case 'VERIFY':
+            return { ...state, verified: true };
         default:
             return state;
     }
@@ -29,8 +32,12 @@ const AuthProvider = ({ children }) => {
         dispatch({ type: 'LOGOUT' });
     };
 
+    const verify = () => {
+        dispatch({ type: 'VERIFY' });
+    };
+
     return (
-        <AuthContext.Provider value={{ authState, login, logout }}>
+        <AuthContext.Provider value={{ authState, login, logout, verify }}>
             {children}
         </AuthContext.Provider>
     );

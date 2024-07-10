@@ -53,11 +53,11 @@ const Tasks = () => {
                 </button>
             </form>
             <div className={styles.container}>
-               <DragAndDropProvider>
+                <DragAndDropProvider>
                     <TaskSection tasks={notStarted} status={'Not Started'} />
                     <TaskSection tasks={progress} status={'In Progress'} />
                     <TaskSection tasks={completed} status={'Completed'} />
-               </DragAndDropProvider>
+                </DragAndDropProvider>
             </div>
         </article>
     )

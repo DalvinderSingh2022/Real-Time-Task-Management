@@ -5,10 +5,12 @@ import styles from '../styles/users.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
+import { AppContext } from '../store/AppContext';
 
 const User = ({ name, followers, _id }) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
+    const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
 
     useEffect(() => {
@@ -20,9 +22,10 @@ const User = ({ name, followers, _id }) => {
     const handleFollow = () => {
         axios.post(`http://localhost:4000/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_followed', data.authUser, data.userToFollow);
+                socketState.socket.emit('user_followed', data.authUser, data.userToFollow, data.message);
             })
             .catch((error) => {
+                addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
             });
     }
@@ -30,9 +33,10 @@ const User = ({ name, followers, _id }) => {
     const handleUnfollow = () => {
         axios.post(`http://localhost:4000/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
+                socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow, data.message);
             })
             .catch((error) => {
+                addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
             });
     }

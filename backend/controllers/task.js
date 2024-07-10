@@ -34,7 +34,7 @@ const allTasks = async (req, res) => {
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -47,7 +47,7 @@ const removeTask = async (req, res) => {
 
         return res.status(201).json({ message: "Task deleted Succesfully" });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 
@@ -70,7 +70,7 @@ const updateTask = async (req, res) => {
 
         return res.status(200).json({ message: 'Task updated successfully', updatedTask });
     } catch (error) {
-        return res.status(500).json({ message: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 

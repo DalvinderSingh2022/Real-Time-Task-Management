@@ -24,6 +24,7 @@
     --green: #83c788;
     --yellow: #ffcf73;
     --red: #F45252;
+    --blue: #549be6;
 }
 
 body {
@@ -297,6 +298,66 @@ main.close .side_nav .link {
     margin: 1em auto;
     animation: rotate 600ms infinite linear;
 }
+
+.notifications {
+    position: fixed;
+    top: 60px;
+    right: 40px;
+    z-index: 999;
+}
+
+.notifications .toast {
+    position: relative;
+    padding: 10px;
+    color: var(--text);
+    border-radius: 8px;
+    background-color: var(--background-color-1);
+    --color: var(--green);
+    gap: 1.2em;
+}
+
+.toast .type {
+    font-size: 1.2em;
+    line-height: .9em;
+    font-weight: 400;
+    text-transform: capitalize;
+}
+
+.toast span {
+    color: var(--color);
+    font-size: 1.6em;
+    cursor: pointer;
+}
+
+.toast.error {
+    --color: var(--red);
+}
+
+.toast.warning {
+    --color: var(--yellow);
+}
+
+.toast.info {
+    --color: var(--blue);
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    height: 4px;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--color);
+    animation: toast 3s ease forwards;
+}
+
+@keyframes toast {
+    100% {
+        width: 0;
+    }
+}
+
 
 @keyframes rotate {
     from {

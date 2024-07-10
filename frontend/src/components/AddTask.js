@@ -6,10 +6,12 @@ import modalStyles from "../styles/modal.module.css";
 
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
+import { AppContext } from '../store/AppContext';
 
 const AddTask = ({ remove }) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
+    const { addToast } = useContext(AppContext);
 
     const handlesubmit = (e) => {
         e.preventDefault();
@@ -23,10 +25,11 @@ const AddTask = ({ remove }) => {
 
         axios.post("http://localhost:4000/api/tasks", task)
             .then(({ data }) => {
-                socketState.socket.emit('task_created', data.task);
+                socketState.socket.emit('task_created', data.task, data.message);
                 remove();
             })
             .catch((error) => {
+                addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
             });
     }
