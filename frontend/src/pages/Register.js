@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
@@ -7,10 +7,12 @@ import styles from "./../styles/auth.module.css";
 import Toast from '../components/Toast';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
+import Response from '../components/Response';
 
 const Register = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
+    const [response, setResponse] = useState(false);
     const navigate = useNavigate();
 
     const handlesubmit = (e) => {
@@ -21,6 +23,7 @@ const Register = () => {
             password: e.target.password.value
         }
 
+        setResponse(true);
         axios.post("http://localhost:4000/api/users/register", user)
             .then(({ data }) => {
                 login(data.user);
@@ -30,7 +33,8 @@ const Register = () => {
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
-            });
+            })
+            .finally(() => setResponse(false));
     }
 
 
@@ -41,6 +45,7 @@ const Register = () => {
     return (
         <>
             <Toast />
+            {response && <Response />}
             <div className="flex full_container">
                 <section className={`flex col gap ${styles.container}`}>
                     <div>

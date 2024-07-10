@@ -2,8 +2,10 @@ import React, { useContext, useState } from 'react';
 
 import styles from "../styles/tasks.module.css";
 
-import { AuthContext } from '../store/AuthContext';
 import ViewTask from './ViewTasks';
+import Response from './Response';
+
+import { AuthContext } from '../store/AuthContext';
 import { DragAndDropContext } from '../store/DragAndDropContext';
 
 const Task = (task) => {
@@ -14,6 +16,7 @@ const Task = (task) => {
     return (
         <>
             {view && <ViewTask {...task} remove={() => setView(false)} />}
+            {context?.response && <Response />}
             <div
                 draggable={!!context?.setTask}
                 onDragStart={() => context?.setTask(task)}

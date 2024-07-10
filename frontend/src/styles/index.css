@@ -331,7 +331,7 @@ main.close .side_nav .link {
     position: fixed;
     top: 60px;
     right: 40px;
-    z-index: 999;
+    z-index: 9999;
 }
 
 .notifications .toast {
@@ -342,6 +342,7 @@ main.close .side_nav .link {
     background-color: var(--background-color-1);
     --color: var(--green);
     gap: 1.2em;
+    max-width: 340px;
 }
 
 .toast .type {
@@ -378,6 +379,20 @@ main.close .side_nav .link {
     width: 100%;
     background-color: var(--color);
     animation: toast 3s ease forwards;
+}
+
+.response {
+    z-index: 9999;
+    align-items: flex-start;
+    backdrop-filter: blur(1px);
+}
+
+.response div {
+    background-color: var(--background-color-1);
+    padding: 1em 1.5em;
+    border-radius: 0 0 8px 8px;
+    font-weight: 500;
+    border-bottom: 2px solid var(--purple-light);
 }
 
 @keyframes toast {

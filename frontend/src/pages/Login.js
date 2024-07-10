@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
 import styles from "./../styles/auth.module.css";
 
 import Toast from '../components/Toast';
+import Response from '../components/Response';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
@@ -12,6 +13,7 @@ import { AppContext } from '../store/AppContext';
 const Login = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
+    const [response, setResponse] = useState(false);
     const navigate = useNavigate();
 
     const handlesubmit = (e) => {
@@ -21,6 +23,8 @@ const Login = () => {
             password: e.target.password.value
         }
 
+
+        setResponse(true);
         axios.put("http://localhost:4000/api/users/login", user)
             .then(({ data }) => {
                 login(data.user);
@@ -31,7 +35,8 @@ const Login = () => {
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
-            });
+            })
+            .finally(() => setResponse(false));
     }
 
     if (authState.authenticated) {
@@ -41,6 +46,7 @@ const Login = () => {
     return (
         <>
             <Toast />
+            {response && <Response />}
             <div className="flex full_container">
                 <section className={`flex col gap ${styles.container}`}>
                     <div>

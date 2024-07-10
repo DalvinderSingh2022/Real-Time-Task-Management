@@ -6,12 +6,14 @@ import styles from '../styles/users.module.css';
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
+import Response from './Response';
 
 const User = ({ name, followers, _id }) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
+    const [response, setResponse] = useState(false);
 
     useEffect(() => {
         if (authState.authenticated) {
@@ -27,7 +29,8 @@ const User = ({ name, followers, _id }) => {
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
-            });
+            })
+            .finally(() => setResponse(false));
     }
 
     const handleUnfollow = () => {
@@ -38,21 +41,25 @@ const User = ({ name, followers, _id }) => {
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
-            });
+            })
+            .finally(() => setResponse(false));
     }
 
     return (
-        <div className={`flex ${styles.user}`}>
-            <div>
-                <div className='text_primary'>{name}</div>
-                <div className='text_secondary'>Followers: {followers.length}</div>
+        <>
+            {response && <Response />}
+            <div className={`flex ${styles.user}`}>
+                <div>
+                    <div className='text_primary'>{name}</div>
+                    <div className='text_secondary'>Followers: {followers.length}</div>
+                </div>
+                {authState.user._id !== _id &&
+                    (following
+                        ? <button className='button secondary' onClick={handleUnfollow}>Unfollow</button>
+                        : <button className='button primary' onClick={handleFollow}>follow</button>
+                    )}
             </div>
-            {authState.user._id !== _id &&
-                (following
-                    ? <button className='button secondary' onClick={handleUnfollow}>Unfollow</button>
-                    : <button className='button primary' onClick={handleFollow}>follow</button>
-                )}
-        </div>
+        </>
     )
 }
 
