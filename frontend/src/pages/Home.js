@@ -45,8 +45,8 @@ const Home = () => {
                         <h4>Total</h4>
                     </div>
                     <div className={`flex ${styles.graph_bar}`}>
-                        <div className={styles.bar_child} style={{ width: `${(completed / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--blue)' }}></div>
-                        <div className={styles.bar_child} style={{ width: `${(progress / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--green)' }}></div>
+                        <div className={styles.bar_child} style={{ width: `${(completed / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--green)' }}></div>
+                        <div className={styles.bar_child} style={{ width: `${(progress / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--blue)' }}></div>
                         <div className={styles.bar_child} style={{ width: `${(notStarted / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--grey)' }}></div>
                     </div>
                     <div className={`flex col gap2`}>
