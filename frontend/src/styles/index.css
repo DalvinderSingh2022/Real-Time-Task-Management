@@ -72,7 +72,7 @@ form :where(input:not(:disabled), textarea, select):focus {
 
 main {
     display: grid;
-    grid-template: 80px auto/ 320px auto;
+    grid-template: 80px 1fr / 320px 1fr;
     min-height: 100vh;
     position: relative;
     transition: all 200ms ease-in-out;

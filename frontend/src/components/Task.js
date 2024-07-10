@@ -9,15 +9,14 @@ import { DragAndDropContext } from '../store/DragAndDropContext';
 const Task = (task) => {
     const [view, setView] = useState(false);
     const { authState } = useContext(AuthContext);
-    const { setTask } = useContext(DragAndDropContext);
+    const context = useContext(DragAndDropContext);
 
     return (
         <>
             {view && <ViewTask {...task} remove={() => setView(false)} />}
             <div
-                draggable
-                onDragStart={() => setTask(task)}
-                onClick={() => setView(true)}
+                draggable={!!context?.setTask}
+                onDragStart={() => context?.setTask(task)}
                 className={`${styles.task} flex col`}
             >
                 <div className={`text_primary ${styles.task_title}`}>{task.title}</div>
@@ -25,7 +24,10 @@ const Task = (task) => {
                 <div className={styles.task_assignTo} title={`Assigned To: ${task.assignedTo.name}`}>
                     <span>{task.assignedTo.name}{authState.user._id === task.assignedTo._id ? "(You)" : ""}</span>
                 </div>
-                <span>{new Date(task.dueDate).toDateString()}</span>
+                <div className={`flex ${styles.group}`}>
+                    <span>{new Date(task.dueDate).toDateString()}</span>
+                    <button onClick={() => setView(true)} className='primary button'>Edit</button>
+                </div>
             </div>
         </>
     )

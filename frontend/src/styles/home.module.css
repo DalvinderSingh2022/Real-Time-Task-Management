@@ -1,0 +1,90 @@
+.article {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 1em;
+}
+
+.article section {
+    border-radius: 8px;
+    background-color: var(--background-color-1);
+    padding: 1em;
+}
+
+.article .header {
+    justify-content: space-between;
+    align-self: stretch;
+}
+
+.article .graph {
+    grid-column: span 3;
+}
+
+.graph .graph_wrapper {
+    padding: 1em;
+    align-items: flex-start;
+}
+
+.graph .graph_bar {
+    align-self: stretch;
+    background-color: var(--background-color-2);
+    height: 16px;
+    border-radius: 40px;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+.graph .bar_child {
+    transition: .2s ease;
+    height: 100%;
+}
+
+.graph .graph_wrapper .graph_total {
+    font-size: 2.4em;
+    font-weight: bold;
+    line-height: .9em;
+}
+
+.graph .graph_wrapper .legend div {
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+}
+
+.graph .graph_wrapper .legend {
+    justify-content: flex-start;
+    align-self: flex-start;
+}
+
+.article .tasks {
+    grid-column: span 2;
+}
+
+.article .tasks .tasks_wrapper {
+    align-items: stretch;
+    padding-top: 1em;
+}
+
+.article .followers {
+    grid-column: span 4;
+}
+
+.article .followers .followers_wrapper div {
+    background-color: var(--background-color-2);
+}
+
+@media screen and (max-width:1200px) {
+    .article .followers {
+        grid-column: span 6;
+    }
+
+    .article .tasks {
+        grid-column: span 6;
+    }
+}
+
+@media screen and (max-width:720px) {
+    .article .graph {
+        grid-column: span 6;
+    }
+}
