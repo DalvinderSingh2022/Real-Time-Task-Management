@@ -20,7 +20,7 @@ const User = ({ name, followers, _id }) => {
     const handleFollow = () => {
         axios.post(`http://localhost:4000/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_followed', data.data.authUser, data.data.userToFollow);
+                socketState.socket.emit('user_followed', data.authUser, data.userToFollow);
             })
             .catch((error) => {
                 console.error(error);
@@ -30,7 +30,7 @@ const User = ({ name, followers, _id }) => {
     const handleUnfollow = () => {
         axios.post(`http://localhost:4000/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_unfollowed', data.data.authUser, data.data.userToUnfollow);
+                socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
             })
             .catch((error) => {
                 console.error(error);

@@ -30,7 +30,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
         axios.put(`http://localhost:4000/api/tasks/${_id}`, task)
             .then(({ data }) => {
-                socketState.socket.emit('task_updated', data);
+                socketState.socket.emit('task_updated', data.updatedTask);
             })
             .catch((error) => {
                 console.error(error);
