@@ -13,19 +13,25 @@ import Logo from "../assects/logo.png";
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
+import { UsersContext } from '../store/UsersContext';
+import { TasksContext } from '../store/TasksContext';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
+    const { resetUsers } = useContext(UsersContext);
+    const { resetTasks } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
 
-    const handleLogout = (message) => {
+    const handleLogout = () => {
         localStorage.removeItem("jwt");
+        resetTasks();
+        resetUsers();
         logout();
     }
 
     const handleDelete = () => {
         axios.delete(`http://localhost:4000/api/users/${authState.user._id}`)
-            .then(({ data }) => handleLogout(data.message))
+            .then(() => handleLogout())
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
