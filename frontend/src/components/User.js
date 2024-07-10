@@ -22,6 +22,7 @@ const User = ({ name, followers, _id }) => {
     }, [authState, _id]);
 
     const handleFollow = () => {
+        setResponse(true);
         axios.post(`http://localhost:4000/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
                 socketState.socket.emit('user_followed', data.authUser, data.userToFollow, data.message);
@@ -34,6 +35,7 @@ const User = ({ name, followers, _id }) => {
     }
 
     const handleUnfollow = () => {
+        setResponse(true);
         axios.post(`http://localhost:4000/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
                 socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow, data.message);
