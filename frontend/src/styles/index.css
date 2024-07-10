@@ -299,6 +299,34 @@ main.close .side_nav .link {
     animation: rotate 600ms infinite linear;
 }
 
+.loader {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.loader span {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: solid transparent;
+    border-right-color: var(--purple-dark);
+    border-left-color: var(--purple-dark);
+    animation: spin 1s ease infinite;
+    transition: 0.2s ease;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0);
+        border-width: 4px;
+    }
+
+    100% {
+        transform: rotate(360deg);
+        border-width: 16px;
+    }
+}
+
 .notifications {
     position: fixed;
     top: 60px;
