@@ -120,7 +120,8 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     name="status"
                                     id="status"
                                     value={task.status}
-                                    onChange={(e) => handlechange(e)}>
+                                    onChange={(e) => handlechange(e)}
+                                >
                                     <option value="Not Started">Not Started</option>
                                     <option value="In Progress">In Progress</option>
                                     <option value="Completed">Completed</option>
@@ -136,6 +137,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     name="assignedBy"
                                     id="assignedBy"
                                     value={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
+                                    onChange={(e) => handlechange(e)}
                                 />
                             </div>
                             <div className={`flex col w_full ${authStyles.group}`}>
@@ -145,6 +147,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     name="assignedTo"
                                     id="assignedTo"
                                     defaultValue={task.assignedTo._id}
+                                    onChange={(e) => handlechange(e)}
                                 >
                                     <option value={authState.user._id}>Self</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}

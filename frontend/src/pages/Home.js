@@ -99,9 +99,9 @@ const Home = () => {
                     <button onClick={() => navigate('users')} className='button primary'>All Users</button>
                 </header>
                 <div className={`${userSstyles.wrapper} ${styles.followers_wrapper}`}>
-                    {authState.user.following?.length > 0
-                        ? authState.user.following.map(user => <User {...user} key={user._id} />)
-                        : (authState.user.following?.length !== 0 ? <div className="loading"></div> : <div style={{ backgroundColor: 'inherit' }}>There is no follower</div>)
+                    {authState.user.followers?.length > 0
+                        ? authState.user.followers.map(user => <User {...user} key={user._id} />)
+                        : (authState.user.followers?.length !== 0 ? <div className="loading"></div> : <div style={{ backgroundColor: 'inherit' }}>There is no follower</div>)
                     }
                 </div>
             </section>
