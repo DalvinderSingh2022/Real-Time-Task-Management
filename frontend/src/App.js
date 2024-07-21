@@ -31,7 +31,7 @@ const App = () => {
             return;
 
         setLoadingMsg("Fetching your details, please wait...");
-        axios.get("http://localhost:4000/api/users/current", {
+        axios.get("https://task-manager-v4zl.onrender.com/api/users/current", {
             headers: {
                 Authorization: localStorage.getItem("jwt")
             }
@@ -52,7 +52,7 @@ const App = () => {
             return;
 
         setLoadingMsg("Fetching your tasks, please wait...");
-        axios.get(`http://localhost:4000/api/tasks/${authState.user._id}`)
+        axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${authState.user._id}`)
             .then(({ data }) => {
                 loadTasks(data.tasks);
             })
@@ -70,7 +70,7 @@ const App = () => {
             return;
 
         setLoadingMsg("Fetching Users details, please wait...");
-        axios.get("http://localhost:4000/api/users")
+        axios.get("https://task-manager-v4zl.onrender.com/api/users")
             .then(({ data }) => {
                 loadUsers(data.users);
             })

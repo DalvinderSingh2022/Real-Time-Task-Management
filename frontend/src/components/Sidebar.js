@@ -35,7 +35,7 @@ const Sidebar = () => {
 
     const handleDelete = () => {
         setResponse(true);
-        axios.delete(`http://localhost:4000/api/users/${authState.user._id}`)
+        axios.delete(`https://task-manager-v4zl.onrender.com/api/users/${authState.user._id}`)
             .then(() => {
                 socketState.socket.emit('user_left', authState.user);
                 handleLogout();

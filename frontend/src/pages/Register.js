@@ -26,7 +26,7 @@ const Register = () => {
         }
 
         setResponse(true);
-        axios.post("http://localhost:4000/api/users/register", user)
+        axios.post("https://task-manager-v4zl.onrender.com/api/users/register", user)
             .then(({ data }) => {
                 login(data.user);
                 localStorage.setItem("jwt", data.token);

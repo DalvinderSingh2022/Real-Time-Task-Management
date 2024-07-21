@@ -25,7 +25,7 @@ const User = ({ name, followers, _id }) => {
 
     const handleFollow = () => {
         setResponse(true);
-        axios.post(`http://localhost:4000/api/users/follow/${_id}`, { userId: authState.user._id })
+        axios.post(`https://task-manager-v4zl.onrender.com/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
                 socketState.socket.emit('user_followed', data.authUser, data.userToFollow);
             })
@@ -38,7 +38,7 @@ const User = ({ name, followers, _id }) => {
 
     const handleUnfollow = () => {
         setResponse(true);
-        axios.post(`http://localhost:4000/api/users/unfollow/${_id}`, { userId: authState.user._id })
+        axios.post(`https://task-manager-v4zl.onrender.com/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
                 socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
             })

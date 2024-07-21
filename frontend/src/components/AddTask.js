@@ -26,7 +26,7 @@ const AddTask = ({ remove, assignedTo }) => {
         }
         setResponse(true);
 
-        axios.post("http://localhost:4000/api/tasks", task)
+        axios.post("https://task-manager-v4zl.onrender.com/api/tasks", task)
             .then(({ data }) => {
                 socketState.socket.emit('task_created', data.task);
                 remove();

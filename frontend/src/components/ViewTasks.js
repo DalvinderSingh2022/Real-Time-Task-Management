@@ -32,7 +32,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
     const handlesubmit = (e) => {
         e.preventDefault();
         setResponse(true);
-        axios.put(`http://localhost:4000/api/tasks/${_id}`, task)
+        axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`, task)
             .then(({ data }) => {
                 socketState.socket.emit('task_updated', data.updatedTask, authState.user);
             })
@@ -48,7 +48,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
     const handelDelete = () => {
         setResponse(true);
-        axios.delete(`http://localhost:4000/api/tasks/${_id}`)
+        axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`)
             .then(({ data }) => {
                 socketState.socket.emit('task_deleted', _id, assignedTo, assignedBy);
             })

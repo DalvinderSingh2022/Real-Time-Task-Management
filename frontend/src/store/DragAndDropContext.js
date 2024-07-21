@@ -47,7 +47,7 @@ const DragAndDropProvider = ({ children }) => {
     useEffect(() => {
         if (dragAndDropState.task && dragAndDropState.status) {
             setResponse(true);
-            axios.put(`http://localhost:4000/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
+            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
                 .then(({ data }) => {
                     reset();
                     socketState.socket.emit('task_updated', data.updatedTask, authState.user);
