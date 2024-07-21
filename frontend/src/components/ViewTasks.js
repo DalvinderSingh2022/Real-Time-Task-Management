@@ -34,7 +34,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
         setResponse(true);
         axios.put(`http://localhost:4000/api/tasks/${_id}`, task)
             .then(({ data }) => {
-                socketState.socket.emit('task_updated', data.updatedTask, data.message);
+                socketState.socket.emit('task_updated', data.updatedTask, authState.user);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
@@ -50,7 +50,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
         setResponse(true);
         axios.delete(`http://localhost:4000/api/tasks/${_id}`)
             .then(({ data }) => {
-                socketState.socket.emit('task_deleted', _id, assignedTo, assignedBy, data.message);
+                socketState.socket.emit('task_deleted', _id, assignedTo, assignedBy);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })

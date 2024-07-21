@@ -5,13 +5,15 @@ import axios from "axios";
 import styles from "./../styles/auth.module.css";
 
 import Toast from '../components/Toast';
+import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import Response from '../components/Response';
+import { SocketContext } from '../store/SocketContext';
 
 const Register = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
+    const { socketState } = useContext(SocketContext);
     const [response, setResponse] = useState(false);
     const navigate = useNavigate();
 
@@ -28,6 +30,7 @@ const Register = () => {
             .then(({ data }) => {
                 login(data.user);
                 localStorage.setItem("jwt", data.token);
+                socketState.socket.emit('user_join', data.user);
                 navigate("/");
             })
             .catch((error) => {

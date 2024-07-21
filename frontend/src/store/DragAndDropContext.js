@@ -3,6 +3,7 @@ import axios from 'axios';
 
 import { SocketContext } from './SocketContext';
 import { AppContext } from './AppContext';
+import { AuthContext } from './AuthContext';
 
 const initialState = {
     task: null,
@@ -28,6 +29,7 @@ const DragAndDropProvider = ({ children }) => {
     const [dragAndDropState, dispatch] = useReducer(dragAndDropReducer, initialState);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
+    const { authState } = useContext(AuthContext);
     const [response, setResponse] = useState(false);
 
     const setTask = (task) => {
@@ -48,7 +50,7 @@ const DragAndDropProvider = ({ children }) => {
             axios.put(`http://localhost:4000/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
                 .then(({ data }) => {
                     reset();
-                    socketState.socket.emit('task_updated', data.updatedTask, data.message);
+                    socketState.socket.emit('task_updated', data.updatedTask, authState.user);
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error.response.data.message })
@@ -56,7 +58,7 @@ const DragAndDropProvider = ({ children }) => {
                 })
                 .finally(() => setResponse(false));
         }
-    }, [dragAndDropState, socketState, addToast]);
+    }, [dragAndDropState, socketState, authState, addToast]);
 
     return (
         <DragAndDropContext.Provider value={{ setTask, setStatus, response }}>

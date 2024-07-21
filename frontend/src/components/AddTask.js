@@ -9,7 +9,7 @@ import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
 import Response from './Response';
 
-const AddTask = ({ remove }) => {
+const AddTask = ({ remove, assignedTo }) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
@@ -28,7 +28,7 @@ const AddTask = ({ remove }) => {
 
         axios.post("http://localhost:4000/api/tasks", task)
             .then(({ data }) => {
-                socketState.socket.emit('task_created', data.task, data.message);
+                socketState.socket.emit('task_created', data.task);
                 remove();
             })
             .catch((error) => {
@@ -82,7 +82,8 @@ const AddTask = ({ remove }) => {
                                 <select
                                     name="assignedTo"
                                     id="assignedTo"
-                                    defaultValue={authState.user._id}
+                                    disabled={!!assignedTo}
+                                    defaultValue={assignedTo || authState.user._id}
                                 >
                                     <option value={authState.user._id}>Self</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}

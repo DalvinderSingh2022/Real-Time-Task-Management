@@ -113,7 +113,7 @@ const Home = () => {
                 </header>
                 <div className={`flex col gap tasks_container ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}>
                     {tasksState.tasks?.length > 0
-                        ? tasksState.tasks.slice(0, 3).map((task, index) => <Task {...task} key={task._id} />)
+                        ? tasksState.tasks.slice(0, 3).map(task => <Task {...task} key={task._id} />)
                         : (tasksState.tasks?.length !== 0 ? <div className={`loading ${styles.loading}`}></div> : <div>There is no task</div>)
                     }
                 </div>

@@ -22,7 +22,7 @@ const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
     const { authState, login, verify } = useContext(AuthContext);
     const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
-    const { usersState, loadUsers, updateUser } = useContext(UsersContext);
+    const { usersState, loadUsers, addUser, updateUser, deleteUser } = useContext(UsersContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
 
@@ -84,13 +84,17 @@ const App = () => {
     }, [usersState, loadUsers, addToast]);
 
     useEffect(() => {
-        socketState.socket.on('user_followed', (authUser, userToFollow, message) => {
+        if (!socketState.connected) {
+            return;
+        }
+
+        socketState.socket.on('user_followed', (authUser, userToFollow) => {
             updateUser(authUser);
             updateUser(userToFollow);
 
             if (authState.user._id === authUser._id) {
                 login(authUser);
-                addToast({ type: 'info', message });
+                addToast({ type: 'success', message: `Followed ${userToFollow.name} successfully` });
             }
             if (authState.user._id === userToFollow._id) {
                 login(userToFollow);
@@ -101,15 +105,18 @@ const App = () => {
         return () => socketState.socket.off('user_followed');
     }, [socketState, authState, login, updateUser, addToast]);
 
-
     useEffect(() => {
-        socketState.socket.on('user_unfollowed', (authUser, userToUnfollow, message) => {
+        if (!socketState.connected) {
+            return;
+        }
+
+        socketState.socket.on('user_unfollowed', (authUser, userToUnfollow) => {
             updateUser(authUser);
             updateUser(userToUnfollow);
 
             if (authState.user._id === authUser._id) {
                 login(authUser);
-                addToast({ type: 'info', message });
+                addToast({ type: 'info', message: `Unfollowed ${userToUnfollow.name} successfully` });
             }
             if (authState.user._id === userToUnfollow._id) {
                 login(userToUnfollow);
@@ -120,24 +127,26 @@ const App = () => {
         return () => socketState.socket.off('user_unfollowed');
     }, [socketState, authState, login, updateUser, addToast]);
 
-
     useEffect(() => {
-        socketState.socket.on('task_created', (task, message) => {
-            if (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) {
+        socketState.socket.on('task_created', (task) => {
+            if (authState.user._id === task.assignedBy._id) {
                 createTask(task);
-                addToast({ type: 'success', message });
+                addToast({ type: 'success', message: `Task created and assigned to ${task.assignedTo._id !== task.assignedBy._id ? task.assignedTo.name : 'Self'}` });
+            }
+            else if (authState.user._id === task.assignedTo._id) {
+                createTask(task);
+                addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
             }
         });
 
         return () => socketState.socket.off('task_created');
     }, [socketState, authState, createTask, addToast]);
 
-
     useEffect(() => {
-        socketState.socket.on('task_updated', (task, message) => {
+        socketState.socket.on('task_updated', (task, user) => {
             if (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) {
                 updateTask(task);
-                addToast({ type: 'info', message });
+                addToast({ type: 'info', message: `Task: ${task.title} updated by ${user.name}` });
             }
         });
 
@@ -145,15 +154,35 @@ const App = () => {
     }, [socketState, authState, updateTask, addToast]);
 
     useEffect(() => {
-        socketState.socket.on('task_deleted', (taskId, assignedTo, assignedBy, message) => {
-            if (authState.user._id === assignedBy._id || authState.user._id === assignedTo._id) {
-                deleteTask(taskId);
-                addToast({ type: 'warning', message });
+        socketState.socket.on('task_deleted', (task, assignedTo, assignedBy) => {
+            if (authState.user._id === assignedBy._id) {
+                deleteTask(task._id);
+                addToast({ type: 'warning', message: `Task : ${task.title} Deleted` });
+            }
+            else if (authState.user._id === assignedTo._id) {
+                deleteTask(task._id);
+                addToast({ type: 'warning', message: `${assignedBy.name} Deleted Task : ${task.title}` });
             }
         });
 
         return () => socketState.socket.off('task_deleted');
     }, [socketState, authState, deleteTask, addToast]);
+
+    useEffect(() => {
+        socketState.socket.on('user_left', user => {
+            deleteUser(user._id);
+        });
+
+        return () => socketState.socket.off('user_left');
+    }, [socketState, deleteUser]);
+
+    useEffect(() => {
+        socketState.socket.on('user_join', user => {
+            addUser(user);
+        });
+
+        return () => socketState.socket.off('user_join');
+    }, [socketState, addUser]);
 
     if (loadingMsg) {
         return <Loading message={loadingMsg} />

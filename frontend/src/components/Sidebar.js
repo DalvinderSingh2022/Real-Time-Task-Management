@@ -16,12 +16,14 @@ import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
 import { TasksContext } from '../store/TasksContext';
+import { SocketContext } from '../store/SocketContext';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
     const { resetUsers } = useContext(UsersContext);
     const { resetTasks } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
+    const { socketState } = useContext(SocketContext);
     const [response, setResponse] = useState(false);
 
     const handleLogout = () => {
@@ -34,7 +36,10 @@ const Sidebar = () => {
     const handleDelete = () => {
         setResponse(true);
         axios.delete(`http://localhost:4000/api/users/${authState.user._id}`)
-            .then(() => handleLogout())
+            .then(() => {
+                socketState.socket.emit('user_left', authState.user);
+                handleLogout();
+            })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
                 console.error(error);
