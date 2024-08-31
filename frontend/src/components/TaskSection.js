@@ -16,7 +16,7 @@ const TaskSection = ({ tasks, status }) => {
             onDragOver={() => newStatus = status}
             onDragEndCapture={() => setStatus(newStatus)}
             data-status={status}
-            className={`flex col ${styles.wrapper}`}
+            className={`flex col ${styles.wrapper} ${status.replaceAll(" ", '').toLowerCase()}`}
         >
             <header className={`flex ${styles.header}`}><div>{status}</div><div>{tasks?.length || 0}</div></header>
             <div className={`flex col gap tasks_container ${styles.tasks_container}`}>
@@ -24,7 +24,7 @@ const TaskSection = ({ tasks, status }) => {
                     ? tasks.map(task => <Task {...task} key={task._id} />)
                     : (tasks?.length !== 0 ? <div className={`loading ${styles.loading}`}></div> : <div>There is no task</div>)}
             </div>
-        </section >
+        </section>
     )
 }
 

@@ -40,16 +40,8 @@
     padding: 12px 16px;
     align-self: stretch;
     color: var(--white);
-    background-color: #6dadf0;
     font-weight: 500;
-}
-
-.wrapper:first-child .header {
-    background-color: #b6b9bd;
-}
-
-.wrapper:last-child .header {
-    background-color: #3cc66a;
+    background-color: var(--color);
 }
 
 .wrapper .tasks_container {
@@ -64,10 +56,10 @@
     cursor: grab;
     gap: 4px;
     align-items: stretch;
-    background-color: #f1f8ff;
-    border-bottom: 2px solid #6dadf0;
     transition: transform 200ms ease;
     max-width: 420px;
+    background-color: var(--background);
+    border-bottom: 2px solid var(--color);
 }
 
 .task .group {
@@ -77,40 +69,12 @@
 
 .task .group button {
     padding: 6px 12px;
-    background-color: #6dadf0;
-    border-color: #6dadf0;
+    background-color: var(--color);
+    border-color: var(--color);
 }
 
 .tasks_container .loading {
-    border-bottom-color: #6dadf0;
-}
-
-.wrapper:first-child .task {
-    background-color: #faf8ff;
-    border-bottom: 0 solid #b6b9bd;
-}
-
-.wrapper:first-child .loading {
-    border-bottom-color: #b6b9bd;
-}
-
-.wrapper:first-child .group button {
-    background-color: #b6b9bd;
-    border-color: #b6b9bd;
-}
-
-.wrapper:last-child .task {
-    background-color: #e8feef;
-    border-bottom: 0 solid #3cc66a;
-}
-
-.wrapper:last-child .loading {
-    border-bottom-color: #3cc66a;
-}
-
-.wrapper:last-child .group button {
-    background-color: #3cc66a;
-    border-color: #3cc66a;
+    border-bottom-color: var(--color);
 }
 
 .task_title {

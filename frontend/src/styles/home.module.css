@@ -7,9 +7,8 @@
 
 .article section {
     border-radius: 8px;
-    background-color: var(--background-color-1);
+    background-color: var(--white);
     padding: 1em;
-    box-shadow: 0 0 24px 2px var(--shadow-color);
 }
 
 .article .header {
@@ -72,10 +71,6 @@
 
 .article .followers {
     grid-column: span 4;
-}
-
-.article .followers .followers_wrapper div {
-    background-color: var(--background-color-2);
 }
 
 @media screen and (max-width:1200px) {

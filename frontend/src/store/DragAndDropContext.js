@@ -46,17 +46,23 @@ const DragAndDropProvider = ({ children }) => {
 
     useEffect(() => {
         if (dragAndDropState.task && dragAndDropState.status) {
+            if (dragAndDropState.status === dragAndDropState.task.status) {
+                return reset();
+            }
+
             setResponse(true);
             axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
                 .then(({ data }) => {
-                    reset();
                     socketState.socket.emit('task_updated', data.updatedTask, authState.user);
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error.response.data.message })
                     console.error(error);
                 })
-                .finally(() => setResponse(false));
+                .finally(() => {
+                    reset();
+                    setResponse(false);
+                });
         }
     }, [dragAndDropState, socketState, authState, addToast]);
 

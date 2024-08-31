@@ -27,6 +27,21 @@
     --blue: #549be6;
 }
 
+.inprogress {
+    --color: #6dadf0;
+    --background: #f1f8ff;
+}
+
+.notstarted {
+    --color: #b6b9bd;
+    --background: #faf8ff;
+}
+
+.completed {
+    --color: #3cc66a;
+    --background: #e8feef;
+}
+
 body {
     background-color: var(--background-color-2);
 }
@@ -58,7 +73,7 @@ form :where(input, textarea, select) {
 }
 
 form :where(input, textarea, select):disabled {
-    background-color: var(--white);
+    background-color: inherit;
     border: none;
     font-weight: 500;
     font-size: 1.01em;
@@ -85,7 +100,7 @@ main.close {
 main :is(nav, aside) {
     position: sticky;
     top: 0;
-    background-color: var(--background-color-1);
+    background-color: var(--white);
 }
 
 article {
@@ -175,7 +190,6 @@ main .top_nav {
     justify-content: space-between;
     padding-inline: 1em;
     z-index: 9;
-    box-shadow: 0 0 34px 10px var(--shadow-color);
 }
 
 .top_nav .greeting {
@@ -204,7 +218,6 @@ main .side_nav {
     padding-block: 2em;
     transition: width 200ms ease;
     z-index: 99;
-    box-shadow: 0 0 14px 4px var(--shadow-color);
 }
 
 .side_nav .menu_toggle {

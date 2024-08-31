@@ -20,7 +20,7 @@ const Task = (task) => {
             <div
                 draggable={!!context?.setTask}
                 onDragStart={() => context?.setTask(task)}
-                className={`${styles.task} flex col`}
+                className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()}`}
             >
                 <div className={`text_primary ${styles.task_title}`}>{task.title}</div>
                 <div className={`text_secondary ${styles.task_description}`}>{task.description}</div>
