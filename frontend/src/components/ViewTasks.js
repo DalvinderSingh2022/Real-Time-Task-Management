@@ -50,7 +50,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
         setResponse(true);
         axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`)
             .then(({ data }) => {
-                socketState.socket.emit('task_deleted', _id, assignedTo, assignedBy);
+                socketState.socket.emit('task_deleted', { _id, ...task }, assignedTo, assignedBy);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })

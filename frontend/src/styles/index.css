@@ -42,6 +42,10 @@
     --background: #e8feef;
 }
 
+.over {
+    background-color: red !important;
+}
+
 body {
     background-color: var(--background-color-2);
 }
