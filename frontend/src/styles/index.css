@@ -42,8 +42,13 @@
     --background: #e8feef;
 }
 
-.over {
-    background-color: red !important;
+.over:not(.task) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+.over.task {
+    border: 2px dashed var(--color);
+    transform: scale(.95);
 }
 
 body {

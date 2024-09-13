@@ -11,16 +11,21 @@ import { DragAndDropContext } from '../store/DragAndDropContext';
 const Task = (task) => {
     const [view, setView] = useState(false);
     const { authState } = useContext(AuthContext);
+    const [dragging, setDragging] = useState(false);
     const context = useContext(DragAndDropContext);
 
     return (
         <>
             {view && <ViewTask {...task} remove={() => setView(false)} />}
-            {context?.response && <Response />}
+            {context.response && <Response />}
             <div
-                draggable={!!context?.setTask}
-                onDragStart={() => context?.setTask(task)}
-                className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()}`}
+                draggable={true}
+                onDragStart={() => {
+                    setDragging(true);
+                    context.setTask(task);
+                }}
+                onDragEnd={() => setDragging(false)}
+                className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()} ${dragging ? "task over" : ""}`}
             >
                 <div className={`text_primary ${styles.task_title}`}>{task.title}</div>
                 <div className={`text_secondary ${styles.task_description}`}>{task.description}</div>

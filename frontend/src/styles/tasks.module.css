@@ -32,6 +32,7 @@
     justify-content: flex-start;
     background-color: var(--white);
     border-radius: 0 0 12px 12px;
+    border-radius: 12px;
 }
 
 .wrapper .header {
@@ -53,7 +54,7 @@
 .tasks_container .task {
     border-radius: 12px;
     padding: 12px;
-    cursor: grab;
+    cursor: move;
     gap: 4px;
     align-items: stretch;
     transition: transform 200ms ease;

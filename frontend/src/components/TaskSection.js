@@ -12,19 +12,23 @@ const TaskSection = ({ tasks, status }) => {
 
     return (
         <section
-            onDragEnter={(e) => {
-                const newClosest = e.target.closest('section');
-
+            onDragLeave={() => {
+                if (closestSection) closestSection.classList.remove("over");
+            }}
+            onDragOver={(e) => {
+                e.preventDefault();
+                newStatus = status; const newClosest = e.target.closest('section');
                 if (newClosest) {
                     closestSection = newClosest;
                     closestSection.classList.add("over");
                 }
             }}
-            onDragLeave={() => {
-                if (closestSection) closestSection.classList.remove("over");
+            onDragEndCapture={() => {
+                if (closestSection) {
+                    closestSection.classList.remove("over");
+                }
+                setStatus(newStatus);
             }}
-            onDragOver={() => newStatus = status}
-            onDragEndCapture={() => setStatus(newStatus)}
             data-status={status}
             className={`flex col ${styles.wrapper} ${status.replaceAll(" ", '').toLowerCase()}`}
         >
