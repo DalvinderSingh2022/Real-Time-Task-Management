@@ -17,12 +17,12 @@ const Task = (task) => {
     return (
         <>
             {view && <ViewTask {...task} remove={() => setView(false)} />}
-            {context.response && <Response />}
+            {context?.response && <Response />}
             <div
-                draggable={true}
+                draggable={!!context}
                 onDragStart={() => {
                     setDragging(true);
-                    context.setTask(task);
+                    context?.setTask(task);
                 }}
                 onDragEnd={() => setDragging(false)}
                 className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()} ${dragging ? "task over" : ""}`}
