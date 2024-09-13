@@ -7,10 +7,8 @@ import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
 import Response from './Response';
-import AddTask from './AddTask';
 
 const User = ({ name, followers, _id }) => {
-    const [view, setView] = useState(false);
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
@@ -52,10 +50,9 @@ const User = ({ name, followers, _id }) => {
     return (
         <>
             {response && <Response />}
-            {view && <AddTask assignedTo={_id} assignedBy={authState.user} remove={() => setView(false)} />}
             <div className={`flex ${styles.user}`}>
                 <div>
-                    <div className='text_primary' onClick={() => setView(true)}>{name}</div>
+                    <div className='text_primary'>{name}</div>
                     <div className='text_secondary'>Followers: {followers.length}</div>
                 </div>
                 {authState.user._id !== _id &&
