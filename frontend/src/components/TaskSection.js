@@ -6,13 +6,23 @@ import styles from "../styles/tasks.module.css";
 import { DragAndDropContext } from '../store/DragAndDropContext';
 
 let newStatus;
+let closestSection;
 const TaskSection = ({ tasks, status }) => {
     const { setStatus } = useContext(DragAndDropContext);
 
     return (
         <section
-            onDragEnter={(e) => e.target.classList.contains('tasks_container') && e.target.classList.add("over")}
-            onDragLeave={(e) => e.target.classList.contains('tasks_container') && e.target.classList.remove("over")}
+            onDragEnter={(e) => {
+                const newClosest = e.target.closest('section');
+
+                if (newClosest) {
+                    closestSection = newClosest;
+                    closestSection.classList.add("over");
+                }
+            }}
+            onDragLeave={() => {
+                if (closestSection) closestSection.classList.remove("over");
+            }}
             onDragOver={() => newStatus = status}
             onDragEndCapture={() => setStatus(newStatus)}
             data-status={status}
