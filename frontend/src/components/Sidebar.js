@@ -79,7 +79,7 @@ const Sidebar = () => {
                     </button>
                     <button className='button flex gap2 link' title='Delete Account' onClick={handleDelete}>
                         <AiOutlineUserDelete />
-                        <p>Delete Account</p>
+                        <p>{!response ? "Delete Account" : "Deleting..."}</p>
                     </button>
                 </div>
             </aside>

@@ -57,8 +57,8 @@ const User = ({ name, followers, _id }) => {
                 </div>
                 {authState.user._id !== _id &&
                     (following
-                        ? <button className='button secondary' onClick={handleUnfollow}>Unfollow</button>
-                        : <button className='button primary' onClick={handleFollow}>follow</button>
+                        ? <button className='button secondary' onClick={handleUnfollow}>{!response ? "Unfollow" : "Loading..."}</button>
+                        : <button className='button primary' onClick={handleFollow}>{!response ? "follow" : "following..."}</button>
                     )}
             </div>
         </>

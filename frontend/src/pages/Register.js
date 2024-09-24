@@ -63,6 +63,7 @@ const Register = () => {
                                 id='name'
                                 name='name'
                                 placeholder='batman'
+                                required
                             />
                         </div>
                         <div className={`flex col w_full ${styles.group}`}>
@@ -72,6 +73,7 @@ const Register = () => {
                                 id='email'
                                 name='email'
                                 placeholder='exapmle@domain.com'
+                                required
                             />
                         </div>
                         <div className={`flex col w_full ${styles.group}`}>
@@ -81,11 +83,12 @@ const Register = () => {
                                 id='password'
                                 name='password'
                                 placeholder='12345678'
+                                required
                             />
                         </div>
 
                         <div className={`flex col w_full ${styles.group}`}>
-                            <button type='submit' className={`button primary ${styles.submit_button}`}>Register</button>
+                            <button type='submit' className={`button primary ${styles.submit_button}`}>{response ? "registering..." : "Register"}</button>
                         </div>
 
                         <div className={styles.link}>

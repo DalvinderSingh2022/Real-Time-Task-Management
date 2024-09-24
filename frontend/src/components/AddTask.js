@@ -54,6 +54,7 @@ const AddTask = ({ remove, assignedTo }) => {
                                 id='title'
                                 name='title'
                                 placeholder='title'
+                                required
                             />
                         </div>
                         <div className={`flex col w_full ${authStyles.group}`}>
@@ -64,6 +65,7 @@ const AddTask = ({ remove, assignedTo }) => {
                                 id='description'
                                 name='description'
                                 placeholder='description'
+                                required
                             />
                         </div>
 
@@ -75,6 +77,7 @@ const AddTask = ({ remove, assignedTo }) => {
                                     id='dueDate'
                                     name='dueDate'
                                     placeholder='dueDate'
+                                    required
                                 />
                             </div>
                             <div className={`flex col w_full ${authStyles.group}`}>
@@ -84,6 +87,7 @@ const AddTask = ({ remove, assignedTo }) => {
                                     id="assignedTo"
                                     disabled={!!assignedTo}
                                     defaultValue={assignedTo || authState.user._id}
+                                    required
                                 >
                                     <option value={authState.user._id}>Self</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
@@ -91,7 +95,7 @@ const AddTask = ({ remove, assignedTo }) => {
                             </div>
                         </div>
                         <div className={`flex gap ${modalStyles.group}`}>
-                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>Add</button>
+                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>{response ? "adding..." : 'Add'}</button>
                             <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                         </div>
                     </form>

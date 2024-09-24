@@ -7,9 +7,10 @@ import styles from "../styles/tasks.module.css";
 import { TasksContext } from '../store/TasksContext';
 import TaskSection from '../components/TaskSection';
 import AddTask from '../components/AddTask';
-import { DragAndDropProvider } from '../store/DragAndDropContext';
+import { DragAndDropContext } from '../store/DragAndDropContext';
 
 const Tasks = () => {
+    const { response } = useContext(DragAndDropContext);
     const { tasksState } = useContext(TasksContext);
     const [notStarted, setNotStarted] = useState(null);
     const [progress, setProgress] = useState(null);
@@ -51,13 +52,12 @@ const Tasks = () => {
                     <FaPlus />
                     <span>Create</span>
                 </button>
+                {response && <div className="loading" style={{ margin: 0 }}></div>}
             </form>
             <div className={styles.container}>
-                <DragAndDropProvider>
-                    <TaskSection tasks={notStarted} status={'Not Started'} />
-                    <TaskSection tasks={progress} status={'In Progress'} />
-                    <TaskSection tasks={completed} status={'Completed'} />
-                </DragAndDropProvider>
+                <TaskSection tasks={notStarted} status={'Not Started'} />
+                <TaskSection tasks={progress} status={'In Progress'} />
+                <TaskSection tasks={completed} status={'Completed'} />
             </div>
         </article>
     )

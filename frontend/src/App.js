@@ -17,6 +17,7 @@ import { TasksContext } from './store/TasksContext';
 import { UsersContext } from './store/UsersContext';
 import { SocketContext } from './store/SocketContext';
 import { AppContext } from './store/AppContext';
+import { DragAndDropProvider } from './store/DragAndDropContext';
 
 const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
@@ -195,7 +196,7 @@ const App = () => {
                 <Route path='/register' element={<Register />} />
                 <Route path='/' element={<Layout />}>
                     <Route index element={<Home />} />
-                    <Route path='tasks' element={<Tasks />} />
+                    <Route path='tasks' element={<DragAndDropProvider><Tasks /></DragAndDropProvider>} />
                     <Route path="/users" element={<Users />} />
                     <Route path='*' element={<Notfound />} />
                 </Route>

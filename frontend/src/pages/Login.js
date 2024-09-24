@@ -61,6 +61,7 @@ const Login = () => {
                                 id='email'
                                 name='email'
                                 placeholder='exapmle@domain.com'
+                                required
                             />
                         </div>
                         <div className={`flex col w_full ${styles.group}`}>
@@ -70,11 +71,12 @@ const Login = () => {
                                 id='password'
                                 name='password'
                                 placeholder='12345678'
+                                required
                             />
                         </div>
 
                         <div className={`flex col w_full ${styles.group}`}>
-                            <button type='submit' className={`button primary ${styles.submit_button}`}>Log In</button>
+                            <button type='submit' className={`button primary ${styles.submit_button}`}>{response ? "logging..." : "Log In"}</button>
                         </div>
 
                         <div className={styles.link}>

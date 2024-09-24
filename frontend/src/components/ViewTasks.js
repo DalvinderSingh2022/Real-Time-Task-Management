@@ -13,7 +13,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
-    const [response, setResponse] = useState(false);
+    const [response, setResponse] = useState('');
     const [task, setTask] = useState({
         title,
         description,
@@ -31,7 +31,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
     const handlesubmit = (e) => {
         e.preventDefault();
-        setResponse(true);
+        setResponse('save');
         axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`, task)
             .then(({ data }) => {
                 socketState.socket.emit('task_updated', data.updatedTask, authState.user);
@@ -42,12 +42,12 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
             })
             .finally(() => {
                 remove();
-                setResponse(false);
+                setResponse('');
             });
     }
 
     const handelDelete = () => {
-        setResponse(true);
+        setResponse('delete');
         axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`)
             .then(({ data }) => {
                 socketState.socket.emit('task_deleted', { _id, ...task }, assignedTo, assignedBy);
@@ -58,7 +58,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
             })
             .finally(() => {
                 remove();
-                setResponse(false);
+                setResponse('');
             });
     }
 
@@ -94,6 +94,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                 placeholder='description'
                                 value={task.description}
                                 onChange={e => handlechange(e)}
+                                required
                             />
                         </div>
 
@@ -108,6 +109,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     placeholder='dueDate'
                                     value={(task.dueDate).substring(0, 10)}
                                     onChange={e => handlechange(e)}
+                                    required
                                 />
                             </div>
                             <div className={`flex col w_full ${authStyles.group}`}>
@@ -121,6 +123,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     id="status"
                                     value={task.status}
                                     onChange={(e) => handlechange(e)}
+                                    required
                                 >
                                     <option value="Not Started">Not Started</option>
                                     <option value="In Progress">In Progress</option>
@@ -138,6 +141,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     id="assignedBy"
                                     value={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
                                     onChange={(e) => handlechange(e)}
+                                    required
                                 />
                             </div>
                             <div className={`flex col w_full ${authStyles.group}`}>
@@ -148,6 +152,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                                     id="assignedTo"
                                     defaultValue={task.assignedTo._id}
                                     onChange={(e) => handlechange(e)}
+                                    required
                                 >
                                     <option value={authState.user._id}>Self</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
@@ -157,9 +162,9 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
                         <div className={`flex gap ${modalStyles.group}`}>
                             {authState.user._id === task.assignedBy._id &&
-                                <button type='button' className={`button ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete</button>
+                                <button type='button' className={`button ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>{response === 'delete' ? "deleting..." : "Delete"}</button>
                             }
-                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>Save</button>
+                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>{response === 'save' ? "saving..." : "Save"}</button>
                             <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                         </div>
                     </form>
