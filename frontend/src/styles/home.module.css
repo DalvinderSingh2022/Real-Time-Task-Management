@@ -37,6 +37,7 @@
 .graph .bar_child {
     transition: .2s ease;
     height: 100%;
+    width: 0%;
 }
 
 .graph .graph_wrapper .graph_total {

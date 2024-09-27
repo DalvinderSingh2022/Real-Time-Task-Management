@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { memo, useContext } from 'react';
 
 import Task from "./Task";
 
@@ -36,10 +36,10 @@ const TaskSection = ({ tasks, status }) => {
             <div className={`flex col gap tasks_container ${styles.tasks_container}`}>
                 {tasks?.length > 0
                     ? tasks.map(task => <Task {...task} key={task._id} />)
-                    : (tasks?.length !== 0 ? <div className={`loading ${styles.loading}`}></div> : <div>There is no task</div>)}
+                    : tasks ? <div>There is no task</div> : <div className={`loading ${styles.loading}`}></div>}
             </div>
         </section>
     )
 }
 
-export default TaskSection;
+export default memo(TaskSection);

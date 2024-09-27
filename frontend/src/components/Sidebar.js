@@ -78,8 +78,8 @@ const Sidebar = () => {
                         <p>Logout</p>
                     </button>
                     <button className='button flex gap2 link' title='Delete Account' onClick={handleDelete}>
-                        <AiOutlineUserDelete />
-                        <p>{!response ? "Delete Account" : "Deleting..."}</p>
+                        {response ? <div className='loading' style={{ borderColor: "var(--text-sec)", borderBottomColor: 'var(--white)' }}></div> : <AiOutlineUserDelete />}
+                        <p>{response ? "Deleting..." : "Delete Account"}</p>
                     </button>
                 </div>
             </aside>

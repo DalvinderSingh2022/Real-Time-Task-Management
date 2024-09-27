@@ -1,7 +1,7 @@
 import { createContext, useReducer } from 'react';
 
 const initialState = {
-    user: {},
+    user: null,
     authenticated: false,
     verified: false,
 };
@@ -11,7 +11,7 @@ const authReducer = (state, action) => {
         case 'LOGIN':
             return { user: action.payload.user, authenticated: true, verified: true };
         case 'LOGOUT':
-            return { user: null, authenticated: false, verified: false };
+            return { user: null, authenticated: false, verified: true };
         case 'VERIFY':
             return { ...state, verified: true };
         default:

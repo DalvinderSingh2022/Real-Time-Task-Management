@@ -1,15 +1,18 @@
 import React, { useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/users.module.css";
 
 import { AuthContext } from '../store/AuthContext';
 import { UsersContext } from '../store/UsersContext';
+import { AppContext } from '../store/AppContext';
 import User from '../components/User';
 
 const Users = () => {
     const { authState } = useContext(AuthContext);
-    const { usersState } = useContext(UsersContext);
+    const { usersState, loadUsers } = useContext(UsersContext);
+    const { addToast } = useContext(AppContext);
     const [search, setSearch] = useState('');
     const [filter, SetFilter] = useState('');
     const [users, setUsers] = useState(null);
@@ -36,6 +39,20 @@ const Users = () => {
         }
     }, [filter, authState, usersState, search]);
 
+    useEffect(() => {
+        if (usersState.loaded) return;
+
+        axios.get("https://task-manager-v4zl.onrender.com/api/users")
+            .then(({ data }) => {
+                loadUsers(data.users);
+            })
+            .catch((error) => {
+                loadUsers([]);
+                addToast({ type: 'error', message: error.response.data.message })
+                console.error(error);
+            })
+    }, [usersState, loadUsers, addToast]);
+
     return (
         <article>
             <form className={`${tasksStyles.filters} ${tasksStyles.wrap}`} onClick={e => changeFilter(e)}>
@@ -55,7 +72,7 @@ const Users = () => {
                 <div className={styles.wrapper}>
                     {users?.length > 0
                         ? users.map(user => <User {...user} key={user._id} />)
-                        : (users?.length !== 0 ? <div className="loading"></div> : <div>There is no user in {filter ? filter : ""}</div>)
+                        : users ? <div>There is no user {filter ? "in " + filter : ""}</div> : <div className="loading"></div>
                     }
                 </div>
             </div>

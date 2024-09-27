@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { memo, useContext, useState } from 'react';
 
 import styles from "../styles/tasks.module.css";
 
@@ -41,4 +41,4 @@ const Task = (task) => {
     )
 }
 
-export default Task;
+export default memo(Task);

@@ -46,7 +46,7 @@ const AddTask = ({ remove, assignedTo }) => {
                     <div>
                         <div className={`w_full text_primary ${authStyles.heading}`}>New Task</div>
                     </div>
-                    <form className={`flex col gap w_full modal_child ${authStyles.form}`} onSubmit={handlesubmit}>
+                    <form className={`flex col gap w_full modal_child`} onSubmit={handlesubmit}>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="title" className='text_primary'>Title</label>
                             <input
@@ -95,7 +95,7 @@ const AddTask = ({ remove, assignedTo }) => {
                             </div>
                         </div>
                         <div className={`flex gap ${modalStyles.group}`}>
-                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>{response ? "adding..." : 'Add'}</button>
+                            <button type='submit' className={`button primary flex gap2 ${authStyles.submit_button}`}>Add{response && <div className='loading'></div>}</button>
                             <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                         </div>
                     </form>

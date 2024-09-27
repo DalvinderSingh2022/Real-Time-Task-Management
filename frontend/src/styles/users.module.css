@@ -6,6 +6,7 @@
 
 .wrapper {
     display: flex;
+    flex-wrap: wrap;
     gap: 1em;
     padding: 1em 2em;
 }
@@ -16,7 +17,7 @@
     height: fit-content;
     border-radius: 12px;
     transition: transform 200ms ease;
-    min-width: 320px;
+    min-width: 240px;
     justify-content: space-between;
 }
 

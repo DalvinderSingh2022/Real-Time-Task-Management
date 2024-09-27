@@ -1,7 +1,7 @@
 import { createContext, useReducer } from 'react';
 
 const initialState = {
-    users: [],
+    users: null,
     loaded: false
 };
 
@@ -18,7 +18,7 @@ const usersReducer = (state, action) => {
         case 'UPDATE_USER':
             return {
                 ...state,
-                users: state.users.map((user) => {
+                users: state.users?.map((user) => {
                     if (user._id === action.payload.user._id) {
                         return { ...action.payload.user };
                     }

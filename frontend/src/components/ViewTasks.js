@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { memo, useContext, useState } from 'react';
 import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
@@ -70,7 +70,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                     <div>
                         <div className={`w_full text_primary ${authStyles.heading}`}>View Task</div>
                     </div>
-                    <form className={`flex col gap w_full modal_child ${authStyles.form}`} onSubmit={handlesubmit}>
+                    <form className={`flex col gap w_full modal_child`} onSubmit={handlesubmit}>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="title" className='text_primary'>Title</label>
                             <input
@@ -162,9 +162,9 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
 
                         <div className={`flex gap ${modalStyles.group}`}>
                             {authState.user._id === task.assignedBy._id &&
-                                <button type='button' className={`button ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>{response === 'delete' ? "deleting..." : "Delete"}</button>
+                                <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
                             }
-                            <button type='submit' className={`button primary ${authStyles.submit_button}`}>{response === 'save' ? "saving..." : "Save"}</button>
+                            <button type='submit' className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
                             <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                         </div>
                     </form>
@@ -174,4 +174,4 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
     )
 }
 
-export default ViewTask;
+export default memo(ViewTask);

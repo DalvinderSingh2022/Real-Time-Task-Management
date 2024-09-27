@@ -1,7 +1,7 @@
 import { createContext, useReducer } from 'react';
 
 const initialState = {
-    tasks: [],
+    tasks: null,
     loaded: false
 };
 
@@ -18,7 +18,7 @@ const tasksReducer = (state, action) => {
         case 'UPDATE_TASK':
             return {
                 ...state,
-                tasks: state.tasks.map((task) => {
+                tasks: state.tasks?.map((task) => {
                     if (task._id === action.payload.task._id) {
                         return { ...action.payload.task };
                     }

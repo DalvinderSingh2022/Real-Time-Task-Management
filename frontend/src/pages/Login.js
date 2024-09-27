@@ -9,10 +9,12 @@ import Response from '../components/Response';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
+import { TasksContext } from '../store/TasksContext';
 
 const Login = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
+    const { loadTasks } = useContext(TasksContext);
     const [response, setResponse] = useState(false);
     const navigate = useNavigate();
 
@@ -23,7 +25,6 @@ const Login = () => {
             password: e.target.password.value
         }
 
-
         setResponse(true);
         axios.put("https://task-manager-v4zl.onrender.com/api/users/login", user)
             .then(({ data }) => {
@@ -31,6 +32,10 @@ const Login = () => {
                 localStorage.setItem("jwt", data.token);
                 addToast({ type: 'success', message: data.message });
                 navigate("/");
+                (async () => {
+                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${data.user._id}`);
+                    loadTasks(tasksData.data.tasks);
+                })();
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
@@ -76,7 +81,7 @@ const Login = () => {
                         </div>
 
                         <div className={`flex col w_full ${styles.group}`}>
-                            <button type='submit' className={`button primary ${styles.submit_button}`}>{response ? "logging..." : "Log In"}</button>
+                            <button type='submit' className={`button primary flex gap2 ${styles.submit_button}`}>Log In{response && <div className='loading'></div>}</button>
                         </div>
 
                         <div className={styles.link}>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 
 import styles from '../styles/users.module.css';
@@ -57,12 +57,12 @@ const User = ({ name, followers, _id }) => {
                 </div>
                 {authState.user._id !== _id &&
                     (following
-                        ? <button className='button secondary' onClick={handleUnfollow}>{!response ? "Unfollow" : "Loading..."}</button>
-                        : <button className='button primary' onClick={handleFollow}>{!response ? "follow" : "following..."}</button>
+                        ? <button className='button secondary flex gap2' onClick={handleUnfollow}>Unfollow {response && <div className='loading'></div>}</button>
+                        : <button className='button primary flex gap2' onClick={handleFollow}>Follow{response && <div className='loading'></div>}</button>
                     )}
             </div>
         </>
     )
 }
 
-export default User;
+export default memo(User);

@@ -9,11 +9,13 @@ import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { SocketContext } from '../store/SocketContext';
+import { TasksContext } from '../store/TasksContext';
 
 const Register = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
     const { socketState } = useContext(SocketContext);
+    const { loadTasks } = useContext(TasksContext);
     const [response, setResponse] = useState(false);
     const navigate = useNavigate();
 
@@ -32,6 +34,10 @@ const Register = () => {
                 localStorage.setItem("jwt", data.token);
                 socketState.socket.emit('user_join', data.user);
                 navigate("/");
+                (async () => {
+                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${data.user._id}`);
+                    loadTasks(tasksData.data.tasks);
+                })();
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error.response.data.message })
@@ -39,7 +45,6 @@ const Register = () => {
             })
             .finally(() => setResponse(false));
     }
-
 
     if (authState.authenticated) {
         return <Navigate to="/" />
@@ -88,7 +93,7 @@ const Register = () => {
                         </div>
 
                         <div className={`flex col w_full ${styles.group}`}>
-                            <button type='submit' className={`button primary ${styles.submit_button}`}>{response ? "registering..." : "Register"}</button>
+                            <button type='submit' className={`button primary flex gap2 ${styles.submit_button}`}>Register{response && <div className='loading'></div>}</button>
                         </div>
 
                         <div className={styles.link}>
