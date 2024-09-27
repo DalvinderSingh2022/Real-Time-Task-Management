@@ -100,7 +100,7 @@ const Home = () => {
                 <div className={`wrap ${userSstyles.wrapper} ${styles.followers_wrapper}`}>
                     {authState.user.followers?.length > 0
                         ? authState.user.followers.map(user => <User {...user} key={user._id} />)
-                        : authState.user.followers ? <div className="loading"></div> : <div style={{ backgroundColor: 'inherit' }}>There is no follower</div>
+                        : authState.user.followers.length === 0 ? <div style={{ backgroundColor: 'inherit' }}>There is no follower</div> : <div className="loading"></div>
                     }
                 </div>
             </section>
@@ -113,7 +113,7 @@ const Home = () => {
                 <div className={`flex col gap tasks_container ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}>
                     {tasksState.tasks?.length > 0
                         ? tasksState.tasks.slice(0, 3).map(task => <Task {...task} key={task._id} />)
-                        : tasksState.tasks ? <div>There is no task</div> : <div className={`loading ${styles.loading}`}></div>
+                        : tasksState.tasks.length === 0 ? <div>There is no task</div> : <div className={`loading ${styles.loading}`}></div>
                     }
                 </div>
             </section>

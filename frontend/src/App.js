@@ -47,7 +47,7 @@ const App = () => {
                 verify();
                 setLoadingMsg('');
                 console.error(error);
-                addToast({ type: 'error', message: error.response.data.message });
+                addToast({ type: 'error', message: error?.response?.data?.message });
             }
         })();
     }, [addToast, authState.verified, loadTasks, login, verify]);

@@ -48,7 +48,7 @@ const Users = () => {
             })
             .catch((error) => {
                 loadUsers([]);
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
     }, [usersState, loadUsers, addToast]);

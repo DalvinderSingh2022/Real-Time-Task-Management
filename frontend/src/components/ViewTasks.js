@@ -37,7 +37,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                 socketState.socket.emit('task_updated', data.updatedTask, authState.user);
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
             .finally(() => {
@@ -53,7 +53,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                 socketState.socket.emit('task_deleted', { _id, ...task }, assignedTo, assignedBy);
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
             .finally(() => {

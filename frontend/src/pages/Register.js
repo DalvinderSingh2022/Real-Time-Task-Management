@@ -40,7 +40,7 @@ const Register = () => {
                 })();
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
             .finally(() => setResponse(false));

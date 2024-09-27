@@ -28,7 +28,7 @@ const User = ({ name, followers, _id }) => {
                 socketState.socket.emit('user_followed', data.authUser, data.userToFollow);
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
             .finally(() => setResponse(false));
@@ -41,7 +41,7 @@ const User = ({ name, followers, _id }) => {
                 socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error.response.data.message })
+                addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
             .finally(() => setResponse(false));

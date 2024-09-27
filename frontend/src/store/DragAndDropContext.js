@@ -56,7 +56,7 @@ const DragAndDropProvider = ({ children }) => {
                     socketState.socket.emit('task_updated', data.updatedTask, authState.user);
                 })
                 .catch((error) => {
-                    addToast({ type: 'error', message: error.response.data.message })
+                    addToast({ type: 'error', message: error?.response?.data?.message })
                     console.error(error);
                 })
                 .finally(() => {
