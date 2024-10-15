@@ -11,6 +11,7 @@
     width: unset;
     padding: 2em;
     background-color: var(--white);
+    min-width: 240px;
 }
 
 .container .comments {
