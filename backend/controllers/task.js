@@ -14,7 +14,14 @@ const addTask = async (req, res) => {
         // Save the new task to the database
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         await newTask.save();
-        const task = await newTask.populate(['assignedBy', 'assignedTo']);
+        const task = await newTask
+            .populate({
+                path: 'assignedTo',
+                select: '_id name'
+            }).populate({
+                path: 'assignedBy',
+                select: '_id name'
+            });
         return res.status(201).json({ message: 'Task created successfully', task });
     } catch (error) {
         validationHandler(error, res);
@@ -31,7 +38,13 @@ const allTasks = async (req, res) => {
                 { assignedTo: req.params.userId },
                 { assignedBy: req.params.userId }
             ]
-        }).populate(['assignedBy', 'assignedTo']);
+        }).populate({
+            path: 'assignedTo',
+            select: '_id name'
+        }).populate({
+            path: 'assignedBy',
+            select: '_id name'
+        }).sort({ updatedAt: 'desc' });
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
     } catch (error) {
@@ -70,7 +83,13 @@ const updateTask = async (req, res) => {
             req.params.id,
             req.body,
             { new: true }
-        ).populate(['assignedBy', 'assignedTo']);
+        ).populate({
+            path: 'assignedTo',
+            select: '_id name'
+        }).populate({
+            path: 'assignedBy',
+            select: '_id name'
+        });
 
         return res.status(200).json({ message: 'Task updated successfully', updatedTask });
     } catch (error) {

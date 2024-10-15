@@ -10,7 +10,11 @@ const allComments = async (req, res) => {
         // Find all comments of task with _id equal to taskId
         // and Populate the task and user fields with the corresponding data
         const taskId = new mongoose.Types.ObjectId(req.params.taskId);
-        const comments = await Comment.find({ task: taskId }).populate(['task', 'user']).sort({ updatedAt: 'desc' });
+        const comments = await Comment.find({ task: taskId })
+            .populate({
+                path: 'user',
+                select: '_id name'
+            }).sort({ updatedAt: 'desc' });
 
         res.status(200).json({ message: 'All Comments fetched successfully', comments });
     } catch (error) {
@@ -34,7 +38,10 @@ const addComment = async (req, res) => {
         // Save the new comment to the database
         // and Populate the task and user fields with the corresponding data
         await newComment.save();
-        const Comment = await newComment.populate(['task', 'user']);
+        const Comment = await newComment.populate({
+            path: 'user',
+            select: '_id name'
+        });
 
         return res.status(201).json({ message: 'Comment added successfully', comment: Comment });
     } catch (error) {

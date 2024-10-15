@@ -37,7 +37,16 @@ const login = async (req, res) => {
     try {
         // Find the user by email
         // and Populate the followers and following fields with the corresponding users data
-        const user = await User.findOne({ email }).populate(['followers', 'following']);
+        const user = await User.findOne({ email })
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!user) {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
@@ -75,7 +84,16 @@ const currentUser = async (req, res) => {
         }
 
         // Find the user by _id (stored in token)
-        const user = await User.findById(validUser.id).populate(['followers', 'following']);
+        const user = await User.findById(validUser.id)
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!user) {
             return res.status(401).json({ message: 'User is not authorized or token is missing' });
         }
@@ -105,7 +123,16 @@ const allUsers = async (req, res) => {
     try {
         // Find all users
         // and Populate the followers and following fields with the corresponding users data
-        const users = await User.find().populate(['followers', 'following']);
+        const users = await User.find()
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            })
+            .sort({ updatedAt: 'desc' });
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
     } catch (error) {
@@ -125,13 +152,31 @@ const followUser = async (req, res) => {
 
     try {
         // Find the user to follow by given _id
-        const userToFollow = await User.findById(userId).populate(['followers', 'following']);;
+        const userToFollow = await User.findById(userId)
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!userToFollow) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Find the authenticated user by given _id
-        const authUser = await User.findById(authUserId).populate(['followers', 'following']);;
+        const authUser = await User.findById(authUserId)
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!authUser) {
             return res.status(404).json({ message: 'Auth user not found' });
         }
@@ -163,13 +208,31 @@ const unfolloweUser = async (req, res) => {
 
     try {
         // Find the user to unfollow by given _id
-        const userToUnfollow = await User.findById(userId).populate(['followers', 'following']);;
+        const userToUnfollow = await User.findById(userId)
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!userToUnfollow) {
             return res.status(404).json({ message: 'User not found' });
         }
 
         // Find the authenticated user by given _id
-        const authUser = await User.findById(authUserId).populate(['followers', 'following']);;
+        const authUser = await User.findById(authUserId)
+            .populate({
+                path: 'followers',
+                select: '_id name followers'
+            })
+            .populate({
+                path: 'following',
+                select: '_id name followers'
+            });
+
         if (!authUser) {
             return res.status(404).json({ message: 'Auth user not found' });
         }

@@ -18,7 +18,7 @@ const TaksComments = () => {
 
     useEffect(() => {
         (async () => {
-            await axios.get(`http://localhost:4000/api/comments/${id}`)
+            await axios.get(`https://task-manager-v4zl.onrender.com/api/comments/${id}`)
                 .then(({ data }) => {
                     setComments(data.comments);
                 })
@@ -32,7 +32,7 @@ const TaksComments = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        await axios.post(`http://localhost:4000/api/comments/${id}`, {
+        await axios.post(`https://task-manager-v4zl.onrender.com/api/comments/${id}`, {
             comment,
             userId: authState.user._id
         })
