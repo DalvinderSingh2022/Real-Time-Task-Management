@@ -18,6 +18,7 @@ const Home = lazy(() => import('./pages/Home'));
 const Tasks = lazy(() => import('./pages/Tasks'));
 const Users = lazy(() => import('./pages/Users'));
 const Notfound = lazy(() => import('./pages/NotFound'));
+const TaskDetails = lazy(() => import('./pages/TaskDetails'));
 
 const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
@@ -173,7 +174,10 @@ const App = () => {
                 <Route path='/register' element={<Register />} />
                 <Route path='/' element={<Layout />}>
                     <Route index element={<Home />} />
-                    <Route path='tasks' element={<DragAndDropProvider><Tasks /></DragAndDropProvider>} />
+                    <Route path='tasks'>
+                        <Route index element={<DragAndDropProvider><Tasks /></DragAndDropProvider>} ></Route>
+                        <Route path=':id' element={<TaskDetails />}></Route>
+                    </Route>
                     <Route path="/users" element={<Users />} />
                     <Route path='*' element={<Notfound />} />
                 </Route>

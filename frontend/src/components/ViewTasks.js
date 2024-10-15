@@ -1,27 +1,29 @@
-import React, { memo, useContext, useState } from 'react';
+import React, { memo, useContext, useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
+import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
-import Response from './Response';
+import { TasksContext } from '../store/TasksContext';
+import Response from '../components/Response';
 
-const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy, status, _id }) => {
+const ViewTask = () => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
+    const { tasksState } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState('');
-    const [task, setTask] = useState({
-        title,
-        description,
-        dueDate,
-        assignedTo,
-        assignedBy,
-        status
-    });
+    const [task, setTask] = useState(null);
+    const { id } = useParams();
+
+    useEffect(() => {
+        setTask(tasksState.tasks.find(task => task._id === id));
+    }, [tasksState, id]);
 
     const handlechange = (e) => {
         const name = e.target.name;
@@ -32,7 +34,7 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
     const handlesubmit = (e) => {
         e.preventDefault();
         setResponse('save');
-        axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`, task)
+        axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`, task)
             .then(({ data }) => {
                 socketState.socket.emit('task_updated', data.updatedTask, authState.user);
             })
@@ -40,48 +42,46 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                 addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
-            .finally(() => {
-                remove();
-                setResponse('');
-            });
+            .finally(() => setResponse(''));
     }
 
     const handelDelete = () => {
         setResponse('delete');
-        axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${_id}`)
-            .then(({ data }) => {
-                socketState.socket.emit('task_deleted', { _id, ...task }, assignedTo, assignedBy);
+        axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
+            .then(() => {
+                socketState.socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })
                 console.error(error);
             })
-            .finally(() => {
-                remove();
-                setResponse('');
-            });
+            .finally(() => setResponse(''));
     }
 
     return (
         <>
             {response && <Response />}
-            <div className="modal full_container" onClick={remove}>
-                <div className={` flex col ${authStyles.container} ${modalStyles.container}`} onClick={e => e.stopPropagation()}>
-                    <div>
-                        <div className={`w_full text_primary ${authStyles.heading}`}>View Task</div>
-                    </div>
+            {task ?
+                <div className={` flex col ${authStyles.container} ${styles.wrapper}`} onClick={e => e.stopPropagation()}>
                     <form className={`flex col gap w_full modal_child`} onSubmit={handlesubmit}>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="title" className='text_primary'>Title</label>
-                            <input
-                                disabled={authState.user._id !== task.assignedBy._id}
-                                type="text"
-                                id='title'
-                                name='title'
-                                placeholder='title'
-                                value={task.title}
-                                onChange={e => handlechange(e)}
-                            />
+                            <div className={`flex gap2`}>
+                                <input
+                                    disabled={authState.user._id !== task.assignedBy._id}
+                                    type="text"
+                                    id='title'
+                                    name='title'
+                                    placeholder='title'
+                                    value={task.title}
+                                    onChange={e => handlechange(e)}
+                                    className='w_full'
+                                />
+                                {authState.user._id === task.assignedBy._id &&
+                                    <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
+                                }
+                                <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
+                            </div>
                         </div>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="description" className='text_primary'>Description</label>
@@ -160,16 +160,23 @@ const ViewTask = ({ remove, title, description, dueDate, assignedTo, assignedBy,
                             </div>
                         </div>
 
-                        <div className={`flex gap ${modalStyles.group}`}>
-                            {authState.user._id === task.assignedBy._id &&
-                                <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
-                            }
-                            <button type='submit' className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
-                            <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
+                        <div className={`flex gap w_full ${authStyles.group}`}>
+                            <div className={`flex col w_full ${authStyles.group}`}>
+                                <label className='text_primary'>Last updated</label>
+                                <div>{new Date(task.updatedAt).toDateString()} at {new Date(task.updatedAt).toLocaleTimeString()}</div>
+                            </div>
                         </div>
+
+                        <div className={`flex gap w_full ${authStyles.group}`}>
+                            <div className={`flex col w_full ${authStyles.group}`}>
+                                <label className='text_primary'>Assigned on</label>
+                                <div>{new Date(task.createdAt).toDateString()} at {new Date(task.createdAt).toLocaleTimeString()}</div>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
-            </div>
+                : <div className='loading'></div>}
         </>
     )
 }
