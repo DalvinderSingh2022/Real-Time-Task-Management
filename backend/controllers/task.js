@@ -1,5 +1,6 @@
 
 const Task = require('../models/task.model');
+const Comment = require('../models/comment.model');
 const validationHandler = require('../middleware/validationHandler');
 
 // Create a new task
@@ -44,6 +45,9 @@ const removeTask = async (req, res) => {
     try {
         // Delete the task with the given _id
         await Task.deleteOne({ _id: req.params.id });
+
+        const taskId = new mongoose.Types.ObjectId(req.params.taskId);
+        await Comment.deleteMany({ task: taskId });
 
         return res.status(201).json({ message: "Task deleted Succesfully" });
     } catch (error) {
