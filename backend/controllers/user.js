@@ -94,14 +94,10 @@ const currentUser = async (req, res) => {
                 select: '_id name followers'
             });
 
-        if (!user) {
-            return res.status(401).json({ message: 'User is not authorized or token is missing' });
-        }
-
         return res.status(200).json({ message: "Current user data fetched successfully", user });
 
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(401).json({ message: 'User is not authorized or token expired' });
     }
 }
 
