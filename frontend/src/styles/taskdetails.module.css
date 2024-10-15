@@ -15,9 +15,30 @@
 
 .container .comments {
     grid-column: span 2;
+    padding: 1em;
+    justify-content: space-between;
 }
 
-@media screen and (max-width:1400px) {
+.comments .messages {
+    margin-bottom: auto;
+    align-items: stretch;
+    align-self: stretch;
+    justify-content: flex-start;
+    overflow: auto;
+    max-height: 65vh;
+}
+
+.messages .message {
+    padding: 0.5em 0.5em 0;
+    border-bottom: 2px solid var(--background-color-2);
+    font-size: 0.9em;
+}
+
+.message span {
+    font-size: 0.8em;
+}
+
+@media screen and (max-width:920px) {
     .container .wrapper {
         grid-column: span 6;
     }

@@ -1,15 +1,15 @@
 import React from 'react';
 
 import ViewTasks from '../components/ViewTasks';
+import TaksComments from '../components/TaksComments';
 
-import authStyles from "../styles/auth.module.css";
 import styles from '../styles/taskdetails.module.css';
 
 const TaskDetails = () => {
     return (
         <div className={`${styles.container}`}>
             <ViewTasks />
-            <div className={`${styles.wrapper} ${styles.comments} ${authStyles.container}`}></div>
+            <TaksComments />
         </div>
     )
 }

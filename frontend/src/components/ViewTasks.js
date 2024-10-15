@@ -61,8 +61,8 @@ const ViewTask = () => {
     return (
         <>
             {response && <Response />}
-            {task ?
-                <div className={` flex col ${authStyles.container} ${styles.wrapper}`} onClick={e => e.stopPropagation()}>
+            <div className={` flex col ${authStyles.container} ${styles.wrapper}`} onClick={e => e.stopPropagation()}>
+                {task ?
                     <form className={`flex col gap w_full modal_child`} onSubmit={handlesubmit}>
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="title" className='text_primary'>Title</label>
@@ -175,8 +175,8 @@ const ViewTask = () => {
                         </div>
 
                     </form>
-                </div>
-                : <div className='loading'></div>}
+                    : <div className='loading'></div>}
+            </div>
         </>
     )
 }
