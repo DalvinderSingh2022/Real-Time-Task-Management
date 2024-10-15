@@ -51,6 +51,18 @@ io.on("connection", (socket) => {
         io.emit('user_join', user);
     });
 
+    socket.on("join_room", id => {
+        socket.join(id);
+    });
+
+    socket.on("leave_room", id => {
+        socket.leave(id);
+    });
+
+    socket.on("send_comment", (comment, id) => {
+        io.in(id).emit('update_comments', comment);
+    });
+
     socket.on("disconnect", () => {
         console.log("disconnected : " + socket.id);
     });

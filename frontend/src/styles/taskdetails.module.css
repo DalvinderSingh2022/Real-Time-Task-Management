@@ -27,6 +27,7 @@
     justify-content: flex-start;
     overflow: auto;
     max-height: 65vh;
+    padding: 0 0 1em;
 }
 
 .messages .message {
