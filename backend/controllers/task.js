@@ -33,13 +33,15 @@ const allTasks = async (req, res) => {
                 { assignedTo: req.params.userId },
                 { assignedBy: req.params.userId }
             ]
-        }).populate({
-            path: 'assignedTo',
-            select: '_id name'
-        }).populate({
-            path: 'assignedBy',
-            select: '_id name'
-        }).sort({ updatedAt: 'desc' });
+        })
+            .sort({ updatedAt: 'desc' })
+            .populate({
+                path: 'assignedTo',
+                select: '_id name'
+            }).populate({
+                path: 'assignedBy',
+                select: '_id name'
+            });
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
     } catch (error) {
@@ -60,6 +62,10 @@ const getTask = async (req, res) => {
                 path: 'assignedBy',
                 select: '_id name'
             });
+
+        if (!task) {
+            return res.status(404).json({ message: "Task Not found" });
+        }
 
         res.status(200).json({ message: 'Task fetched successfully', task });
     } catch (error) {

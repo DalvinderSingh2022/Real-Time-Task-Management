@@ -11,14 +11,15 @@ const allComments = async (req, res) => {
         // and Populate the task and user fields with the corresponding data
         const taskId = new mongoose.Types.ObjectId(req.params.taskId);
         const comments = await Comment.find({ task: taskId })
+            .sort({ updatedAt: 'asc' })
             .populate({
                 path: 'user',
                 select: '_id name'
-            }).sort({ updatedAt: 'desc' });
+            });
 
         res.status(200).json({ message: 'All Comments fetched successfully', comments });
     } catch (error) {
-        return res.status(500).json({ message: "Server error", error: error.message });
+        return res.status(500).json({ message: "Internal Server Error" });
     }
 };
 

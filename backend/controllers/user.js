@@ -120,6 +120,7 @@ const allUsers = async (req, res) => {
         // Find all users
         // and Populate the followers and following fields with the corresponding users data
         const users = await User.find()
+            .sort({ updatedAt: 'desc' })
             .populate({
                 path: 'followers',
                 select: '_id name followers'
@@ -127,8 +128,7 @@ const allUsers = async (req, res) => {
             .populate({
                 path: 'following',
                 select: '_id name followers'
-            })
-            .sort({ updatedAt: 'desc' });
+            });
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
     } catch (error) {
