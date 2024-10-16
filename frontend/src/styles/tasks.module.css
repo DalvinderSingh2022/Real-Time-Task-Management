@@ -58,7 +58,6 @@
     gap: 4px;
     align-items: stretch;
     transition: transform 200ms ease;
-    max-width: 420px;
     background-color: var(--background);
     border-bottom: 2px solid var(--color);
 }

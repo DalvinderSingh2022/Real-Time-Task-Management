@@ -14,14 +14,9 @@ const addTask = async (req, res) => {
         // Save the new task to the database
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         await newTask.save();
-        const task = await newTask
-            .populate({
-                path: 'assignedTo',
-                select: '_id name'
-            }).populate({
-                path: 'assignedBy',
-                select: '_id name'
-            });
+        await newTask.populate({ path: 'assignedTo', select: '_id name' })
+        const task = await newTask.populate({ path: 'assignedBy', select: '_id name' });
+
         return res.status(201).json({ message: 'Task created successfully', task });
     } catch (error) {
         validationHandler(error, res);
@@ -52,6 +47,25 @@ const allTasks = async (req, res) => {
     }
 };
 
+// Retrieve a task
+const getTask = async (req, res) => {
+    try {
+        // Retrieve the task with the given _id
+        // and Populate the assignedBy and assignedTo fields with the corresponding user data
+        const task = await Task.findById(req.params.id)
+            .populate({
+                path: 'assignedTo',
+                select: '_id name'
+            }).populate({
+                path: 'assignedBy',
+                select: '_id name'
+            });
+
+        res.status(200).json({ message: 'Task fetched successfully', task });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
 
 // Delete a task
 const removeTask = async (req, res) => {
@@ -97,4 +111,4 @@ const updateTask = async (req, res) => {
     }
 };
 
-module.exports = { addTask, allTasks, removeTask, updateTask };
+module.exports = { allTasks, addTask, getTask, removeTask, updateTask };

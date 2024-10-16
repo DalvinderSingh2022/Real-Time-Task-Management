@@ -9,21 +9,17 @@ import styles from '../styles/taskdetails.module.css';
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
-import { TasksContext } from '../store/TasksContext';
 import Response from '../components/Response';
 
-const ViewTask = () => {
+const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
-    const { tasksState } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState('');
     const [task, setTask] = useState(null);
     const { id } = useParams();
 
-    useEffect(() => {
-        setTask(tasksState.tasks.find(task => task._id === id));
-    }, [tasksState, id]);
+    useEffect(() => setTask(prop.task), [prop]);
 
     const handlechange = (e) => {
         const name = e.target.name;
@@ -80,7 +76,10 @@ const ViewTask = () => {
                                 {authState.user._id === task.assignedBy._id &&
                                     <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
                                 }
-                                <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
+                                {
+                                    (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) &&
+                                    <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
+                                }
                             </div>
                         </div>
                         <div className={`flex col w_full ${authStyles.group}`}>

@@ -11,7 +11,7 @@ import { AppContext } from '../store/AppContext';
 import { SocketContext } from '../store/SocketContext';
 import Response from './Response';
 
-const TaksComments = () => {
+const TaksComments = ({ task }) => {
     const { addToast } = useContext(AppContext);
     const { socketState } = useContext(SocketContext);
     const { authState } = useContext(AuthContext);
@@ -26,6 +26,7 @@ const TaksComments = () => {
             await axios.get(`https://task-manager-v4zl.onrender.com/api/comments/${id}`)
                 .then(({ data }) => {
                     setComments(data.comments);
+                    setTimeout(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, 0);
                 })
                 .catch((error) => {
                     console.error(error);
@@ -47,13 +48,12 @@ const TaksComments = () => {
 
         socketState.socket.on('update_comments', (comment) => {
             setComments(prev => [...prev, comment]);
-            setTimeout(() => {
-                messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
-            }, 0);
+            setTimeout(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, 0);
+            addToast({ type: 'info', message: `${task.title}: new comment` });
         });
 
         return () => socketState.socket.off("update_comments");
-    }, [comments, socketState]);
+    }, [comments, socketState, addToast, task]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -109,7 +109,6 @@ const TaksComments = () => {
 }
 
 const Comment = memo(({ _id, comment, user, createdAt, authState }) => {
-
     return <div key={_id} className={`${styles.message}`}>
         <div>{comment}</div>
         <span className='text_secondary'>{user._id === authState.user._id ? "You" : user.name} on {new Date(createdAt).toLocaleString()}</span>

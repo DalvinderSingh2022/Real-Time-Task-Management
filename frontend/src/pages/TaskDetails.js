@@ -1,29 +1,42 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
+import axios from 'axios';
 
 import styles from '../styles/taskdetails.module.css';
 
-import { TasksContext } from '../store/TasksContext';
+import { AppContext } from '../store/AppContext';
 import NotFound from '../pages/NotFound';
 import ViewTasks from '../components/ViewTasks';
 import TaksComments from '../components/TaksComments';
 
 const TaskDetails = () => {
-    const { tasksState } = useContext(TasksContext);
+    const { addToast } = useContext(AppContext);
     const [task, setTask] = useState(null);
+    const [invalidId, setInvalidId] = useState(false);
     const { id } = useParams();
 
     useEffect(() => {
-        setTask(tasksState.tasks.filter(task => task._id === id));
-    }, [tasksState, id]);
+        (async () => {
+            axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
+                .then(({ data }) => {
+                    setTask(data.task);
+                })
+                .catch((error) => {
+                    setInvalidId(true);
+                    addToast({ type: 'error', message: error?.response?.data?.message })
+                    console.error(error);
+                });
+        })();
+    }, [id, addToast]);
+
+    if (invalidId) return <NotFound />;
 
     return (
-        task?.length > 0
-            ? <div className={`${styles.container}`}>
-                <ViewTasks />
-                <TaksComments />
+        !task ? <div className="loading"></div> :
+            <div className={`${styles.container}`}>
+                <ViewTasks task={task} />
+                <TaksComments task={task} />
             </div>
-            : task ? <NotFound /> : <div className="loading"></div>
     )
 }
 

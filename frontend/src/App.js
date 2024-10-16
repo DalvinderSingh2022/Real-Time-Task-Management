@@ -23,7 +23,7 @@ const TaskDetails = lazy(() => import('./pages/TaskDetails'));
 const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
     const { authState, login, verify } = useContext(AuthContext);
-    const { loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
+    const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
     const { addUser, updateUser, deleteUser } = useContext(UsersContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
@@ -42,7 +42,7 @@ const App = () => {
                 login(userData.data.user);
                 setLoadingMsg('');
 
-                const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${userData.data.user._id}`);
+                const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${userData.data.user._id}`);
                 loadTasks(tasksData.data.tasks);
             } catch (error) {
                 verify();
@@ -53,6 +53,18 @@ const App = () => {
         })();
     }, [addToast, authState.verified, loadTasks, login, verify]);
 
+
+    useEffect(() => {
+        if (!socketState.connected || !tasksState.loaded) return;
+
+        tasksState.tasks.map(task =>
+            socketState.socket.emit("join_room", task._id)
+        );
+
+        return () => tasksState.tasks.map(task =>
+            socketState.socket.emit("leave_room", task._id)
+        );
+    }, [socketState, tasksState]);
 
     useEffect(() => {
         if (!socketState.connected) return;

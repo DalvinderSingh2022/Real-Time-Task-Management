@@ -33,7 +33,7 @@ const Login = () => {
                 addToast({ type: 'success', message: data.message });
                 navigate("/");
                 (async () => {
-                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${data.user._id}`);
+                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`);
                     loadTasks(tasksData.data.tasks);
                 })();
             })

@@ -35,7 +35,7 @@ const Register = () => {
                 socketState.socket.emit('user_join', data.user);
                 navigate("/");
                 (async () => {
-                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${data.user._id}`);
+                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`);
                     loadTasks(tasksData.data.tasks);
                 })();
             })

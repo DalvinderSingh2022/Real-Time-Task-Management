@@ -83,10 +83,11 @@ form :where(input, textarea, select) {
 
 form :where(input, textarea, select):disabled {
     background-color: inherit;
-    border: none;
+    cursor: not-allowed;
+    border-width: 1px;
     font-weight: 500;
     font-size: 1.01em;
-    padding: 0;
+    padding: 6px 8px;
 }
 
 form :where(input:not(:disabled), textarea, select):focus {
@@ -372,7 +373,8 @@ button .loading {
     background-color: var(--background-color-1);
     --color: var(--green);
     gap: 1.2em;
-    max-width: 340px;
+    width: 340px;
+    justify-content: space-between;
 }
 
 .toast .type {
@@ -380,6 +382,10 @@ button .loading {
     line-height: .9em;
     font-weight: 400;
     text-transform: capitalize;
+}
+
+.toast .content {
+    margin-right: auto;
 }
 
 .toast span {
