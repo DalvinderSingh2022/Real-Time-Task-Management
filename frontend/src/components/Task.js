@@ -23,15 +23,14 @@ const Task = (task) => {
                     context?.setTask(task);
                 }}
                 onDragEnd={() => setDragging(false)}
+                title={`${task.title} : ${task.status}`}
                 className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()} ${dragging ? "task over" : ""}`}
             >
                 <Link className={`text_primary ${styles.task_title}`} to={`/tasks/${task._id}`}>{task.title}</Link>
                 <div className={`text_secondary ${styles.task_description}`}>{task.description}</div>
-                <div className={styles.task_assignTo} title={`Assigned To: ${task.assignedTo.name}`}>
-                    <span>{task.assignedTo.name}{authState.user._id === task.assignedTo._id ? "(You)" : ""}</span>
-                </div>
                 <div className={`flex ${styles.group}`}>
-                    <span>{new Date(task.dueDate).toDateString()}</span>
+                    <span title={`Assigned To: ${task.assignedTo.name}`}>{task.assignedTo.name}{authState.user._id === task.assignedTo._id ? "(You)" : ""}</span>
+                    <span title={`DueDate : ${new Date(task.dueDate).toDateString()}`}>{new Date(task.dueDate).toDateString().slice(4)}</span>
                 </div>
             </div>
         </>

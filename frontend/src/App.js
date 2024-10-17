@@ -147,7 +147,7 @@ const App = () => {
             }
             if (authState.user._id === userToUnfollow._id) {
                 login(userToUnfollow);
-                addToast({ type: 'info', message: `${authUser.name} Unfollowed you` });
+                addToast({ type: 'warning', message: `${authUser.name} Unfollowed you` });
             }
         });
 

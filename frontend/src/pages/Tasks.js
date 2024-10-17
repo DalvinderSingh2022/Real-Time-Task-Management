@@ -16,19 +16,19 @@ const Tasks = () => {
     const [progress, setProgress] = useState(null);
     const [completed, setCompleted] = useState(null);
     const [addTask, setAddTask] = useState(false);
-    const [tasks, setTasks] = useState([]);
+    const [tasks, setTasks] = useState(null);
     const [search, setSearch] = useState('');
 
     useEffect(() => {
+        if (!tasks) return;
+
         setNotStarted(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted'));
         setProgress(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'inprogress'));
         setCompleted(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'completed'));
     }, [tasks]);
 
     useEffect(() => {
-        if (!tasksState.loaded) {
-            return;
-        }
+        if (!tasksState.loaded) return;
 
         setTasks(tasksState.tasks.filter(task =>
             task.title.toLowerCase().replaceAll(" ", '').includes(search) ||
@@ -39,16 +39,16 @@ const Tasks = () => {
     return (
         <article>
             {addTask && <AddTask remove={() => setAddTask(false)} />}
-            <form className={`${styles.filters}`}>
+            <form className={`${styles.filters} flex gap2`} onSubmit={(e) => e.preventDefault()}>
                 <input
-                    type="text"
+                    type="search"
                     name="search"
                     id="search"
                     placeholder='search by title, description'
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
-                <button type='button' className="button primary flex gap2" onClick={() => setAddTask(true)}>
+                <button type='button' className={`button primary flex gap2 ${styles.create_btn}`} onClick={() => setAddTask(true)}>
                     <FaPlus />
                     <span>Create</span>
                 </button>

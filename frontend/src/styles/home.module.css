@@ -11,7 +11,7 @@
     padding: 1em;
 }
 
-.header {
+section .header {
     justify-content: space-between;
     align-self: stretch;
 }
@@ -27,7 +27,7 @@
 
 .graph .graph_bar {
     align-self: stretch;
-    background-color: var(--background-color-2);
+    background-color: var(--background-color);
     height: 16px;
     border-radius: 40px;
     justify-content: flex-start;
@@ -35,7 +35,7 @@
 }
 
 .graph .bar_child {
-    transition: .2s ease;
+    transition: .2s ease-in-out;
     height: 100%;
     width: 0%;
 }

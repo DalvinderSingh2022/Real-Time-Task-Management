@@ -2,6 +2,9 @@ import React, { useContext, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import axios from "axios";
 
+import { FiEye } from "react-icons/fi";
+import { FiEyeOff } from "react-icons/fi";
+
 import styles from "./../styles/auth.module.css";
 
 import Toast from '../components/Toast';
@@ -16,6 +19,7 @@ const Login = () => {
     const { addToast } = useContext(AppContext);
     const { loadTasks } = useContext(TasksContext);
     const [response, setResponse] = useState(false);
+    const [show, setShow] = useState(false);
     const navigate = useNavigate();
 
     const handlesubmit = (e) => {
@@ -67,17 +71,20 @@ const Login = () => {
                                 name='email'
                                 placeholder='exapmle@domain.com'
                                 required
+                                autoComplete="email"
                             />
                         </div>
                         <div className={`flex col w_full ${styles.group}`}>
                             <label htmlFor="password" className='text_primary'>Password</label>
                             <input
-                                type="password"
+                                type={show ? 'text' : 'password'}
                                 id='password'
                                 name='password'
                                 placeholder='12345678'
                                 required
+                                autoComplete="current-password"
                             />
+                            <span className={`${styles.password_eye} flex`} onClick={() => setShow(prev => !prev)}>{show ? <FiEyeOff /> : <FiEye />}</span>
                         </div>
 
                         <div className={`flex col w_full ${styles.group}`}>

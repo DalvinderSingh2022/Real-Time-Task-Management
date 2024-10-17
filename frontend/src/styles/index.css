@@ -11,8 +11,7 @@
     --purple-light: #925bc8;
     --purple-dark: #511690;
 
-    --background-color-1: #fafafa;
-    --background-color-2: #f5f5f5;
+    --background-color: #fafafa;
 
     --text: #11142d;
     --text-sec: #808191;
@@ -20,7 +19,7 @@
     --shadow-color: rgb(50 50 80 / 6%);
 
     --white: #ffffff;
-    --grey: #E4E4E4;
+    --grey: #e1e1e1;
     --green: #83c788;
     --yellow: #ffcf73;
     --red: #F45252;
@@ -33,8 +32,8 @@
 }
 
 .notstarted {
-    --color: #b6b9bd;
-    --background: #faf8ff;
+    --color: #747373;
+    --background: #f6f6f6;
 }
 
 .completed {
@@ -52,7 +51,7 @@
 }
 
 body {
-    background-color: var(--background-color-2);
+    background-color: var(--background-color);
 }
 
 button {
@@ -87,12 +86,19 @@ form :where(input, textarea, select):disabled {
     border-width: 1px;
     font-weight: 500;
     font-size: 1.01em;
-    padding: 6px 8px;
+    padding: 7px 11px;
 }
 
 form :where(input:not(:disabled), textarea, select):focus {
     border-color: var(--grey);
     border-bottom-color: var(--purple-light);
+}
+
+form input[type='search'] {
+    padding: 12px 24px;
+    border-color: var(--white);
+    box-shadow: 0 0 42px 0 var(--shadow-color);
+    width: min(480px, 100%);
 }
 
 main {
@@ -177,7 +183,7 @@ article {
 
 .button.secondary {
     color: var(--purple-light);
-    background-color: var(--background-color-1);
+    background-color: var(--background-color);
 }
 
 .button.round {
@@ -226,7 +232,7 @@ main .side_nav {
     height: 100vh;
     justify-content: space-between;
     padding-block: 2em;
-    transition: width 200ms ease;
+    transition: width 200ms ease-in-out;
     z-index: 99;
 }
 
@@ -302,11 +308,10 @@ main.close .side_nav .link {
     backdrop-filter: blur(4px);
     display: grid;
     place-items: center;
-    background-color: transparent;
+    background-color: var(--shadow-color);
 }
 
 .modal .modal_child {
-    background-color: var(--background-color-1);
     padding: 1em 0;
     border-radius: 8px;
     width: min(420px, 100%);
@@ -315,7 +320,7 @@ main.close .side_nav .link {
 .loading {
     height: 30px;
     width: 30px;
-    border: 5px solid var(--grey);
+    border: 5px solid var(--white);
     border-bottom-color: var(--purple-light);
     border-radius: 50%;
     margin: 1em auto;
@@ -342,8 +347,8 @@ button .loading {
     border: solid transparent;
     border-right-color: var(--purple-dark);
     border-left-color: var(--purple-dark);
-    animation: spin 1s ease infinite;
-    transition: 0.2s ease;
+    animation: spin 1s ease-in-out infinite;
+    transition: 0.2s ease-in-out;
 }
 
 @keyframes spin {
@@ -369,8 +374,8 @@ button .loading {
     position: relative;
     padding: 10px;
     color: var(--text);
-    border-radius: 8px;
-    background-color: var(--background-color-1);
+    border-radius: 8px 8px 0 0;
+    background-color: var(--white);
     --color: var(--green);
     gap: 1.2em;
     width: 340px;
@@ -414,20 +419,17 @@ button .loading {
     bottom: 0;
     width: 100%;
     background-color: var(--color);
-    animation: toast 3s ease forwards;
+    animation: toast 3s ease-in-out forwards;
 }
 
 .response {
     z-index: 9999;
 }
 
-.response>span {
-    background-color: var(--background-color-2);
-    padding: 0.5em 1.5em;
-    border-radius: 48px;
-    font-weight: 500;
-    border-bottom: 2px solid var(--purple-light);
-    margin-top: 12px;
+.not_found {
+    color: var(--purple-light);
+    font-size: 1.8em;
+    padding-bottom: 4em;
 }
 
 @keyframes toast {
@@ -458,7 +460,7 @@ button .loading {
         position: fixed;
         left: 0;
         top: 0;
-        width: 360px;
+        width: 340px;
         grid-row: none;
     }
 

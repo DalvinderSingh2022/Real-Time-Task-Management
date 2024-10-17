@@ -50,9 +50,9 @@ const User = ({ name, followers, _id }) => {
     return (
         <>
             {response && <Response />}
-            <div className={`flex ${styles.user}`}>
+            <div className={`flex ${styles.user}`} title={name}>
                 <div>
-                    <div className='text_primary'>{name}</div>
+                    <div className={`text_primary ${styles.user_title}`}>{name}</div>
                     <div className='text_secondary'>Followers: {followers.length}</div>
                 </div>
                 {authState.user._id !== _id &&

@@ -1,5 +1,5 @@
 import React, { memo, useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
@@ -18,6 +18,7 @@ const ViewTask = (prop) => {
     const [response, setResponse] = useState('');
     const [task, setTask] = useState(null);
     const { id } = useParams();
+    const navigate = useNavigate();
 
     useEffect(() => setTask(prop.task), [prop]);
 
@@ -45,6 +46,7 @@ const ViewTask = (prop) => {
         setResponse('delete');
         axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
             .then(() => {
+                navigate('/tasks');
                 socketState.socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy);
             })
             .catch((error) => {
@@ -153,7 +155,7 @@ const ViewTask = (prop) => {
                                     onChange={(e) => handlechange(e)}
                                     required
                                 >
-                                    <option value={authState.user._id}>Self</option>
+                                    <option value={authState.user._id}>{authState.user.name + ' (You)'}</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
                                 </select>
                             </div>

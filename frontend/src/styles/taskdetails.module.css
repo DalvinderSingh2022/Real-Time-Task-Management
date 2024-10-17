@@ -31,12 +31,15 @@
 }
 
 .messages .message {
-    padding: 0.5em 0.5em 0;
-    border-bottom: 2px solid var(--background-color-2);
+    padding: 6px 12px;
     font-size: 0.9em;
 }
 
-.message span {
+.messages .message:not(:last-of-type) {
+    border-bottom: 1px solid var(--grey);
+}
+
+.message .comment_date {
     font-size: 0.8em;
 }
 

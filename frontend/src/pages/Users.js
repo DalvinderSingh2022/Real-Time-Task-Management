@@ -55,24 +55,26 @@ const Users = () => {
 
     return (
         <article>
-            <form className={`${tasksStyles.filters} ${tasksStyles.wrap}`} onClick={e => changeFilter(e)}>
+            <form className={`${tasksStyles.filters} flex gap wrap`} onClick={e => changeFilter(e)} onSubmit={e => e.preventDefault()}>
                 <input
-                    type="text"
+                    type="search"
                     name="search"
                     id="search"
                     placeholder='search by name'
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
-                <button type='button' className={`${filter === "" ? "primary" : "secondary"} button flex gap2`}>All</button>
-                <button type='button' data-filter='followers' className={`${filter === "followers" ? "primary" : "secondary"} button flex gap2`}>Followers</button>
-                <button type='button' data-filter='following' className={`${filter === "following" ? "primary" : "secondary"} button flex gap2`}>Following</button>
+                <div className="flex gap2">
+                    <button type='button' className={`${filter === "" ? "primary" : "secondary"} button flex gap2`}>All</button>
+                    <button type='button' data-filter='followers' className={`${filter === "followers" ? "primary" : "secondary"} button flex gap2`}>Followers</button>
+                    <button type='button' data-filter='following' className={`${filter === "following" ? "primary" : "secondary"} button flex gap2`}>Following</button>
+                </div>
             </form>
             <div className={styles.container}>
-                <div className={styles.wrapper}>
+                <div className={`flex gap wrap ${styles.wrapper}`}>
                     {users?.length > 0
                         ? users.map(user => <User {...user} key={user._id} />)
-                        : users ? <div>There is no user {filter ? "in " + filter : ""}</div> : <div className="loading"></div>
+                        : users ? <div className='text_secondary flex'>There is no user {filter ? "in " + filter : ""}</div> : <div className="loading"></div>
                     }
                 </div>
             </div>

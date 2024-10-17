@@ -22,13 +22,12 @@ const Home = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setNotStarted(tasksState.tasks?.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted').length || 0);
-        setProgress(tasksState.tasks?.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'inprogress').length || 0);
-        setCompleted(tasksState.tasks?.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'completed').length || 0);
+        setNotStarted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted').length);
+        setProgress(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'inprogress').length);
+        setCompleted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'completed').length);
 
-
-        setBySelf(tasksState.tasks?.filter(task => task.assignedBy._id === authState.user._id).length || 0);
-        setByOthers(tasksState.tasks?.filter(task => task.assignedBy._id !== authState.user._id).length || 0);
+        setBySelf(tasksState.tasks.filter(task => task.assignedBy._id === authState.user._id).length);
+        setByOthers(tasksState.tasks.filter(task => task.assignedBy._id !== authState.user._id).length);
     }, [tasksState, authState]);
 
     return (
@@ -92,28 +91,28 @@ const Home = () => {
                 </div>
             </section>
 
-            <section className={styles.followers}>
-                <header className={`flex ${styles.header}`}>
-                    <h2 className='text_primary'>Followers</h2>
-                    <button onClick={() => navigate('users')} className='button primary'>All Users</button>
-                </header>
-                <div className={`wrap ${userSstyles.wrapper} ${styles.followers_wrapper}`}>
-                    {authState.user.followers?.length > 0
-                        ? authState.user.followers.map(user => <User {...user} key={user._id} />)
-                        : authState.user.followers.length === 0 ? <div style={{ backgroundColor: 'inherit' }}>There is no follower</div> : <div className="loading"></div>
-                    }
-                </div>
-            </section>
-
             <section className={styles.tasks}>
                 <header className={`flex ${styles.header}`}>
                     <h2 className='text_primary'>Tasks</h2>
                     <button onClick={() => navigate('tasks')} className='button primary'>All Tasks</button>
                 </header>
-                <div className={`flex col gap tasks_container ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}>
-                    {tasksState.tasks?.length > 0
+                <div className={`flex col gap2 tasks_container ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}>
+                    {tasksState.tasks.length
                         ? tasksState.tasks.slice(0, 3).map(task => <Task {...task} key={task._id} />)
-                        : tasksState.tasks.length === 0 ? <div>There is no task</div> : <div className={`loading ${styles.loading}`}></div>
+                        : tasksState.loaded ? <div className='text_secondary flex'>There is no task</div> : <div className={`loading ${styles.loading}`}></div>
+                    }
+                </div>
+            </section>
+
+            <section className={styles.followers}>
+                <header className={`flex ${styles.header}`}>
+                    <h2 className='text_primary'>Followers</h2>
+                    <button onClick={() => navigate('users')} className='button primary'>All Users</button>
+                </header>
+                <div className={`flex gap2 wrap ${userSstyles.wrapper} ${styles.followers_wrapper}`}>
+                    {authState.user.followers?.length
+                        ? authState.user.followers.map(user => <User {...user} key={user._id} />)
+                        : authState.authenticated ? <div className='text_secondary flex'>There is no follower</div> : <div className="loading"></div>
                     }
                 </div>
             </section>

@@ -32,11 +32,10 @@ const TaskDetails = () => {
     if (invalidId) return <NotFound />;
 
     return (
-        !task ? <div className="loading"></div> :
-            <div className={`${styles.container}`}>
-                <ViewTasks task={task} />
-                <TaksComments task={task} />
-            </div>
+        <div className={`${styles.container}`}>
+            <ViewTasks task={task} />
+            <TaksComments task={task} />
+        </div>
     )
 }
 
