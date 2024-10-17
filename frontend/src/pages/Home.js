@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 import { AuthContext } from '../store/AuthContext';
 
@@ -19,7 +18,6 @@ const Home = () => {
     const [completed, setCompleted] = useState(0);
     const [bySelf, setBySelf] = useState(0);
     const [byOthers, setByOthers] = useState(0);
-    const navigate = useNavigate();
 
     useEffect(() => {
         setNotStarted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted').length);
@@ -93,8 +91,7 @@ const Home = () => {
 
             <section className={styles.tasks}>
                 <header className={`flex ${styles.header}`}>
-                    <h2 className='text_primary'>Tasks</h2>
-                    <button onClick={() => navigate('tasks')} className='button primary'>All Tasks</button>
+                    <h3 className='text_primary'>Recent Tasks</h3>
                 </header>
                 <div className={`flex col gap2 tasks_container ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}>
                     {tasksState.tasks.length
@@ -106,8 +103,7 @@ const Home = () => {
 
             <section className={styles.followers}>
                 <header className={`flex ${styles.header}`}>
-                    <h2 className='text_primary'>Followers</h2>
-                    <button onClick={() => navigate('users')} className='button primary'>All Users</button>
+                    <h3 className='text_primary'>Your Followers</h3>
                 </header>
                 <div className={`flex gap2 wrap ${userSstyles.wrapper} ${styles.followers_wrapper}`}>
                     {authState.user.followers?.length

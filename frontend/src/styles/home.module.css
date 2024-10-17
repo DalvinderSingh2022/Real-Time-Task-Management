@@ -9,6 +9,7 @@
     border-radius: 8px;
     background-color: var(--white);
     padding: 1em;
+    box-shadow: none;
 }
 
 section .header {

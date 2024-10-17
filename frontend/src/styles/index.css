@@ -46,8 +46,7 @@
 }
 
 .over.task {
-    border: 2px dashed var(--color) !important;
-    transform: scale(.95);
+    transform: scale(0.90) !important;
 }
 
 body {
@@ -78,26 +77,25 @@ form :where(input, textarea, select) {
     resize: none;
     border: 2px solid var(--grey);
     border-radius: 12px;
+    text-overflow: ellipsis;
+    color: var(--text);
 }
 
 form :where(input, textarea, select):disabled {
     background-color: inherit;
     cursor: not-allowed;
     border-width: 1px;
-    font-weight: 500;
-    font-size: 1.01em;
-    padding: 7px 11px;
 }
 
 form :where(input:not(:disabled), textarea, select):focus {
     border-color: var(--grey);
-    border-bottom-color: var(--purple-light);
+    border-bottom-color: var(--purple-light) !important;
 }
 
 form input[type='search'] {
     padding: 12px 24px;
     border-color: var(--white);
-    box-shadow: 0 0 42px 0 var(--shadow-color);
+    border-bottom-color: var(--grey);
     width: min(480px, 100%);
 }
 
@@ -117,6 +115,7 @@ main :is(nav, aside) {
     position: sticky;
     top: 0;
     background-color: var(--white);
+    box-shadow: 0 0 42px 0 var(--shadow-color);
 }
 
 article {

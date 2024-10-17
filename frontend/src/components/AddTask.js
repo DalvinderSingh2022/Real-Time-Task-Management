@@ -89,7 +89,7 @@ const AddTask = ({ remove, assignedTo }) => {
                                     defaultValue={assignedTo || authState.user._id}
                                     required
                                 >
-                                    <option value={authState.user._id}>Self</option>
+                                    <option value={authState.user._id}>{authState.user.name + " (You)"}</option>
                                     {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
                                 </select>
                             </div>

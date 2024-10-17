@@ -76,7 +76,7 @@ const App = () => {
             }
             else if (authState.user._id === assignedTo._id) {
                 deleteTask(task._id);
-                addToast({ type: 'warning', message: `${assignedBy.name} Deleted Task : ${task.title}` });
+                addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
             }
         });
 
@@ -89,7 +89,7 @@ const App = () => {
         socketState.socket.on('task_created', (task) => {
             if (authState.user._id === task.assignedBy._id) {
                 createTask(task);
-                addToast({ type: 'success', message: `Task created and assigned to ${task.assignedTo._id !== task.assignedBy._id ? task.assignedTo.name : 'Self'}` });
+                addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo._id === authState.user._id ? `to ${task.assignedTo.name}` : ''}` });
             }
             else if (authState.user._id === task.assignedTo._id) {
                 createTask(task);
@@ -106,7 +106,7 @@ const App = () => {
         socketState.socket.on('task_updated', (task, user) => {
             if (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) {
                 updateTask(task);
-                addToast({ type: 'info', message: `Task: ${task.title} updated by ${user.name}` });
+                addToast({ type: 'info', message: `Task: ${task.title} updated ${user._id !== authState.user._id ? `by ${user.name}` : ''}` });
             }
         });
 

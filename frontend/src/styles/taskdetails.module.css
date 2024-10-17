@@ -9,7 +9,7 @@
 .container .wrapper {
     grid-column: span 4;
     width: unset;
-    padding: 2em;
+    padding: 1em;
     background-color: var(--white);
     min-width: 240px;
 }

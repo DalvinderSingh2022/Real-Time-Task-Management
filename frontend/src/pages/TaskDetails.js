@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 import styles from '../styles/taskdetails.module.css';
+import homeStyles from "../styles/home.module.css";
 
 import { AppContext } from '../store/AppContext';
 import NotFound from '../pages/NotFound';
@@ -32,7 +33,7 @@ const TaskDetails = () => {
     if (invalidId) return <NotFound />;
 
     return (
-        <div className={`${styles.container}`}>
+        <div className={`${styles.container} ${homeStyles.article}`}>
             <ViewTasks task={task} />
             <TaksComments task={task} />
         </div>
