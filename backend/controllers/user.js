@@ -2,7 +2,10 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const dotenv = require("dotenv").config();
 const User = require('../models/user.model');
+const Task = require('../models/task.model');
 const validationHandler = require('../middleware/validationHandler');
+const mongoose = require('mongoose');
+const Comment = require('../models/comment.model');
 
 // Register a new user
 const register = async (req, res) => {
@@ -18,7 +21,8 @@ const register = async (req, res) => {
         // Save the user to the database
         // Generate a JSON Web Token (JWT) for the user
         await user.save();
-        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
+        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "24h" });
+
         res.status(200).json({ message: 'User created successfully', user, token });
     } catch (err) {
         validationHandler(err, res);
@@ -38,14 +42,10 @@ const login = async (req, res) => {
         // Find the user by email
         // and Populate the followers and following fields with the corresponding users data
         const user = await User.findOne({ email })
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         if (!user) {
             return res.status(401).json({ message: 'Invalid username or password' });
@@ -84,15 +84,19 @@ const currentUser = async (req, res) => {
         }
 
         // Find the user by _id (stored in token)
-        const user = await User.findById(validUser.id)
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+        if (!mongoose.Types.ObjectId.isValid(validUser.id)) {
+            return res.status(404).json({ message: "User Not found, incorrect Token" });
+        }
+
+        const user = await User.findById(validUser.id);
+        if (!user) {
+            return res.status(404).json({ message: "User Not found, Refresh Page" });
+        }
+
+        await user.populate([
+            { path: 'followers', select: '_id name followers' },
+            { path: 'following', select: '_id name followers' }
+        ]);
 
         return res.status(200).json({ message: "Current user data fetched successfully", user });
 
@@ -105,9 +109,42 @@ const currentUser = async (req, res) => {
 const removeUser = async (req, res) => {
     try {
         // Delete the user by given _id 
-        await User.deleteOne({ _id: req.params.id });
+        const userId = req.params.id;
 
-        return res.status(201).json({ messgae: "Account deleted successfully" });
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(404).json({ message: "User Not found, incorrect Id" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User  not found" });
+        }
+
+        // Delete tasks assigned by the user
+        // also Delete all comments of that task
+        const tasksAssignedByUser = await Task.find({ assignedBy: user._id });
+        await Promise.all(tasksAssignedByUser.map(async (task) => {
+            await Task.findByIdAndDelete(task._id);
+            await Comment.deleteMany({ task: task._id });
+        }));
+
+        // Reassign tasks assigned to the user
+        const tasksAssignedToUser = await Task.find({ assignedTo: user._id });
+        await Promise.all(tasksAssignedToUser.map(async (task) => {
+            task.assignedTo = task.assignedBy;
+            await task.save();
+        }));
+
+        // Remove the user from all followers
+        await User.updateMany({ followers: user._id }, { $pull: { followers: user._id } });
+
+        // Remove the user from all following
+        await User.updateMany({ following: user._id }, { $pull: { following: user._id } });
+
+        // Delete user
+        await User.deleteOne({ _id: userId });
+
+        return res.status(201).json({ message: "Account deleted successfully" });
     } catch (error) {
         return res.status(500).json({ message: "Internal Server Error" });
     }
@@ -121,14 +158,10 @@ const allUsers = async (req, res) => {
         // and Populate the followers and following fields with the corresponding users data
         const users = await User.find()
             .sort({ updatedAt: 'desc' })
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
     } catch (error) {
@@ -146,17 +179,21 @@ const followUser = async (req, res) => {
         return res.status(400).json({ message: "You can't follow/unfollow yourself" });
     }
 
+    let isValidId = mongoose.Types.ObjectId.isValid(userId);
+    if (isValidId) {
+        isValidId = mongoose.Types.ObjectId.isValid(authUserId);
+    }
+    if (!isValidId) {
+        return res.status(404).json({ message: "User Not found, incorrect userId" });
+    }
+
     try {
         // Find the user to follow by given _id
         const userToFollow = await User.findById(userId)
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         if (!userToFollow) {
             return res.status(404).json({ message: 'User not found' });
@@ -164,14 +201,10 @@ const followUser = async (req, res) => {
 
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         if (!authUser) {
             return res.status(404).json({ message: 'Auth user not found' });
@@ -202,17 +235,21 @@ const unfolloweUser = async (req, res) => {
         return res.status(400).json({ message: "You can't follow/unfollow yourself" });
     }
 
+    let isValidId = mongoose.Types.ObjectId.isValid(userId);
+    if (isValidId) {
+        isValidId = mongoose.Types.ObjectId.isValid(authUserId);
+    }
+    if (!isValidId) {
+        return res.status(404).json({ message: "User Not found, incorrect userId" });
+    }
+
     try {
         // Find the user to unfollow by given _id
         const userToUnfollow = await User.findById(userId)
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         if (!userToUnfollow) {
             return res.status(404).json({ message: 'User not found' });
@@ -220,14 +257,10 @@ const unfolloweUser = async (req, res) => {
 
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
-            .populate({
-                path: 'followers',
-                select: '_id name followers'
-            })
-            .populate({
-                path: 'following',
-                select: '_id name followers'
-            });
+            .populate([
+                { path: 'followers', select: '_id name followers' },
+                { path: 'following', select: '_id name followers' }
+            ]);
 
         if (!authUser) {
             return res.status(404).json({ message: 'Auth user not found' });
