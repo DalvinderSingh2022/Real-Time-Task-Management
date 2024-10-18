@@ -18,7 +18,7 @@ const io = new Server(server, {
 connectMongo();
 app.use(cors());
 app.use(express.json());
-app.use(routes);
+app.use('/api', routes);
 
 io.on("connection", (socket) => {
     console.log("user connected : " + socket.id);

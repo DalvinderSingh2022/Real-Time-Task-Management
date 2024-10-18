@@ -42,7 +42,7 @@ const Users = () => {
     useEffect(() => {
         if (usersState.loaded) return;
 
-        axios.get("https://task-manager-v4zl.onrender.com/api/users")
+        axios.get("https://task-manager-v4zl.onrender.com/api/users/all")
             .then(({ data }) => {
                 loadUsers(data.users);
             })

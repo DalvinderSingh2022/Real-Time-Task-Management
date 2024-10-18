@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-export const NotificationTypes = {
+const NotificationTypes = {
     TASK_UPDATE: 'task_update',
     COMMENT: 'comment',
     FOLLOW: 'follow',
@@ -49,4 +49,4 @@ setInterval(async () => {
 
 const Notification = mongoose.model("Notification", NotificationSchema);
 
-module.exports = Notification;
+module.exports = { Notification, NotificationTypes };

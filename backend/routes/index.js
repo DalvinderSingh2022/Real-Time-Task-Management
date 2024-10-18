@@ -5,9 +5,9 @@ const commentRouter = require("./comments");
 const notificationRouter = require("./notifications");
 
 const router = express.Router();
-router.use(usersRouter);
-router.use(taskRouter);
-router.use(commentRouter);
-router.use(notificationRouter);
+router.use('/users', usersRouter);
+router.use('/tasks', taskRouter);
+router.use('/comments', commentRouter);
+router.use('/notifications', notificationRouter);
 
 module.exports = router;

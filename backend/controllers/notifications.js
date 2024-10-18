@@ -1,5 +1,5 @@
-import { NotificationTypes, Notification } from "../models/notification.model";
-import validationHandler from "../middleware/validationHandler";
+const { NotificationTypes, Notification } = require("../models/notification.model");
+const validationHandler = require("../middleware/validationHandler");
 
 // Task Assignment Notification
 const taskAssign = async (req, res) => {
@@ -22,4 +22,4 @@ const generateNotification = async (user, message, type, data) => {
     }
 }
 
-export { taskAssign };
+module.exports = { taskAssign };
