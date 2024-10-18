@@ -7,6 +7,7 @@ import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
 import Response from './Response';
+import AddTask from './AddTask';
 
 const User = ({ name, followers, _id }) => {
     const { authState } = useContext(AuthContext);
@@ -14,6 +15,7 @@ const User = ({ name, followers, _id }) => {
     const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
     const [response, setResponse] = useState(false);
+    const [addTask, setAddTask] = useState(false);
 
     useEffect(() => {
         if (authState.authenticated) {
@@ -50,9 +52,12 @@ const User = ({ name, followers, _id }) => {
     return (
         <>
             {response && <Response />}
+            {addTask && <AddTask assignedTo={_id} remove={() => setAddTask(false)} />}
             <div className={`flex ${styles.user}`} title={name}>
                 <div>
-                    <div className={`text_primary ${styles.user_title}`}>{name}</div>
+                    {authState.user.followers.find(user => user._id === _id)
+                        ? <div className={`text_primary ${styles.user_title}`} style={{ cursor: 'pointer' }} onClick={() => setAddTask(true)} >{name}</div>
+                        : <div className={`text_primary ${styles.user_title}`}>{name}</div>}
                     <div className='text_secondary'>Followers: {followers.length}</div>
                 </div>
                 {authState.user._id !== _id &&
