@@ -1,0 +1,46 @@
+:root {
+    --color: var(--purple-light);
+}
+
+.notification {
+    background-color: var(--white);
+    padding: 1em;
+    border-radius: 6px;
+    align-self: stretch;
+    transition: .2s ease;
+}
+
+.notification:hover {
+    background-color: var(--shadow-color);
+    transform: scale(1.01);
+}
+
+.notification.unread {
+    background-color: var(--shadow-color);
+    --color: var(--purple-dark)
+}
+
+.notification .icon {
+    border-radius: 50%;
+    background-color: var(--color);
+    border: none;
+    font-size: 1.4em;
+    color: var(--white);
+    margin-bottom: auto;
+}
+
+.notification .message {
+    font-weight: 600;
+    color: var(--color);
+}
+
+.notification .data>div {
+    line-height: 1.4em;
+}
+
+.notification button {
+    font-size: 1.3em;
+    border: none;
+    background-color: inherit;
+    margin-bottom: auto;
+}

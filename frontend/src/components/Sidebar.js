@@ -4,10 +4,10 @@ import axios from 'axios';
 
 import { GoHomeFill } from "react-icons/go";
 import { FaUsers } from "react-icons/fa";
-import { RiTodoFill } from "react-icons/ri";
+import { RiTodoFill, RiCloseLine } from "react-icons/ri";
 import { TbLogout } from "react-icons/tb";
 import { AiOutlineUserDelete } from "react-icons/ai";
-import { RiCloseLine } from "react-icons/ri";
+import { IoNotificationsSharp } from "react-icons/io5";
 
 import Logo from "../assects/logo.png";
 
@@ -70,6 +70,10 @@ const Sidebar = () => {
                     <NavLink to='/users' className="button flex link gap2" title='Users'>
                         <FaUsers />
                         <p>Users</p>
+                    </NavLink>
+                    <NavLink to='/notifications' className="button flex link gap2" title='Users'>
+                        <IoNotificationsSharp />
+                        <p>Notifications</p>
                     </NavLink>
                 </div>
                 <div className="flex col gap2 w_full">

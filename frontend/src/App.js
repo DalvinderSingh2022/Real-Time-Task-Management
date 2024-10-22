@@ -19,6 +19,7 @@ const Tasks = lazy(() => import('./pages/Tasks'));
 const Users = lazy(() => import('./pages/Users'));
 const Notfound = lazy(() => import('./pages/NotFound'));
 const TaskDetails = lazy(() => import('./pages/TaskDetails'));
+const Notifications = lazy(() => import('./pages/Notifications.js'));
 
 const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
@@ -191,6 +192,7 @@ const App = () => {
                         <Route path=':id' element={<TaskDetails />}></Route>
                     </Route>
                     <Route path="/users" element={<Users />} />
+                    <Route path="/notifications" element={<Notifications />} />
                     <Route path='*' element={<Notfound />} />
                 </Route>
             </Routes>

@@ -19,7 +19,7 @@
     display: grid;
     grid-template: auto / repeat(auto-fit, minmax(320px, 1fr));
     gap: 1em;
-    min-height: 75vh;
+    min-height: 74vh;
 }
 
 .container .wrapper {
