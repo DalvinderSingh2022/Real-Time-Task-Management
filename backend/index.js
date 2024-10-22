@@ -31,8 +31,9 @@ io.on("connection", (socket) => {
         io.emit('user_unfollowed', authUser, userToUnfollow);
     });
 
-    socket.on('task_created', (task) => {
-        io.in(task._id).emit('task_created', task);
+    socket.on('task_created', (task, notification) => {
+        io.emit('task_created', task);
+        addNotification(notification);
     });
 
     socket.on('task_updated', (task, user) => {
@@ -63,18 +64,18 @@ io.on("connection", (socket) => {
         io.in(id).emit('update_comments', comment);
     });
 
-    socket.on("add_notification", (notification) => {
-        switch (notification.type) {
-            case 'TASK_ASSIGNMENT':
-                io.in(notification.data.task.assignedTo._id).emit('new_notification', notification);
-                break;
-        }
-    });
-
     socket.on("disconnect", () => {
         console.log("disconnected : " + socket.id);
     });
 });
+
+const addNotification = (notification) => {
+    switch (notification.type) {
+        case 'TASK_ASSIGNMENT':
+            io.in(notification.data.task.assignedTo._id).emit('new_notification', notification);
+            break;
+    }
+};
 
 const PORT = process.env.PORT || 4000;
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

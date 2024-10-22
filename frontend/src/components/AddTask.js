@@ -27,14 +27,13 @@ const AddTask = ({ remove, assignedTo }) => {
 
         setResponse(true);
         axios.post("https://task-manager-v4zl.onrender.com/api/tasks", task)
-            .then(({ data }) => {
-                socketState.socket.emit('task_created', data.task);
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: data.task })
-                    .then(({ data }) => {
-                        socketState.socket.emit('add_notification', data.notification);
-                    });
-
+            .then(({ data: taskData }) => {
                 remove();
+
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: taskData.task })
+                    .then(({ data: notificationData }) => {
+                        socketState.socket.emit('task_created', taskData.task, notificationData.notification);
+                    });
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })
