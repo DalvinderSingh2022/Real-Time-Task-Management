@@ -8,11 +8,12 @@ const taskAssign = async (req, res) => {
     const message = `You have been assigned a new task: ${task.title} by ${task.assignedBy}.`;
     const data = { task };
 
-    await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_ASSIGNMENT, data);
+    await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_ASSIGNMENT, data, res);
 };
 
-const generateNotification = async (user, message, type, data) => {
+const generateNotification = async (user, message, type, data, res) => {
     const notification = new Notification({ user, message, type, data });
+
     try {
         await notification.save();
 

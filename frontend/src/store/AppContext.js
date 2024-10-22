@@ -4,6 +4,7 @@ import { AuthProvider } from './AuthContext';
 import { SocketProvider } from './SocketContext';
 import { TasksProvider } from './TasksContext';
 import { UsersProvider } from './UsersContext';
+import { NotificationsProvider } from './NotificationContext';
 
 const initialState = {
     toasts: [],
@@ -41,9 +42,11 @@ const AppProvider = ({ children }) => {
             <UsersProvider>
                 <TasksProvider>
                     <SocketProvider>
-                        <AppContext.Provider value={{ appState, addToast, removeToast }}>
-                            {children}
-                        </AppContext.Provider>
+                        <NotificationsProvider>
+                            <AppContext.Provider value={{ appState, addToast, removeToast }}>
+                                {children}
+                            </AppContext.Provider>
+                        </NotificationsProvider>
                     </SocketProvider>
                 </TasksProvider>
             </UsersProvider>

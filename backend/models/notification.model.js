@@ -1,15 +1,15 @@
 const mongoose = require("mongoose");
 
 const NotificationTypes = {
-    TASK_UPDATE: 'task_update',
-    COMMENT: 'comment',
-    FOLLOW: 'follow',
-    UNFOLLOW: 'unfollow',
-    TASK_ASSIGNMENT: 'task_assignment',
-    TASK_COMPLETION: 'task_completion',
-    // DUE_DATE_REMINDER: 'due_date_reminder',
-    // USER_MENTION: 'user_mention',
-    // SYSTEM_ALERT: 'system_alert',
+    TASK_UPDATE: 'TASK_UPDATE',
+    COMMENT: 'COMMENT',
+    FOLLOW: 'FOLLOW',
+    UNFOLLOW: 'UNFOLLOW',
+    TASK_ASSIGNMENT: 'TASK_ASSIGNMENT',
+    TASK_COMPLETION: 'TASK_COMPLETION',
+    // DUE_DATE_REMINDER: 'DUE_DATE_REMINDER',
+    // USER_MENTION: 'USER_MENTION',
+    // SYSTEM_ALERT: 'SYSTEM_ALERT',
 };
 
 const NotificationSchema = new mongoose.Schema({
@@ -31,7 +31,7 @@ const NotificationSchema = new mongoose.Schema({
         default: false
     },
     data: {
-        type: String,
+        type: Object,
         required: true
     },
 }, {
