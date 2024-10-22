@@ -1,7 +1,8 @@
 const express = require("express");
-const { taskAssign, allNotifications } = require("../controllers/notifications");
+const { taskAssign, allNotifications, updateNotification, removeNotification } = require("../controllers/notifications");
 const router = express.Router();
 
+router.route('/:id').put(updateNotification).delete(removeNotification);
 router.post('/assign-task', taskAssign);
 router.get('/all/:userId', allNotifications);
 

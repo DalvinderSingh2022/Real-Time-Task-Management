@@ -7,12 +7,14 @@ import modalStyles from "../styles/modal.module.css";
 import { AuthContext } from '../store/AuthContext';
 import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
+import { NotificationsContext } from '../store/NotificationContext';
 import Response from './Response';
 
 const AddTask = ({ remove, assignedTo }) => {
     const { authState } = useContext(AuthContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
+    const { addNotification } = useContext(NotificationsContext)
     const [response, setResponse] = useState(false);
 
     const handlesubmit = (e) => {
@@ -31,7 +33,7 @@ const AddTask = ({ remove, assignedTo }) => {
                 socketState.socket.emit('task_created', data.task);
                 axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: data.task })
                     .then(({ data }) => {
-                        console.log(data.notification);
+                        addNotification(data.notification);
                     });
 
                 remove();

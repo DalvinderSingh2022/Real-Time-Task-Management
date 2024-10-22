@@ -9,7 +9,7 @@ const notificationsReducer = (state, action) => {
     switch (action.type) {
         case 'LOAD_NOTIFICATIONS':
             return { notifications: action.payload.notifications, loaded: true }
-        case 'CREATE_NOTIFICATION':
+        case 'ADD_NOTIFICATION':
             return { ...state, notifications: [...state.notifications, action.payload.notification] };
         case 'DELETE_NOTIFICATION':
             return { ...state, notifications: state.notifications.filter((notification) => notification._id !== action.payload.notificationId) };
@@ -39,8 +39,8 @@ const NotificationsProvider = ({ children }) => {
         dispatch({ type: 'LOAD_NOTIFICATIONS', payload: { notifications } });
     };
 
-    const createNotification = (notification) => {
-        dispatch({ type: 'CREATE_NOTIFICATION', payload: { notification } });
+    const addNotification = (notification) => {
+        dispatch({ type: 'ADD_NOTIFICATION', payload: { notification } });
     };
 
     const deleteNotification = (notificationId) => {
@@ -56,7 +56,7 @@ const NotificationsProvider = ({ children }) => {
     };
 
     return (
-        <NotificationsContext.Provider value={{ notificationsState, createNotification, deleteNotification, loadNotifications, readNotification, resetNotifications }}>
+        <NotificationsContext.Provider value={{ notificationsState, addNotification, deleteNotification, loadNotifications, readNotification, resetNotifications }}>
             {children}
         </NotificationsContext.Provider>
     );

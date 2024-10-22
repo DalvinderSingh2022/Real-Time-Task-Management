@@ -7,15 +7,7 @@ import TaskAssign from '../components/Notifications/TaskAssign';
 import { NotificationsContext } from '../store/NotificationContext';
 
 const NotificationTypes = {
-    TASK_UPDATE: <></>,
-    COMMENT: <></>,
-    FOLLOW: <></>,
-    UNFOLLOW: <></>,
-    TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />,
-    TASK_COMPLETION: <></>,
-    // DUE_DATE_REMINDER: 'due_date_reminder',
-    // USER_MENTION: 'user_mention',
-    // SYSTEM_ALERT: 'system_alert',
+    TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />
 };
 
 const Notifications = () => {
@@ -35,11 +27,12 @@ const Notifications = () => {
                 />
             </form>
             <div className='flex col gap'>
-                {notificationsState.notifications.map(notification =>
-                    <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
-                        {NotificationTypes[notification.type] ? NotificationTypes[notification.type](notification) : <></>}
-                    </div>
-                )}
+                {notificationsState.notifications.length
+                    ? (notificationsState.notifications.map(notification =>
+                        <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
+                            {NotificationTypes[notification.type] ? NotificationTypes[notification.type](notification) : <></>}
+                        </div>
+                    )) : notificationsState.loaded ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
             </div>
         </article>
     )
