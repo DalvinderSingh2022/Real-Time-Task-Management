@@ -29,6 +29,11 @@ const AddTask = ({ remove, assignedTo }) => {
         axios.post("https://task-manager-v4zl.onrender.com/api/tasks", task)
             .then(({ data }) => {
                 socketState.socket.emit('task_created', data.task);
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: data.task })
+                    .then(({ data }) => {
+                        console.log(data.notification);
+                    });
+
                 remove();
             })
             .catch((error) => {

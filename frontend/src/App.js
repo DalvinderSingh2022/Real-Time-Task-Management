@@ -11,6 +11,7 @@ import { SocketContext } from './store/SocketContext';
 import { AppContext } from './store/AppContext';
 import { DragAndDropProvider } from './store/DragAndDropContext';
 import { UsersContext } from './store/UsersContext';
+import { NotificationsContext } from './store/NotificationContext.js';
 
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -26,6 +27,7 @@ const App = () => {
     const { authState, login, verify } = useContext(AuthContext);
     const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
     const { addUser, updateUser, deleteUser } = useContext(UsersContext);
+    const { loadNotifications } = useContext(NotificationsContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
 
@@ -43,8 +45,12 @@ const App = () => {
                 login(userData.data.user);
                 setLoadingMsg('');
 
-                const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${userData.data.user._id}`);
+                const [tasksData, notificationsData] = await Promise.all([
+                    axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${userData.data.user._id}`),
+                    axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${userData.data.user._id}`)
+                ]);
                 loadTasks(tasksData.data.tasks);
+                loadNotifications(notificationsData.data.notifications);
             } catch (error) {
                 verify();
                 setLoadingMsg('');
@@ -52,7 +58,7 @@ const App = () => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
             }
         })();
-    }, [addToast, authState.verified, loadTasks, login, verify]);
+    }, [addToast, authState.verified, loadTasks, login, verify, loadNotifications]);
 
 
     useEffect(() => {

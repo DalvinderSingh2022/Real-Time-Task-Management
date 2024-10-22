@@ -11,6 +11,19 @@ const taskAssign = async (req, res) => {
     await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_ASSIGNMENT, data, res);
 };
 
+const allNotifications = async (req, res) => {
+    try {
+        // Find all notifications for current user 
+        const userId = req.params.userId;
+
+        const notifications = await Notification.find({ user: userId }).sort({ updatedAt: 'desc' });
+
+        res.status(200).json({ message: 'All Notifications fetched successfully', notifications });
+    } catch (error) {
+        return res.status(500).json({ message: "Internal Server Error" });
+    }
+};
+
 const generateNotification = async (user, message, type, data, res) => {
     const notification = new Notification({ user, message, type, data });
 
@@ -23,4 +36,4 @@ const generateNotification = async (user, message, type, data, res) => {
     }
 }
 
-module.exports = { taskAssign };
+module.exports = { taskAssign, allNotifications };
