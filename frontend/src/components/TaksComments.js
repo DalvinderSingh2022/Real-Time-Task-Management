@@ -35,12 +35,21 @@ const TaksComments = ({ task }) => {
     }, [id, addToast]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
+        if (!socketState.connected || !task) return;
 
-        socketState.socket.emit("join_room", id);
+        const userId = authState.user._id;
+        const isUserAssigned = userId === task.assignedBy._id || userId === task.assignedTo._id;
 
-        return () => socketState.socket.emit("leave_room", id);
-    }, [socketState, id]);
+        if (!isUserAssigned) {
+            socketState.socket.emit("join_room", id);
+        }
+
+        return () => {
+            if (!isUserAssigned) {
+                socketState.socket.emit("leave_room", id);
+            }
+        };
+    }, [socketState, id, task, authState]);
 
     useEffect(() => {
         if (!socketState.connected) return;

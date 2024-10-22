@@ -32,15 +32,15 @@ io.on("connection", (socket) => {
     });
 
     socket.on('task_created', (task) => {
-        io.emit('task_created', task);
+        io.in(task._id).emit('task_created', task);
     });
 
     socket.on('task_updated', (task, user) => {
-        io.emit('task_updated', task, user);
+        io.in(task._id).emit('task_updated', task, user);
     });
 
     socket.on('task_deleted', (task, assignedTo, assignedBy) => {
-        io.emit('task_deleted', task, assignedTo, assignedBy);
+        io.in(task._id).emit('task_deleted', task, assignedTo, assignedBy);
     });
 
     socket.on('user_left', user => {
@@ -61,6 +61,14 @@ io.on("connection", (socket) => {
 
     socket.on("send_comment", (comment, id) => {
         io.in(id).emit('update_comments', comment);
+    });
+
+    socket.on("add_notification", (notification) => {
+        switch (notification.type) {
+            case 'TASK_ASSIGNMENT':
+                io.in(notification.data.task.assignedTo._id).emit('new_notification', notification);
+                break;
+        }
     });
 
     socket.on("disconnect", () => {

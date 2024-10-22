@@ -27,7 +27,7 @@ const App = () => {
     const { authState, login, verify } = useContext(AuthContext);
     const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
     const { addUser, updateUser, deleteUser } = useContext(UsersContext);
-    const { loadNotifications } = useContext(NotificationsContext);
+    const { loadNotifications, addNotification } = useContext(NotificationsContext);
     const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
 
@@ -62,6 +62,14 @@ const App = () => {
 
 
     useEffect(() => {
+        if (!socketState.connected || !authState.authenticated) return;
+
+        socketState.socket.emit("join_room", authState.user._id);
+
+        return () => socketState.socket.emit("leave_room", authState.user._id);
+    }, [socketState, authState]);
+
+    useEffect(() => {
         if (!socketState.connected || !tasksState.loaded) return;
 
         tasksState.tasks.map(task =>
@@ -73,18 +81,29 @@ const App = () => {
         );
     }, [socketState, tasksState]);
 
+
+    useEffect(() => {
+        if (!socketState.connected) return;
+
+        socketState.socket.on("new_notification", (notification) => {
+            addNotification(notification);
+        });
+
+        return () => socketState.socket.off("new_notification");
+    }, [socketState, addNotification]);
+
+
     useEffect(() => {
         if (!socketState.connected) return;
 
         socketState.socket.on('task_deleted', (task, assignedTo, assignedBy) => {
             if (authState.user._id === assignedBy._id) {
-                deleteTask(task._id);
                 addToast({ type: 'warning', message: `Task : ${task.title} Deleted` });
             }
             else if (authState.user._id === assignedTo._id) {
-                deleteTask(task._id);
                 addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
             }
+            deleteTask(task._id);
         });
 
         return () => socketState.socket.off('task_deleted');
@@ -95,13 +114,12 @@ const App = () => {
 
         socketState.socket.on('task_created', (task) => {
             if (authState.user._id === task.assignedBy._id) {
-                createTask(task);
                 addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo._id === authState.user._id ? `to ${task.assignedTo.name}` : ''}` });
             }
             else if (authState.user._id === task.assignedTo._id) {
-                createTask(task);
                 addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
             }
+            createTask(task);
         });
 
         return () => socketState.socket.off('task_created');

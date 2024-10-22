@@ -12,6 +12,7 @@ import { IoNotificationsSharp } from "react-icons/io5";
 import Logo from "../assects/logo.png";
 
 import Response from './Response';
+import { NotificationsContext } from '../store/NotificationContext';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
@@ -20,6 +21,7 @@ import { SocketContext } from '../store/SocketContext';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
+    const { resetNotifications } = useContext(NotificationsContext);
     const { resetUsers } = useContext(UsersContext);
     const { resetTasks } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
@@ -30,6 +32,7 @@ const Sidebar = () => {
         localStorage.removeItem("jwt");
         resetTasks();
         resetUsers();
+        resetNotifications();
         logout();
     }
 
