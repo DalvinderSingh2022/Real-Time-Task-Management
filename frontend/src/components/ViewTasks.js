@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 
@@ -18,10 +18,16 @@ const ViewTask = (prop) => {
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState('');
     const [task, setTask] = useState(null);
+    const [originalTask, setOriginalTask] = useState(null);
     const { id } = useParams();
     const navigate = useNavigate();
 
-    useEffect(() => setTask(prop.task), [prop]);
+    useEffect(() => {
+        if (task && originalTask) return;
+
+        setTask(prop.task);
+        setOriginalTask(prop.task);
+    }, [prop, task, originalTask]);
 
     const handlechange = (e) => {
         const name = e.target.name;
@@ -31,17 +37,36 @@ const ViewTask = (prop) => {
 
     const handlesubmit = (e) => {
         e.preventDefault();
-        setResponse('save');
-        axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`, task)
-            .then(({ data }) => {
-                socketState.socket.emit('task_updated', data.updatedTask, authState.user);
-                setTask(data.updatedTask);
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
-            })
-            .finally(() => setResponse(''));
+
+        const changes = {};
+        Object.keys(originalTask).forEach((key) => {
+            if (originalTask[key] !== task[key]) {
+                changes[key] = {
+                    field: key,
+                    oldValue: originalTask[key],
+                    newValue: task[key]
+                };
+            }
+        });
+
+        if (Object.keys(changes).length) {
+            setResponse('save');
+            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`, task)
+                .then(({ data }) => {
+                    setTask(data.updatedTask);
+                    setOriginalTask(data.updatedTask);
+
+                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: originalTask })
+                        .then(({ data: notificationData }) => {
+                            socketState.socket.emit('task_updated', data.updatedTask, authState.user, notificationData.notification, originalTask);
+                        });
+                })
+                .catch((error) => {
+                    addToast({ type: 'error', message: error?.response?.data?.message });
+                    console.error(error);
+                })
+                .finally(() => setResponse(''));
+        }
     }
 
     const handelDelete = () => {
@@ -222,4 +247,4 @@ const ViewTask = (prop) => {
     )
 }
 
-export default memo(ViewTask, (prev, next) => prev?.prop?.task?._id === next?.prop?.task?._id);
+export default ViewTask;

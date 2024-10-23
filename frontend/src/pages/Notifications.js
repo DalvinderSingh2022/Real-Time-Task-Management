@@ -4,10 +4,12 @@ import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
 
 import TaskAssign from '../components/Notifications/TaskAssign';
+import TaskUpdate from '../components/Notifications/TaskUpdate';
 import { NotificationsContext } from '../store/NotificationContext';
 
 const NotificationTypes = {
-    TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />
+    TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />,
+    TASK_UPDATE: (props) => <TaskUpdate {...props} />
 };
 
 const Notifications = () => {

@@ -59,11 +59,25 @@ const removeNotification = async (req, res) => {
 // Task Assignment Notification
 const taskAssign = async (req, res) => {
     const task = req.body.task;
-
     const message = `You have been assigned a new task: ${task.title} by ${task.assignedBy.name}.`;
     const data = { task };
 
     await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_ASSIGNMENT, data, res);
+};
+
+// Notification for Task update
+const taskUpdate = async (req, res) => {
+    const { changes, task, oldTask } = req.body;
+    const message = `Task ${task._id} has been updated.`;
+    const data = { changes };
+
+    await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_UPDATE, data, res);
+    if (task.assignedTo._id !== task.assignedBy._id) {
+        await generateNotification(task.assignedBy._id, message, NotificationTypes.TASK_UPDATE, data, res);
+    }
+    if (task.assignedTo._id !== oldTask.assignedTo._id) {
+        await generateNotification(oldTask.assignedTo._id, message, NotificationTypes.TASK_UPDATE, data, res);
+    }
 };
 
 const generateNotification = async (user, message, type, data, res) => {
@@ -78,4 +92,4 @@ const generateNotification = async (user, message, type, data, res) => {
     }
 }
 
-module.exports = { taskAssign, allNotifications, updateNotification, removeNotification };
+module.exports = { taskAssign, taskUpdate, allNotifications, updateNotification, removeNotification };

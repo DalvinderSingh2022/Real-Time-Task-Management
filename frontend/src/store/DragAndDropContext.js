@@ -50,10 +50,21 @@ const DragAndDropProvider = ({ children }) => {
                 return reset();
             }
 
+            const changes = {
+                'status': {
+                    field: 'status',
+                    oldValue: dragAndDropState.task.status,
+                    newValue: dragAndDropState.status
+                }
+            }
+
             setResponse(true);
             axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
                 .then(({ data }) => {
-                    socketState.socket.emit('task_updated', data.updatedTask, authState.user);
+                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: dragAndDropState.task })
+                        .then(({ data: notificationData }) => {
+                            socketState.socket.emit('task_updated', data.updatedTask, authState.user, notificationData.notification, dragAndDropState.task);
+                        });
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error?.response?.data?.message })
