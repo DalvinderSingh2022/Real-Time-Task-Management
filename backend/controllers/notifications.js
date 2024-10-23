@@ -58,7 +58,7 @@ const removeNotification = async (req, res) => {
 
 // Task Assignment Notification
 const taskAssign = async (req, res, next) => {
-    const task = req.body.task;
+    const { task } = req.body;
 
     req.message = `You have been assigned a new task: ${task.title} by ${task.assignedBy.name}.`;
     req.data = { task };
@@ -73,7 +73,7 @@ const taskUpdate = async (req, res, next) => {
     const { changes, task, oldTask } = req.body;
 
     req.message = `Task ${task._id} has been updated.`;
-    req.data = { changes };
+    req.data = { changes, task };
     req.type = NotificationTypes.TASK_UPDATE;
 
     const users = [task.assignedTo._id];
@@ -88,6 +88,28 @@ const taskUpdate = async (req, res, next) => {
     next();
 };
 
+// Notification for new follower
+const followUser = (req, res, next) => {
+    const { authUser, userToFollow } = req.body;
+
+    req.type = NotificationTypes.FOLLOW;
+    req.users = [userToFollow._id];
+    req.message = `${authUser.name} started following you.`;
+    req.data = { user: authUser };
+
+    next();
+};
+
+const unFollowUser = (req, res, next) => {
+    const { authUser, userToUnfollow } = req.body;
+
+    req.type = NotificationTypes.UNFOLLOW;
+    req.users = [userToUnfollow._id];
+    req.message = `${authUser.name} has unfollowed you.`;
+    req.data = { user: authUser };
+
+    next();
+};
 const generateNotification = async (req, res) => {
     const { users, message, type, data } = req;
 
@@ -105,4 +127,4 @@ const generateNotification = async (req, res) => {
     }
 }
 
-module.exports = { taskAssign, taskUpdate, allNotifications, updateNotification, removeNotification, generateNotification };
+module.exports = { allNotifications, updateNotification, removeNotification, taskAssign, taskUpdate, followUser, unFollowUser, generateNotification };

@@ -26,7 +26,13 @@ const User = ({ name, followers, _id }) => {
         setResponse(true);
         axios.post(`https://task-manager-v4zl.onrender.com/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socket.emit('user_followed', data.authUser, data.userToFollow);
+                const { authUser, userToFollow } = data;
+
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/follow-user', { authUser, userToFollow })
+                    .then(({ data: notificationData }) => {
+                        const [notification] = notificationData.notifications;
+                        socket.emit('user_followed', authUser, userToFollow, notification);
+                    });
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })
@@ -39,7 +45,13 @@ const User = ({ name, followers, _id }) => {
         setResponse(true);
         axios.post(`https://task-manager-v4zl.onrender.com/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
+                const { authUser, userToUnfollow } = data;
+
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/unfollow-user', { authUser, userToUnfollow })
+                    .then(({ data: notificationData }) => {
+                        const [notification] = notificationData.notifications;
+                        socket.emit('user_unfollowed', authUser, userToUnfollow, notification);
+                    });
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })

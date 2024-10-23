@@ -26,7 +26,7 @@ const TaskUpdate = (prop) => {
         <>
             <div className={`${styles.icon} button round flex`}><VscGitPullRequestGoToChanges /></div>
             <div className="w_full">
-                <Link to={`/tasks/${'_id'}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
+                <Link to={`/tasks/${prop.data.task._id}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
                 <div className={styles.data}>
                     {notificationData && <div>
                         <div>{field.toUpperCase()}</div>

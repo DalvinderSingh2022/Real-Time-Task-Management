@@ -44,26 +44,30 @@ const DragAndDropProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        if (dragAndDropState.task && dragAndDropState.status) {
-            if (dragAndDropState.status === dragAndDropState.task.status) {
+        const oldTask = dragAndDropState.task;
+
+        if (oldTask && dragAndDropState.status) {
+            if (dragAndDropState.status === oldTask.status) {
                 return reset();
             }
 
             const changes = {
                 'status': {
                     field: 'status',
-                    oldValue: dragAndDropState.task.status,
+                    oldValue: oldTask.status,
                     newValue: dragAndDropState.status
                 }
             }
 
             setResponse(true);
-            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${dragAndDropState.task._id}`, { ...dragAndDropState.task, status: dragAndDropState.status })
+            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${oldTask._id}`, { ...oldTask, status: dragAndDropState.status })
                 .then(({ data }) => {
-                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: dragAndDropState.task })
+                    const { updatedTask: task } = data;
+
+                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task, oldTask })
                         .then(({ data: notificationData }) => {
                             const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                            socket.emit('task_updated', data.updatedTask, authState.user, notification, dragAndDropState.task);
+                            socket.emit('task_updated', data, authState.user, notification, oldTask);
                         });
                 })
                 .catch((error) => {

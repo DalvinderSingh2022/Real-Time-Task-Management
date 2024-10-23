@@ -3,13 +3,17 @@ import React, { useContext, useEffect, useState } from 'react';
 import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
 
+import { NotificationsContext } from '../store/NotificationContext';
 import TaskAssign from '../components/Notifications/TaskAssign';
 import TaskUpdate from '../components/Notifications/TaskUpdate';
-import { NotificationsContext } from '../store/NotificationContext';
+import FollowUser from '../components/Notifications/FollowUser';
+import UnfollowUser from '../components/Notifications/UnfollowUser';
 
 const NotificationTypes = {
     TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />,
-    TASK_UPDATE: (props) => <TaskUpdate {...props} />
+    TASK_UPDATE: (props) => <TaskUpdate {...props} />,
+    FOLLOW: (props) => <FollowUser {...props} />,
+    UNFOLLOW: (props) => <UnfollowUser {...props} />,
 };
 
 const Notifications = () => {

@@ -27,10 +27,12 @@ const AddTask = ({ remove, assignedTo }) => {
         setResponse(true);
         axios.post("https://task-manager-v4zl.onrender.com/api/tasks", task)
             .then(({ data: taskData }) => {
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: taskData.task })
+                const { task } = taskData;
+
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task })
                     .then(({ data: notificationData }) => {
-                        const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                        socket.emit('task_created', taskData.task, notification);
+                        const [notification] = notificationData.notifications;
+                        socket.emit('task_created', task, notification);
                         remove();
                     });
             })
