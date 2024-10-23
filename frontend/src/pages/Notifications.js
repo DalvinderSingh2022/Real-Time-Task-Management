@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
@@ -12,7 +12,16 @@ const NotificationTypes = {
 
 const Notifications = () => {
     const { notificationsState } = useContext(NotificationsContext);
+    const [notifications, setNotifications] = useState(null);
     const [search, setSearch] = useState('');
+
+    useEffect(() => {
+        if (!notificationsState.loaded) return;
+
+        setNotifications(notificationsState.notifications.filter(notification =>
+            notification.message.toLowerCase().replaceAll(" ", '').includes(search)
+        ));
+    }, [notificationsState, search]);
 
     return (
         <article>
@@ -27,12 +36,12 @@ const Notifications = () => {
                 />
             </form>
             <div className='flex col gap'>
-                {notificationsState.notifications.length
-                    ? (notificationsState.notifications.map(notification =>
+                {notifications?.length
+                    ? (notifications.map(notification =>
                         <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
                             {NotificationTypes[notification.type] ? NotificationTypes[notification.type](notification) : <></>}
                         </div>
-                    )) : notificationsState.loaded ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
+                    )) : notificationsState ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
             </div>
         </article>
     )

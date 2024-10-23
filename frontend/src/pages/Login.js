@@ -10,6 +10,7 @@ import styles from "./../styles/auth.module.css";
 import Toast from '../components/Toast';
 import Response from '../components/Response';
 
+import { NotificationsContext } from '../store/NotificationContext';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { TasksContext } from '../store/TasksContext';
@@ -18,6 +19,7 @@ const Login = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
     const { loadTasks } = useContext(TasksContext);
+    const { loadNotifications } = useContext(NotificationsContext);
     const [response, setResponse] = useState(false);
     const [show, setShow] = useState(false);
     const navigate = useNavigate();
@@ -37,8 +39,12 @@ const Login = () => {
                 addToast({ type: 'success', message: data.message });
                 navigate("/");
                 (async () => {
-                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`);
+                    const [tasksData, notificationsData] = await Promise.all([
+                        axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`),
+                        axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${data.user._id}`)
+                    ]);
                     loadTasks(tasksData.data.tasks);
+                    loadNotifications(notificationsData.data.notifications);
                 })();
             })
             .catch((error) => {

@@ -37,11 +37,11 @@ io.on("connection", (socket) => {
     });
 
     socket.on('task_updated', (task, user) => {
-        io.in(task._id).emit('task_updated', task, user);
+        io.emit('task_updated', task, user);
     });
 
     socket.on('task_deleted', (task, assignedTo, assignedBy) => {
-        io.in(task._id).emit('task_deleted', task, assignedTo, assignedBy);
+        io.emit('task_deleted', task, assignedTo, assignedBy);
     });
 
     socket.on('user_left', user => {
