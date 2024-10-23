@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { memo, useContext, useState } from 'react';
 import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
@@ -109,4 +109,4 @@ const AddTask = ({ remove, assignedTo }) => {
     )
 }
 
-export default AddTask;
+export default memo(AddTask, (prev, next) => prev?.assignedTo?._id === next?.assignedTo?._id);

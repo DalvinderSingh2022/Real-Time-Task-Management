@@ -43,4 +43,4 @@ const TaskSection = ({ tasks, status }) => {
     )
 }
 
-export default memo(TaskSection);
+export default memo(TaskSection, (prev, next) => prev?.tasks?.length === next?.tasks?.length && prev?.status === next?.status);

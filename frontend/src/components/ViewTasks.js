@@ -222,4 +222,4 @@ const ViewTask = (prop) => {
     )
 }
 
-export default memo(ViewTask);
+export default memo(ViewTask, (prev, next) => prev?.prop?.task?._id === next?.prop?.task?._id);

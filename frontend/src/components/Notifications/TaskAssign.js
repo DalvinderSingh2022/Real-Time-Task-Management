@@ -26,4 +26,4 @@ const TaskAssign = (prop) => {
     )
 }
 
-export default memo(TaskAssign);
+export default memo(TaskAssign, (prev, next) => prev?.data?.task?._id === next?.data?.task?._id);

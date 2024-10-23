@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { memo, useContext, useEffect } from 'react';
 import axios from 'axios';
 
 import { IoCloseSharp } from "react-icons/io5";
@@ -50,4 +50,4 @@ const DeleteButton = ({ response, setResponse, prop }) => {
     )
 }
 
-export default DeleteButton;
+export default memo(DeleteButton, (prev, next) => prev?.prop?._id === next?.prop?._id);

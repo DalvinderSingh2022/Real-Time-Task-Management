@@ -37,4 +37,4 @@ const Task = (task) => {
     )
 }
 
-export default memo(Task);
+export default memo(Task, (prev, next) => prev?.task?._id === next?.task?._id);

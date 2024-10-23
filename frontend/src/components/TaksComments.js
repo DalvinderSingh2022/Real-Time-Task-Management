@@ -128,11 +128,11 @@ const TaksComments = ({ task }) => {
     )
 }
 
-const Comment = memo(({ _id, comment, user, createdAt, authState }) => {
-    return <div key={_id} className={`${styles.message}`}>
+const Comment = memo(({ _id, comment, user, createdAt, authState }) =>
+    <div key={_id} className={`${styles.message}`}>
         <div>{comment}</div>
         <div className={`text_secondary ${styles.comment_date}`}>{user.name + (user._id === authState.user._id ? "(You)" : '')} on {new Date(createdAt).toLocaleString()}</div>
     </div>
-});
+    , (prev, next) => prev?._id === next?._id);
 
 export default TaksComments;

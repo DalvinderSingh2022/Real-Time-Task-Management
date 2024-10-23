@@ -70,4 +70,4 @@ const User = ({ name, followers, _id }) => {
     )
 }
 
-export default memo(User);
+export default memo(User, (prev, next) => prev?._id === next?._id);
