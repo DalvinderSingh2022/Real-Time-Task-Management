@@ -57,39 +57,52 @@ const removeNotification = async (req, res) => {
 };
 
 // Task Assignment Notification
-const taskAssign = async (req, res) => {
+const taskAssign = async (req, res, next) => {
     const task = req.body.task;
-    const message = `You have been assigned a new task: ${task.title} by ${task.assignedBy.name}.`;
-    const data = { task };
 
-    await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_ASSIGNMENT, data, res);
+    req.message = `You have been assigned a new task: ${task.title} by ${task.assignedBy.name}.`;
+    req.data = { task };
+    req.users = [task.assignedTo._id];
+    req.type = NotificationTypes.TASK_ASSIGNMENT;
+
+    next();
 };
 
 // Notification for Task update
-const taskUpdate = async (req, res) => {
+const taskUpdate = async (req, res, next) => {
     const { changes, task, oldTask } = req.body;
-    const message = `Task ${task._id} has been updated.`;
-    const data = { changes };
 
-    await generateNotification(task.assignedTo._id, message, NotificationTypes.TASK_UPDATE, data, res);
+    req.message = `Task ${task._id} has been updated.`;
+    req.data = { changes };
+    req.type = NotificationTypes.TASK_UPDATE;
+
+    const users = [task.assignedTo._id];
     if (task.assignedTo._id !== task.assignedBy._id) {
-        await generateNotification(task.assignedBy._id, message, NotificationTypes.TASK_UPDATE, data, res);
+        users.push(task.assignedBy._id);
     }
     if (task.assignedTo._id !== oldTask.assignedTo._id) {
-        await generateNotification(oldTask.assignedTo._id, message, NotificationTypes.TASK_UPDATE, data, res);
+        users.push(oldTask.assignedTo._id);
     }
+    req.users = users;
+
+    next();
 };
 
-const generateNotification = async (user, message, type, data, res) => {
-    const notification = new Notification({ user, message, type, data });
+const generateNotification = async (req, res) => {
+    const { users, message, type, data } = req;
 
     try {
-        await notification.save();
+        const notificationPromises = users.map(user => {
+            const notification = new Notification({ user, message, type, data });
+            return notification.save();
+        });
 
-        return res.status(201).json({ message: 'Notification created successfully', notification });
+        const notifications = await Promise.all(notificationPromises);
+
+        return res.status(201).json({ message: 'Notifications created successfully', notifications, });
     } catch (error) {
         validationHandler(error, res);
     }
 }
 
-module.exports = { taskAssign, taskUpdate, allNotifications, updateNotification, removeNotification };
+module.exports = { taskAssign, taskUpdate, allNotifications, updateNotification, removeNotification, generateNotification };
