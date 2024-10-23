@@ -1,7 +1,6 @@
 import { createContext, useCallback, useReducer } from 'react';
 
 import { AuthProvider } from './AuthContext';
-import { SocketProvider } from './SocketContext';
 import { TasksProvider } from './TasksContext';
 import { UsersProvider } from './UsersContext';
 import { NotificationsProvider } from './NotificationContext';
@@ -41,13 +40,11 @@ const AppProvider = ({ children }) => {
         <AuthProvider>
             <UsersProvider>
                 <TasksProvider>
-                    <SocketProvider>
-                        <NotificationsProvider>
-                            <AppContext.Provider value={{ appState, addToast, removeToast }}>
-                                {children}
-                            </AppContext.Provider>
-                        </NotificationsProvider>
-                    </SocketProvider>
+                    <NotificationsProvider>
+                        <AppContext.Provider value={{ appState, addToast, removeToast }}>
+                            {children}
+                        </AppContext.Provider>
+                    </NotificationsProvider>
                 </TasksProvider>
             </UsersProvider>
         </AuthProvider>

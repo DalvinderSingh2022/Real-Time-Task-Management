@@ -7,11 +7,13 @@ import Loading from './components/Loading';
 
 import { AuthContext } from './store/AuthContext';
 import { TasksContext } from './store/TasksContext';
-import { SocketContext } from './store/SocketContext';
 import { AppContext } from './store/AppContext';
 import { DragAndDropProvider } from './store/DragAndDropContext';
 import { UsersContext } from './store/UsersContext';
 import { NotificationsContext } from './store/NotificationContext.js';
+
+import io from 'socket.io-client';
+export const socket = io.connect('https://task-manager-v4zl.onrender.com/');
 
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
@@ -28,7 +30,6 @@ const App = () => {
     const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
     const { addUser, updateUser, deleteUser } = useContext(UsersContext);
     const { loadNotifications, addNotification } = useContext(NotificationsContext);
-    const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
 
     useEffect(() => {
@@ -62,41 +63,37 @@ const App = () => {
 
 
     useEffect(() => {
-        if (!socketState.connected || !authState.authenticated) return;
+        if (!authState.authenticated) return;
 
-        socketState.socket.emit("join_room", authState.user._id);
+        socket.emit("join_room", authState.user._id);
 
-        return () => socketState.socket.emit("leave_room", authState.user._id);
-    }, [socketState, authState]);
+        return () => socket.emit("leave_room", authState.user._id);
+    }, [authState]);
 
     useEffect(() => {
-        if (!socketState.connected || !tasksState.loaded) return;
+        if (!tasksState.loaded) return;
 
         tasksState.tasks.map(task =>
-            socketState.socket.emit("join_room", task._id)
+            socket.emit("join_room", task._id)
         );
 
         return () => tasksState.tasks.map(task =>
-            socketState.socket.emit("leave_room", task._id)
+            socket.emit("leave_room", task._id)
         );
-    }, [socketState, tasksState]);
+    }, [tasksState]);
 
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on("new_notification", (notification) => {
+        socket.on("new_notification", (notification) => {
             addNotification(notification);
         });
 
-        return () => socketState.socket.off("new_notification");
-    }, [socketState, addNotification]);
+        return () => socket.off("new_notification");
+    }, [addNotification]);
 
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('task_deleted', (task, assignedTo, assignedBy) => {
+        socket.on('task_deleted', (task, assignedTo, assignedBy) => {
             if (authState.user._id === assignedBy._id) {
                 addToast({ type: 'warning', message: `Task : ${task.title} Deleted` });
             }
@@ -106,13 +103,11 @@ const App = () => {
             deleteTask(task._id);
         });
 
-        return () => socketState.socket.off('task_deleted');
-    }, [socketState, authState, deleteTask, addToast]);
+        return () => socket.off('task_deleted');
+    }, [authState, deleteTask, addToast]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('task_created', (task) => {
+        socket.on('task_created', (task) => {
             if (authState.user._id === task.assignedBy._id) {
                 addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo._id === authState.user._id ? `to ${task.assignedTo.name}` : ''}` });
             }
@@ -122,27 +117,23 @@ const App = () => {
             createTask(task);
         });
 
-        return () => socketState.socket.off('task_created');
-    }, [socketState, authState, createTask, addToast]);
+        return () => socket.off('task_created');
+    }, [authState, createTask, addToast]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('task_updated', (task, user) => {
+        socket.on('task_updated', (task, user) => {
             if (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) {
                 updateTask(task);
                 addToast({ type: 'info', message: `Task: ${task.title} updated ${user._id !== authState.user._id ? `by ${user.name}` : ''}` });
             }
         });
 
-        return () => socketState.socket.off('task_updated');
-    }, [addToast, socketState, updateTask, authState]);
+        return () => socket.off('task_updated');
+    }, [addToast, updateTask, authState]);
 
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('user_followed', (authUser, userToFollow) => {
+        socket.on('user_followed', (authUser, userToFollow) => {
             updateUser(authUser);
             updateUser(userToFollow);
 
@@ -156,13 +147,11 @@ const App = () => {
             }
         });
 
-        return () => socketState.socket.off('user_followed');
-    }, [socketState, authState, login, updateUser, addToast]);
+        return () => socket.off('user_followed');
+    }, [authState, login, updateUser, addToast]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('user_unfollowed', (authUser, userToUnfollow) => {
+        socket.on('user_unfollowed', (authUser, userToUnfollow) => {
             updateUser(authUser);
             updateUser(userToUnfollow);
 
@@ -176,29 +165,25 @@ const App = () => {
             }
         });
 
-        return () => socketState.socket.off('user_unfollowed');
-    }, [socketState, authState, login, updateUser, addToast]);
+        return () => socket.off('user_unfollowed');
+    }, [authState, login, updateUser, addToast]);
 
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('user_left', user => {
+        socket.on('user_left', user => {
             deleteUser(user._id);
         });
 
-        return () => socketState.socket.off('user_left');
-    }, [socketState, deleteUser]);
+        return () => socket.off('user_left');
+    }, [deleteUser]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('user_join', user => {
+        socket.on('user_join', user => {
             addUser(user);
         });
 
-        return () => socketState.socket.off('user_join');
-    }, [socketState, addUser]);
+        return () => socket.off('user_join');
+    }, [addUser]);
 
     if (loadingMsg || !authState.verified) {
         return <Loading message={loadingMsg} />

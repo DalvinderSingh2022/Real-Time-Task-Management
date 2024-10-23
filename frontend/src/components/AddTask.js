@@ -5,13 +5,12 @@ import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
 
 import { AuthContext } from '../store/AuthContext';
-import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
+import { socket } from '../App';
 import Response from './Response';
 
 const AddTask = ({ remove, assignedTo }) => {
     const { authState } = useContext(AuthContext);
-    const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState(false);
 
@@ -30,7 +29,8 @@ const AddTask = ({ remove, assignedTo }) => {
             .then(({ data: taskData }) => {
                 axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task: taskData.task })
                     .then(({ data: notificationData }) => {
-                        socketState.socket.emit('task_created', taskData.task, notificationData.notification);
+                        const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                        socket.emit('task_created', taskData.task, notification);
                         remove();
                     });
             })

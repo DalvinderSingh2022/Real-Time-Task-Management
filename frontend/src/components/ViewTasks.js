@@ -8,13 +8,12 @@ import modalStyles from "../styles/modal.module.css";
 import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
-import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
+import { socket } from '../App';
 import Response from '../components/Response';
 
 const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);
-    const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState('');
     const [task, setTask] = useState(null);
@@ -58,7 +57,8 @@ const ViewTask = (prop) => {
 
                     axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: originalTask })
                         .then(({ data: notificationData }) => {
-                            socketState.socket.emit('task_updated', data.updatedTask, authState.user, notificationData.notification, originalTask);
+                            const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                            socket.emit('task_updated', data.updatedTask, authState.user, notification, originalTask);
                         });
                 })
                 .catch((error) => {
@@ -74,7 +74,7 @@ const ViewTask = (prop) => {
         axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
             .then(() => {
                 navigate('/tasks');
-                socketState.socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy);
+                socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })

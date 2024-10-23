@@ -8,12 +8,11 @@ import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { SocketContext } from '../store/SocketContext';
+import { socket } from '../App';
 import Response from './Response';
 
 const TaksComments = ({ task }) => {
     const { addToast } = useContext(AppContext);
-    const { socketState } = useContext(SocketContext);
     const { authState } = useContext(AuthContext);
     const [comments, setComments] = useState(null);
     const [comment, setComment] = useState('');
@@ -35,34 +34,32 @@ const TaksComments = ({ task }) => {
     }, [id, addToast]);
 
     useEffect(() => {
-        if (!socketState.connected || !task) return;
+        if (!task) return;
 
         const userId = authState.user._id;
         const isUserAssigned = userId === task.assignedBy._id || userId === task.assignedTo._id;
 
         if (!isUserAssigned) {
-            socketState.socket.emit("join_room", id);
+            socket.emit("join_room", id);
         }
 
         return () => {
             if (!isUserAssigned) {
-                socketState.socket.emit("leave_room", id);
+                socket.emit("leave_room", id);
             }
         };
-    }, [socketState, id, task, authState]);
+    }, [id, task, authState]);
 
     useEffect(() => {
-        if (!socketState.connected) return;
-
-        socketState.socket.on('update_comments', (comment) => {
+        socket.on('update_comments', (comment) => {
             setComments(prev => [...prev, comment]);
             if (authState.user._id !== comment.user._id) {
                 addToast({ type: 'info', message: `${task.title}: new comment by ${comment.user.name}` });
             }
         });
 
-        return () => socketState.socket.off("update_comments");
-    }, [comments, socketState, addToast, task, authState]);
+        return () => socket.off("update_comments");
+    }, [comments, addToast, task, authState]);
 
     useEffect(() => {
         if (messagesRef.current) {
@@ -80,7 +77,7 @@ const TaksComments = ({ task }) => {
                 userId: authState.user._id
             })
             .then(({ data }) => {
-                socketState.socket.emit('send_comment', data.comment, id);
+                socket.emit('send_comment', data.comment, id);
                 setComment('');
             })
             .catch((error) => {

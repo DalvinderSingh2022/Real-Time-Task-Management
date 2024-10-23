@@ -11,13 +11,12 @@ import Toast from '../components/Toast';
 import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { SocketContext } from '../store/SocketContext';
 import { TasksContext } from '../store/TasksContext';
+import { socket } from '../App';
 
 const Register = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
-    const { socketState } = useContext(SocketContext);
     const { loadTasks } = useContext(TasksContext);
     const [response, setResponse] = useState(false);
     const [show, setShow] = useState(false);
@@ -36,7 +35,7 @@ const Register = () => {
             .then(({ data }) => {
                 login(data.user);
                 localStorage.setItem("jwt", data.token);
-                socketState.socket.emit('user_join', data.user);
+                socket.emit('user_join', data.user);
                 navigate("/");
                 (async () => {
                     const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`);

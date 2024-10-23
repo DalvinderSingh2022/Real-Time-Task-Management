@@ -4,14 +4,13 @@ import axios from 'axios';
 import styles from '../styles/users.module.css';
 
 import { AuthContext } from '../store/AuthContext';
-import { SocketContext } from '../store/SocketContext';
 import { AppContext } from '../store/AppContext';
+import { socket } from '../App';
 import Response from './Response';
 import AddTask from './AddTask';
 
 const User = ({ name, followers, _id }) => {
     const { authState } = useContext(AuthContext);
-    const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
     const [response, setResponse] = useState(false);
@@ -27,7 +26,7 @@ const User = ({ name, followers, _id }) => {
         setResponse(true);
         axios.post(`https://task-manager-v4zl.onrender.com/api/users/follow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_followed', data.authUser, data.userToFollow);
+                socket.emit('user_followed', data.authUser, data.userToFollow);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })
@@ -40,7 +39,7 @@ const User = ({ name, followers, _id }) => {
         setResponse(true);
         axios.post(`https://task-manager-v4zl.onrender.com/api/users/unfollow/${_id}`, { userId: authState.user._id })
             .then(({ data }) => {
-                socketState.socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
+                socket.emit('user_unfollowed', data.authUser, data.userToUnfollow);
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })

@@ -1,9 +1,9 @@
 import { createContext, useContext, useEffect, useReducer, useState } from 'react';
 import axios from 'axios';
 
-import { SocketContext } from './SocketContext';
 import { AppContext } from './AppContext';
 import { AuthContext } from './AuthContext';
+import { socket } from '../App';
 
 const initialState = {
     task: null,
@@ -27,7 +27,6 @@ const DragAndDropContext = createContext();
 
 const DragAndDropProvider = ({ children }) => {
     const [dragAndDropState, dispatch] = useReducer(dragAndDropReducer, initialState);
-    const { socketState } = useContext(SocketContext);
     const { addToast } = useContext(AppContext);
     const { authState } = useContext(AuthContext);
     const [response, setResponse] = useState(false);
@@ -63,7 +62,8 @@ const DragAndDropProvider = ({ children }) => {
                 .then(({ data }) => {
                     axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: dragAndDropState.task })
                         .then(({ data: notificationData }) => {
-                            socketState.socket.emit('task_updated', data.updatedTask, authState.user, notificationData.notification, dragAndDropState.task);
+                            const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                            socket.emit('task_updated', data.updatedTask, authState.user, notification, dragAndDropState.task);
                         });
                 })
                 .catch((error) => {
@@ -75,7 +75,7 @@ const DragAndDropProvider = ({ children }) => {
                     setResponse(false);
                 });
         }
-    }, [dragAndDropState, socketState, authState, addToast]);
+    }, [dragAndDropState, authState, addToast]);
 
     return (
         <DragAndDropContext.Provider value={{ setTask, setStatus, response }}>

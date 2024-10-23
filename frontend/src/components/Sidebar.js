@@ -17,7 +17,7 @@ import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
 import { TasksContext } from '../store/TasksContext';
-import { SocketContext } from '../store/SocketContext';
+import { socket } from '../App';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
@@ -25,7 +25,6 @@ const Sidebar = () => {
     const { resetUsers } = useContext(UsersContext);
     const { resetTasks } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
-    const { socketState } = useContext(SocketContext);
     const [response, setResponse] = useState(false);
 
     const handleLogout = () => {
@@ -40,7 +39,7 @@ const Sidebar = () => {
         setResponse(true);
         axios.delete(`https://task-manager-v4zl.onrender.com/api/users/${authState.user._id}`)
             .then(() => {
-                socketState.socket.emit('user_left', authState.user);
+                socket.emit('user_left', authState.user);
                 handleLogout();
             })
             .catch((error) => {
