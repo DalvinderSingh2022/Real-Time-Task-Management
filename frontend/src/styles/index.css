@@ -374,7 +374,7 @@ button .loading {
     padding: 10px;
     color: var(--text);
     border-radius: 8px 8px 0 0;
-    background-color: var(--white);
+    background-color: var(--background-color);
     --color: var(--green);
     gap: 1.2em;
     width: 340px;
@@ -475,5 +475,17 @@ button .loading {
 
     .top_nav .greeting {
         display: none;
+    }
+}
+
+@media screen and (max-width:480px) {
+    .notifications {
+        top: 20px;
+        right: 0;
+        width: 100%;
+    }
+
+    .notifications .toast {
+        width: calc(100% - 2em);
     }
 }

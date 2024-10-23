@@ -77,26 +77,32 @@ const AddTask = ({ remove, assignedTo }) => {
                         <div className={`flex gap w_full ${authStyles.group}`}>
                             <div className={`flex col w_full ${authStyles.group}`}>
                                 <label htmlFor="dueDate" className='text_primary'>DueDate</label>
-                                <input
-                                    type='date'
-                                    id='dueDate'
-                                    name='dueDate'
-                                    placeholder='dueDate'
-                                    required
-                                />
+                                <div className="flex">
+                                    <input
+                                        type='date'
+                                        id='dueDate'
+                                        name='dueDate'
+                                        placeholder='dueDate'
+                                        required
+                                        className='w_full'
+                                    />
+                                </div>
                             </div>
                             <div className={`flex col w_full ${authStyles.group}`}>
                                 <label htmlFor="assignedTo" className='text_primary'>Assign To</label>
-                                <select
-                                    name="assignedTo"
-                                    id="assignedTo"
-                                    disabled={!!assignedTo}
-                                    defaultValue={assignedTo || authState.user._id}
-                                    required
-                                >
-                                    <option value={authState.user._id}>{authState.user.name + " (You)"}</option>
-                                    {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
-                                </select>
+                                <div className="flex">
+                                    <select
+                                        name="assignedTo"
+                                        id="assignedTo"
+                                        disabled={!!assignedTo}
+                                        defaultValue={assignedTo || authState.user._id}
+                                        required
+                                        className='w_full'
+                                    >
+                                        <option value={authState.user._id}>{authState.user.name + " (You)"}</option>
+                                        {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
+                                    </select>
+                                </div>
                             </div>
                         </div>
                         <div className={`flex gap ${modalStyles.group}`}>
