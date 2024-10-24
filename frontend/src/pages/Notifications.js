@@ -7,23 +7,27 @@ import { NotificationsContext } from '../store/NotificationContext';
 import TaskNotification from '../components/Notifications/TaskNotification';
 import UserNotification from '../components/Notifications/UserNotification';
 
-const NotificationTypes = {
-    TASK_NOTIFICATION: (prop) => <TaskNotification {...prop} />,
-    USER_NOTIFICATION: (prop) => <UserNotification {...prop} />,
+const NOTIFICATION = {
+    TASK: (prop) => <TaskNotification {...prop} />,
+    USER: (prop) => <UserNotification {...prop} />,
 };
+
+const NotificationTypes = ['TASK_UPDATE', 'TASK_DELETED', 'TASK_ASSIGNMENT', 'USER_FOLLOW', 'USER_UNFOLLOW'];
 
 const Notifications = () => {
     const { notificationsState } = useContext(NotificationsContext);
     const [notifications, setNotifications] = useState(null);
+    const [filter, SetFilter] = useState('ALL');
     const [search, setSearch] = useState('');
 
     useEffect(() => {
         if (!notificationsState.loaded) return;
 
         setNotifications(notificationsState.notifications.filter(notification =>
+            (filter === 'ALL' || notification.type === filter) &&
             notification.message.toLowerCase().replaceAll(" ", '').includes(search)
         ));
-    }, [notificationsState, search]);
+    }, [notificationsState, search, filter]);
 
     return (
         <article>
@@ -36,13 +40,21 @@ const Notifications = () => {
                     value={search}
                     onChange={e => setSearch(e.target.value)}
                 />
+                <select
+                    defaultValue={'ALL'}
+                    onChange={(e) => SetFilter(e.target.value)}
+                    className='button primary'
+                >
+                    <option value={'ALL'}>All</option>
+                    {NotificationTypes.map(notification => <option key={notification} value={notification}>{notification.at(0) + notification.slice(1).toLowerCase().replace("_", " ")}</option>)}
+                </select>
             </form>
             <div className='flex col gap'>
                 {notifications?.length
                     ? (notifications.map(notification =>
                         <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
-                            {notification.type.startsWith('TASK') && NotificationTypes.TASK_NOTIFICATION(notification)}
-                            {notification.type.startsWith('USER') && NotificationTypes.USER_NOTIFICATION(notification)}
+                            {notification.type.startsWith('TASK') && NOTIFICATION.TASK(notification)}
+                            {notification.type.startsWith('USER') && NOTIFICATION.USER(notification)}
                         </div>
                     )) : notificationsState ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
             </div>

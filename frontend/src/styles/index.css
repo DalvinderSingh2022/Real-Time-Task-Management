@@ -99,6 +99,11 @@ form input[type='search'] {
     width: min(480px, 100%);
 }
 
+form select option {
+    background-color: var(--background-color);
+    color: var(--text);
+}
+
 main {
     display: grid;
     grid-template: 80px 1fr / 320px 1fr;
@@ -191,11 +196,11 @@ article {
     padding: 0;
 }
 
-.button:hover {
+button.button:hover {
     transform: scale(1.02) translateY(-2px);
 }
 
-.button:active {
+button.button:active {
     transform: scale(0.98);
 }
 

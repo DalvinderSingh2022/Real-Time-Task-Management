@@ -10,9 +10,11 @@
     padding-inline: 18px;
 }
 
-.filters button {
+.filters button,
+.filters select {
     text-wrap: nowrap;
     font-size: 1.01em;
+    appearance: none;
 }
 
 .container {
