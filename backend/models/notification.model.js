@@ -38,15 +38,16 @@ const NotificationSchema = new mongoose.Schema({
     timestamps: true
 });
 
-setInterval(async () => {
+const Notification = mongoose.model("Notification", NotificationSchema);
+
+(async () => {
     const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
     try {
-        await Notification.deleteMany({ createdAt: { $lt: thirtyDaysAgo } });
+        const notifications = await Notification.deleteMany({ createdAt: { $lt: thirtyDaysAgo } });
+        console.log(notifications);
     } catch (error) {
         console.error(error);
     }
-}, 24 * 60 * 60 * 1000);
-
-const Notification = mongoose.model("Notification", NotificationSchema);
+})();
 
 module.exports = { Notification, NotificationTypes };
