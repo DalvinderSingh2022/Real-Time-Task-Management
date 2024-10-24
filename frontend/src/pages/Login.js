@@ -14,11 +14,13 @@ import { NotificationsContext } from '../store/NotificationContext';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { TasksContext } from '../store/TasksContext';
+import { UsersContext } from '../store/UsersContext';
 
 const Login = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
     const { loadTasks } = useContext(TasksContext);
+    const { loadUsers } = useContext(UsersContext);
     const { loadNotifications } = useContext(NotificationsContext);
     const [response, setResponse] = useState(false);
     const [show, setShow] = useState(false);
@@ -39,10 +41,12 @@ const Login = () => {
                 addToast({ type: 'success', message: data.message });
                 navigate("/");
                 (async () => {
-                    const [tasksData, notificationsData] = await Promise.all([
+                    const [tasksData, notificationsData, usersData] = await Promise.all([
                         axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`),
-                        axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${data.user._id}`)
+                        axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${data.user._id}`),
+                        axios.get("https://task-manager-v4zl.onrender.com/api/users/all")
                     ]);
+                    loadUsers(usersData.data.users);
                     loadTasks(tasksData.data.tasks);
                     loadNotifications(notificationsData.data.notifications);
                 })();

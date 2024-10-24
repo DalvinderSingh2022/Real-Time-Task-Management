@@ -21,9 +21,8 @@ const register = async (req, res) => {
         // Save the user to the database
         // Generate a JSON Web Token (JWT) for the user
         await user.save();
-        const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "24h" });
 
-        res.status(200).json({ message: 'User created successfully', user, token });
+        res.status(200).json({ message: 'User Registered successfully', user });
     } catch (err) {
         validationHandler(err, res);
     }

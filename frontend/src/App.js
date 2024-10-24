@@ -28,7 +28,7 @@ const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
     const { authState, login, verify } = useContext(AuthContext);
     const { tasksState, loadTasks, createTask, updateTask, deleteTask } = useContext(TasksContext);
-    const { addUser, updateUser, deleteUser } = useContext(UsersContext);
+    const { loadUsers, addUser, updateUser, deleteUser } = useContext(UsersContext);
     const { loadNotifications, addNotification } = useContext(NotificationsContext);
     const { addToast } = useContext(AppContext);
 
@@ -46,11 +46,13 @@ const App = () => {
                 login(userData.data.user);
                 setLoadingMsg('');
 
-                const [tasksData, notificationsData] = await Promise.all([
+                const [tasksData, notificationsData, usersData] = await Promise.all([
                     axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${userData.data.user._id}`),
-                    axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${userData.data.user._id}`)
+                    axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${userData.data.user._id}`),
+                    axios.get("https://task-manager-v4zl.onrender.com/api/users/all")
                 ]);
                 loadTasks(tasksData.data.tasks);
+                loadUsers(usersData.data.users);
                 loadNotifications(notificationsData.data.notifications);
             } catch (error) {
                 verify();
@@ -59,7 +61,7 @@ const App = () => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
             }
         })();
-    }, [addToast, authState.verified, loadTasks, login, verify, loadNotifications]);
+    }, [addToast, authState.verified, login, verify, loadTasks, loadUsers, loadNotifications]);
 
 
     useEffect(() => {

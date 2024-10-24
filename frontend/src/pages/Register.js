@@ -11,13 +11,11 @@ import Toast from '../components/Toast';
 import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { TasksContext } from '../store/TasksContext';
 import { socket } from '../App';
 
 const Register = () => {
-    const { authState, login } = useContext(AuthContext);
+    const { authState } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
-    const { loadTasks } = useContext(TasksContext);
     const [response, setResponse] = useState(false);
     const [show, setShow] = useState(false);
     const navigate = useNavigate();
@@ -33,17 +31,12 @@ const Register = () => {
         setResponse(true);
         axios.post("https://task-manager-v4zl.onrender.com/api/users/register", user)
             .then(({ data }) => {
-                login(data.user);
-                localStorage.setItem("jwt", data.token);
                 socket.emit('user_join', data.user);
-                navigate("/");
-                (async () => {
-                    const tasksData = await axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`);
-                    loadTasks(tasksData.data.tasks);
-                })();
+                addToast({ type: 'success', message: data.message });
+                navigate("/login");
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
+                addToast({ type: 'error', message: error?.response?.data?.message });
                 console.error(error);
             })
             .finally(() => setResponse(false));
