@@ -1,11 +1,11 @@
 const mongoose = require("mongoose");
 
 const NotificationTypes = {
-    TASK_UPDATE: 'TASK_UPDATE',
-    TASK_DELETED: 'TASK_DELETED',
-    TASK_ASSIGNMENT: 'TASK_ASSIGNMENT',
-    USER_FOLLOW: 'USER_FOLLOW',
-    USER_UNFOLLOW: 'USER_UNFOLLOW',
+    TASK_UPDATE: 'Task_update',
+    TASK_DELETED: 'Task_deleted',
+    TASK_ASSIGNMENT: 'Task_assignment',
+    USER_FOLLOW: 'User_follow',
+    USER_UNFOLLOW: 'USer_unfollow',
     // COMMENT: 'COMMENT',
     // DUE_DATE_REMINDER: 'DUE_DATE_REMINDER',
     // USER_MENTION: 'USER_MENTION',

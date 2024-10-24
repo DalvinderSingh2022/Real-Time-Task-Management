@@ -12,7 +12,7 @@ const UserNotification = (prop) => {
     return (
         <>
             <div className={`${styles.icon} button round flex`}>
-                {prop.type === 'USER_FOLLOW' ? <RiUserUnfollowLine /> : <RiUserFollowLine />}
+                {prop.type === 'User_follow' ? <RiUserUnfollowLine /> : <RiUserFollowLine />}
             </div>
             <div className="w_full">
                 <span className={`text_primary ${styles.message}`}>{prop.message}</span>

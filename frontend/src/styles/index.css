@@ -180,7 +180,9 @@ article {
     border: 1px solid var(--purple-light);
 }
 
-.button.primary {
+.button.primary,
+.link.active,
+.side_nav .link.active {
     color: var(--white);
     background-color: var(--purple-light);
 }
@@ -301,11 +303,6 @@ main.close .side_nav .link {
 
 .side_nav .link:hover {
     color: var(--text);
-}
-
-.side_nav .link.active {
-    color: var(--white);
-    background-color: var(--purple-light);
 }
 
 .side_nav .link .notifications_count {
