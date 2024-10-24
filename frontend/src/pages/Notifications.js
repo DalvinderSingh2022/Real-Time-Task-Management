@@ -4,18 +4,12 @@ import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
 
 import { NotificationsContext } from '../store/NotificationContext';
-import TaskAssign from '../components/Notifications/TaskAssign';
-import TaskUpdate from '../components/Notifications/TaskUpdate';
-import TaskDelete from '../components/Notifications/TaskDelete';
-import FollowUser from '../components/Notifications/FollowUser';
-import UnfollowUser from '../components/Notifications/UnfollowUser';
+import TaskNotification from '../components/Notifications/TaskNotification';
+import UserNotification from '../components/Notifications/UserNotification';
 
 const NotificationTypes = {
-    TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />,
-    TASK_UPDATE: (props) => <TaskUpdate {...props} />,
-    TASK_DELETED: (props) => <TaskDelete {...props} />,
-    FOLLOW: (props) => <FollowUser {...props} />,
-    UNFOLLOW: (props) => <UnfollowUser {...props} />,
+    TASK_NOTIFICATION: (prop) => <TaskNotification {...prop} />,
+    USER_NOTIFICATION: (prop) => <UserNotification {...prop} />,
 };
 
 const Notifications = () => {
@@ -47,7 +41,8 @@ const Notifications = () => {
                 {notifications?.length
                     ? (notifications.map(notification =>
                         <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
-                            {NotificationTypes[notification.type] ? NotificationTypes[notification.type](notification) : <></>}
+                            {notification.type.startsWith('TASK') && NotificationTypes.TASK_NOTIFICATION(notification)}
+                            {notification.type.startsWith('USER') && NotificationTypes.USER_NOTIFICATION(notification)}
                         </div>
                     )) : notificationsState ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
             </div>

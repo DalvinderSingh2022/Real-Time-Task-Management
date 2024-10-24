@@ -76,7 +76,7 @@ const handleSocketEvents = (io) => {
             }
         }
 
-        if (notification.type === NotificationTypes.FOLLOW || notification.type === NotificationTypes.UNFOLLOW) {
+        if (notification.type === NotificationTypes.USER_FOLLOW || notification.type === NotificationTypes.USER_UNFOLLOW) {
             const id = notification.user;
 
             io.in(id).emit('new_notification', notification);

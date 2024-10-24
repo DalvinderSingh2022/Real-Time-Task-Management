@@ -110,7 +110,7 @@ const taskDelete = async (req, res, next) => {
 const followUser = (req, res, next) => {
     const { authUser, userToFollow } = req.body;
 
-    req.type = NotificationTypes.FOLLOW;
+    req.type = NotificationTypes.USER_UNFOLLOW;
     req.users = [userToFollow._id];
     req.message = `${authUser.name} started following you.`;
     req.data = { user: authUser };
@@ -122,7 +122,7 @@ const followUser = (req, res, next) => {
 const unFollowUser = (req, res, next) => {
     const { authUser, userToUnfollow } = req.body;
 
-    req.type = NotificationTypes.UNFOLLOW;
+    req.type = NotificationTypes.USER_FOLLOW;
     req.users = [userToUnfollow._id];
     req.message = `${authUser.name} has unfollowed you.`;
     req.data = { user: authUser };
