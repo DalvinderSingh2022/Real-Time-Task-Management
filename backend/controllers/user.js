@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const dotenv = require("dotenv").config();
 const User = require('../models/user.model');
 const Task = require('../models/task.model');
-const validationHandler = require('../middleware/validationHandler');
 const mongoose = require('mongoose');
 const Comment = require('../models/comment.model');
 
@@ -23,8 +22,8 @@ const register = async (req, res) => {
         await user.save();
 
         res.status(200).json({ message: 'User Registered successfully', user });
-    } catch (err) {
-        validationHandler(err, res);
+    } catch (error) {
+        res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -61,7 +60,7 @@ const login = async (req, res) => {
 
         return res.status(200).json({ message: 'Logged in successfully', user, token });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -145,7 +144,7 @@ const removeUser = async (req, res) => {
 
         return res.status(201).json({ message: "Account deleted successfully" });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -164,7 +163,7 @@ const allUsers = async (req, res) => {
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
 
@@ -219,7 +218,7 @@ const followUser = async (req, res) => {
 
         res.json({ message: 'Followed user successfully', authUser, userToFollow });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -275,7 +274,7 @@ const unfolloweUser = async (req, res) => {
 
         res.json({ message: 'Unfollowed user successfully', authUser, userToUnfollow });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 

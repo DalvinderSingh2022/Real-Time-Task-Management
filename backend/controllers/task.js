@@ -2,7 +2,6 @@
 const Task = require('../models/task.model');
 const Comment = require('../models/comment.model');
 const mongoose = require('mongoose');
-const validationHandler = require('../middleware/validationHandler');
 
 // Create a new task
 const addTask = async (req, res) => {
@@ -20,7 +19,7 @@ const addTask = async (req, res) => {
 
         return res.status(201).json({ message: 'Task created successfully', task });
     } catch (error) {
-        validationHandler(error, res);
+        res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -42,7 +41,7 @@ const allTasks = async (req, res) => {
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -69,7 +68,7 @@ const getTask = async (req, res) => {
 
         res.status(200).json({ message: 'Task fetched successfully', task });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -88,7 +87,7 @@ const removeTask = async (req, res) => {
 
         return res.status(201).json({ message: "Task deleted Succesfully" });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -115,7 +114,7 @@ const updateTask = async (req, res) => {
 
         return res.status(200).json({ message: 'Task updated successfully', updatedTask });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 

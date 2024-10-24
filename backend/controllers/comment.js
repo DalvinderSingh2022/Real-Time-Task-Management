@@ -1,8 +1,6 @@
 const express = require("express");
-const router = express.Router();
 const Comment = require("../models/comment.model");
 const mongoose = require("mongoose");
-const validationHandler = require("../middleware/validationHandler");
 
 // Get comments for a specific task
 const allComments = async (req, res) => {
@@ -24,7 +22,7 @@ const allComments = async (req, res) => {
 
         res.status(200).json({ message: 'All Comments fetched successfully', comments });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -59,7 +57,7 @@ const addComment = async (req, res) => {
 
         return res.status(201).json({ message: 'Comment added successfully', comment: Comment });
     } catch (error) {
-        validationHandler(error, res);
+        res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 

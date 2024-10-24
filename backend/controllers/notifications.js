@@ -1,5 +1,4 @@
 const { NotificationTypes, Notification } = require("../models/notification.model");
-const validationHandler = require("../middleware/validationHandler");
 const mongoose = require("mongoose");
 
 // Find all notifications for current user 
@@ -11,7 +10,7 @@ const allNotifications = async (req, res) => {
 
         res.status(200).json({ message: 'All Notifications fetched successfully', notifications });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -33,7 +32,7 @@ const updateNotification = async (req, res) => {
 
         return res.status(200).json({ message: 'Notification updated successfully', updatedNotification });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -52,7 +51,7 @@ const removeNotification = async (req, res) => {
 
         res.status(200).json({ message: "Notification deleted Succesfully" });
     } catch (error) {
-        return res.status(500).json({ message: "Internal Server Error" });
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 };
 
@@ -143,7 +142,7 @@ const generateNotification = async (req, res) => {
 
         return res.status(201).json({ message: 'Notifications created successfully', notifications, });
     } catch (error) {
-        validationHandler(error, res);
+        res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
 
