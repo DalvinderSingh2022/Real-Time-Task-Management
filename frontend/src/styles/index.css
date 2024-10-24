@@ -196,11 +196,11 @@ article {
     padding: 0;
 }
 
-button.button:hover {
+.button:hover:not(select.button) {
     transform: scale(1.02) translateY(-2px);
 }
 
-button.button:active {
+.button:active:not(select.button) {
     transform: scale(0.98);
 }
 
@@ -306,6 +306,13 @@ main.close .side_nav .link {
 .side_nav .link.active {
     color: var(--white);
     background-color: var(--purple-light);
+}
+
+.side_nav .link .notifications_count {
+    min-width: 24px;
+    height: 24px;
+    margin: -16px;
+    margin-left: auto;
 }
 
 .modal {

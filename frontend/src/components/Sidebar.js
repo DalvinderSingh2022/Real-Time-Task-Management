@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import axios from 'axios';
 
@@ -21,11 +21,12 @@ import { socket } from '../App';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
-    const { resetNotifications } = useContext(NotificationsContext);
+    const { notificationsState, resetNotifications } = useContext(NotificationsContext);
     const { resetUsers } = useContext(UsersContext);
     const { resetTasks } = useContext(TasksContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState(false);
+    const [count, setCount] = useState(0);
 
     const handleLogout = () => {
         localStorage.removeItem("jwt");
@@ -48,6 +49,10 @@ const Sidebar = () => {
             })
             .finally(() => setResponse(false));
     }
+
+    useEffect(() => {
+        setCount(notificationsState.notifications.filter(notification => !notification.read).length);
+    }, [notificationsState]);
 
     return (
         <>
@@ -76,6 +81,7 @@ const Sidebar = () => {
                     <NavLink to='/notifications' className="button flex link gap2" title='Users'>
                         <IoNotificationsSharp />
                         <p>Notifications</p>
+                        {count > 0 && <span className='notifications_count flex button secondary round'>{count}</span>}
                     </NavLink>
                 </div>
                 <div className="flex col gap2 w_full">

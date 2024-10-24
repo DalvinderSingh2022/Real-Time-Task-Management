@@ -18,9 +18,9 @@ const icons = {
 const TaskNotification = (prop) => {
     const [response, setResponse] = useState(false);
     const { usersState } = useContext(UsersContext);
-    const { title, description, dueDate, assignedTo, status } = prop?.data?.changes || {};
+    const { title, description, dueDate, assignedTo, status } = prop.data.changes || prop.data.task;
     const notificationData = title || description || dueDate || status || assignedTo;
-    let { field, oldValue, newValue } = notificationData || {};
+    let { field, oldValue, newValue } = notificationData;
 
     if (field === 'dueDate') {
         oldValue = new Date(oldValue).toDateString();
@@ -36,7 +36,7 @@ const TaskNotification = (prop) => {
             <div className="w_full">
                 <Link to={`${prop.type === 'TASK_DELETED' ? '' : `/tasks/${prop.data.task._id}`}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
                 <div className={styles.data}>
-                    {notificationData ?
+                    {prop.type === 'TASK_UPDATE' ?
                         <>
                             <div>{field.toUpperCase()}</div>
                             <div>OldValue: {oldValue}</div>
