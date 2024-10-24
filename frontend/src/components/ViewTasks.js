@@ -73,8 +73,12 @@ const ViewTask = (prop) => {
         setResponse('delete');
         axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
             .then(() => {
-                navigate('/tasks');
-                socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy);
+                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/delete-task', { task })
+                    .then(({ data: notificationData }) => {
+                        const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                        socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy, notification);
+                        navigate('/tasks');
+                    });
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })

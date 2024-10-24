@@ -6,12 +6,14 @@ import styles from "../styles/notifications.module.css";
 import { NotificationsContext } from '../store/NotificationContext';
 import TaskAssign from '../components/Notifications/TaskAssign';
 import TaskUpdate from '../components/Notifications/TaskUpdate';
+import TaskDelete from '../components/Notifications/TaskDelete';
 import FollowUser from '../components/Notifications/FollowUser';
 import UnfollowUser from '../components/Notifications/UnfollowUser';
 
 const NotificationTypes = {
     TASK_ASSIGNMENT: (props) => <TaskAssign {...props} />,
     TASK_UPDATE: (props) => <TaskUpdate {...props} />,
+    TASK_DELETED: (props) => <TaskDelete {...props} />,
     FOLLOW: (props) => <FollowUser {...props} />,
     UNFOLLOW: (props) => <UnfollowUser {...props} />,
 };

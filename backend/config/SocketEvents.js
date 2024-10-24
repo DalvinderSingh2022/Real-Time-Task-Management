@@ -24,8 +24,9 @@ const handleSocketEvents = (io) => {
             addNotification({ notification, task, oldTask });
         });
 
-        socket.on('task_deleted', (task, assignedTo, assignedBy) => {
+        socket.on('task_deleted', (task, assignedTo, assignedBy, notification) => {
             io.emit('task_deleted', task, assignedTo, assignedBy);
+            addNotification({ notification });
         });
 
         socket.on('user_left', user => {
@@ -79,6 +80,15 @@ const handleSocketEvents = (io) => {
             const id = notification.user;
 
             io.in(id).emit('new_notification', notification);
+        }
+
+        if (notification.type == NotificationTypes.TASK_DELETED) {
+            const { task } = notification.data;
+
+            io.in(task.assignedBy._id).emit('new_notification', notification);
+            if (task.assignedTo._id !== task.assignedBy._id) {
+                io.in(task.assignedTo._id).emit('new_notification', notification);
+            }
         }
     };
 }

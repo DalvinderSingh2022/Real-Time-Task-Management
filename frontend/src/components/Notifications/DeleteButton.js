@@ -50,4 +50,4 @@ const DeleteButton = ({ response, setResponse, prop }) => {
     )
 }
 
-export default memo(DeleteButton, (prev, next) => prev?.prop?._id === next?.prop?._id);
+export default memo(DeleteButton, (prev, next) => prev?.prop?._id && prev?.prop?._id === next?.prop?._id);
