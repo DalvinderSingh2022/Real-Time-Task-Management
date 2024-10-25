@@ -11,13 +11,11 @@ import AddTask from '../components/AddTask';
 import useSearch from '../hooks/useSearch';
 
 const Tasks = () => {
-    const { response } = useContext(DragAndDropContext);
     const { tasksState } = useContext(TasksContext);
     const [notStarted, setNotStarted] = useState(null);
     const [progress, setProgress] = useState(null);
     const [completed, setCompleted] = useState(null);
-    const [addTask, setAddTask] = useState(false);
-    const [handleChange, tasks] = useSearch(tasksState.tasks, 'title');
+    const [handleChange, tasks, query] = useSearch(tasksState.tasks, 'title');
 
     useEffect(() => {
         if (!tasks) return;
@@ -29,8 +27,7 @@ const Tasks = () => {
 
     return (
         <article>
-            {addTask && <AddTask remove={() => setAddTask(false)} />}
-            <SearchInput handleChange={handleChange} setAddTask={setAddTask} response={response} />
+            <SearchInput handleChange={handleChange} query={query} />
             <div className={styles.container}>
                 <TaskSection tasks={notStarted} status={'Not Started'} />
                 <TaskSection tasks={progress} status={'In Progress'} />
@@ -40,20 +37,28 @@ const Tasks = () => {
     )
 }
 
-const SearchInput = ({ handleChange, setAddTask, response }) => {
+const SearchInput = ({ handleChange, query }) => {
+    const { response } = useContext(DragAndDropContext);
+    const [addTask, setAddTask] = useState(false);
+
     return (
-        <form className={`${styles.filters} flex gap2`} onSubmit={e => e.preventDefault()}>
-            <input
-                type="search"
-                name="q"
-                placeholder='search by title'
-                onChange={handleChange}
-            />
-            <button type='button' className={`button primary flex gap2 ${styles.create_btn}`} onClick={() => setAddTask(true)}>
-                <FaPlus />
-                <span>Create</span>
-            </button>
-            {response && <div className="loading" style={{ margin: 0 }}></div>}
-        </form>);
+        <>
+            {addTask && <AddTask remove={() => setAddTask(false)} />}
+            <form className={`${styles.filters} flex gap2`} onSubmit={e => e.preventDefault()}>
+                <input
+                    type="search"
+                    name="q"
+                    placeholder='search by title'
+                    value={query.get('q') || ''}
+                    onChange={handleChange}
+                />
+                <button type='button' className={`button primary flex gap2 ${styles.create_btn}`} onClick={() => setAddTask(true)}>
+                    <FaPlus />
+                    <span>Create</span>
+                </button>
+                {response && <div className="loading" style={{ margin: 0 }}></div>}
+            </form>
+        </>
+    );
 }
 export default Tasks;

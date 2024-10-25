@@ -9,11 +9,11 @@ import SearchInput from './SearchInput';
 
 const Followers = () => {
     const { authState } = useContext(AuthContext);
-    const [handleChange, users] = useSearch(authState?.user?.followers, 'name');
+    const [handleChange, users, query] = useSearch(authState?.user?.followers, 'name');
 
     return (
         <article>
-            <SearchInput handleChange={handleChange} />
+            <SearchInput handleChange={handleChange} query={query} />
             <div className={styles.container}>
                 <div className={`flex gap wrap ${styles.wrapper}`}>
                     {users?.length > 0

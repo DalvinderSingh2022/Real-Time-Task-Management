@@ -9,11 +9,11 @@ import SearchInput from './SearchInput';
 
 const AllUsers = () => {
     const { usersState } = useContext(UsersContext);
-    const [handleChange, users] = useSearch(usersState.users, 'name');
+    const [handleChange, users, query] = useSearch(usersState.users, 'name');
 
     return (
         <article>
-            <SearchInput handleChange={handleChange} />
+            <SearchInput handleChange={handleChange} query={query} />
             <div className={styles.container}>
                 <div className={`flex gap wrap ${styles.wrapper}`}>
                     {users?.length > 0

@@ -17,11 +17,11 @@ const NotificationTypes = ['Task_update', 'Task_deleted', 'Task_assignment', 'Us
 
 const Notifications = () => {
     const { notificationsState } = useContext(NotificationsContext);
-    const [handleChange, notifications] = useSearch(notificationsState.notifications, 'message', 'type');
+    const [handleChange, notifications, query] = useSearch(notificationsState.notifications, 'message', 'type');
 
     return (
         <article>
-            <SearchInput handleChange={handleChange} />
+            <SearchInput handleChange={handleChange} query={query} />
             <div className='flex col gap'>
                 {notifications?.length
                     ? (notifications.map(notification =>
@@ -35,16 +35,17 @@ const Notifications = () => {
     )
 }
 
-const SearchInput = ({ handleChange }) => {
+const SearchInput = ({ handleChange, query }) => {
     return <form className={`${tasksStyles.filters} flex gap wrap`} onSubmit={e => e.preventDefault()}>
         <input
             type="search"
             name="q"
+            value={query.get('q') || ''}
             placeholder='search by title'
             onChange={handleChange}
         />
         <select
-            defaultValue=''
+            defaultValue={query.get('type') || ''}
             onChange={handleChange}
             name='type'
             className='button primary'

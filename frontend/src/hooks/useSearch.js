@@ -23,7 +23,7 @@ const useSearch = (initialData, query, filter) => {
         });
     };
 
-    return [handleChange, data]
+    return [handleChange, data, search]
 }
 
 export default useSearch;

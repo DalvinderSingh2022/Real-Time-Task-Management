@@ -3,13 +3,14 @@ import { NavLink } from 'react-router-dom';
 
 import tasksStyles from "../../styles/tasks.module.css";
 
-const SearchInput = ({ handleChange }) => {
+const SearchInput = ({ handleChange, query }) => {
     return (
         <form className={`${tasksStyles.filters} flex gap wrap`} onSubmit={e => e.preventDefault()}>
             <input
                 type="search"
                 name="q"
                 placeholder='search by name'
+                value={query.get('q') || ''}
                 onChange={handleChange}
             />
             <div className="flex gap2">

@@ -36,7 +36,7 @@ const TaskNotification = (prop) => {
             <div className="w_full">
                 {prop.type === 'Task_deleted'
                     ? <div className={`text_primary ${styles.message}`}>{prop.message}</div>
-                    : <Link to={`/tasks/${prop.data.task._id}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
+                    : <Link to={`/tasks?q=${prop.data.task.title}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
                 }
                 <div className={styles.data}>
                     {prop.type === 'Task_update' ?
