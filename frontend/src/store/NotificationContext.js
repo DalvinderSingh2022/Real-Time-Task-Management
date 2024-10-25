@@ -8,7 +8,7 @@ const initialState = {
 const notificationsReducer = (state, action) => {
     switch (action.type) {
         case 'LOAD_NOTIFICATIONS':
-            return { notifications: [...state.notifications, ...action.payload.notifications], loaded: true }
+            return { notifications: action.payload.notifications, loaded: true }
         case 'ADD_NOTIFICATION':
             return { ...state, notifications: [...state.notifications, action.payload.notification] };
         case 'DELETE_NOTIFICATION':

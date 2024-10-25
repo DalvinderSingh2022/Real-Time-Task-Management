@@ -8,7 +8,7 @@ const initialState = {
 const usersReducer = (state, action) => {
     switch (action.type) {
         case 'LOAD_USERS':
-            return { users: [...state.users, ...action.payload.users], loaded: true }
+            return { users: action.payload.users, loaded: true }
         case 'ADD_USER':
             return { ...state, users: [...state.users, action.payload.user] };
         case 'DELETE_USER':

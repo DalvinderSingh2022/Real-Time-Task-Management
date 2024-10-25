@@ -10,21 +10,17 @@ import styles from "./../styles/auth.module.css";
 import Toast from '../components/Toast';
 import Response from '../components/Response';
 
-import { NotificationsContext } from '../store/NotificationContext';
+import useLoadStates from '../hooks/useLoadStates';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { TasksContext } from '../store/TasksContext';
-import { UsersContext } from '../store/UsersContext';
 
 const Login = () => {
     const { authState, login } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
-    const { loadTasks } = useContext(TasksContext);
-    const { loadUsers } = useContext(UsersContext);
-    const { loadNotifications } = useContext(NotificationsContext);
     const [response, setResponse] = useState(false);
     const [show, setShow] = useState(false);
     const navigate = useNavigate();
+    useLoadStates(authState.user);
 
     const handlesubmit = (e) => {
         e.preventDefault();
@@ -40,16 +36,6 @@ const Login = () => {
                 localStorage.setItem("jwt", data.token);
                 addToast({ type: 'success', message: data.message });
                 navigate("/");
-                (async () => {
-                    const [tasksData, notificationsData, usersData] = await Promise.all([
-                        axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${data.user._id}`),
-                        axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${data.user._id}`),
-                        axios.get("https://task-manager-v4zl.onrender.com/api/users/all")
-                    ]);
-                    loadUsers(usersData.data.users);
-                    loadTasks(tasksData.data.tasks);
-                    loadNotifications(notificationsData.data.notifications);
-                })();
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message })

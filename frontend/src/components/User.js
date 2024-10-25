@@ -5,7 +5,7 @@ import styles from '../styles/users.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { socket } from '../App';
+import { socket } from '../hooks/useSocket';
 import Response from './Response';
 import AddTask from './AddTask';
 

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 import { AppContext } from './AppContext';
 import { AuthContext } from './AuthContext';
-import { socket } from '../App';
+import { socket } from '../hooks/useSocket';
 
 const initialState = {
     task: null,

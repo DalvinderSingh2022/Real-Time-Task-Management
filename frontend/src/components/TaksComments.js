@@ -8,7 +8,7 @@ import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { socket } from '../App';
+import { socket } from '../hooks/useSocket';
 import Response from './Response';
 
 const TaksComments = ({ task }) => {

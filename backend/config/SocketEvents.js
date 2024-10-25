@@ -49,8 +49,8 @@ const handleSocketEvents = (io) => {
             io.in(id).emit('update_comments', comment);
         });
 
-        socket.on("disconnect", () => {
-            console.log("disconnected : " + socket.id);
+        socket.on('disconnect', (reason) => {
+            console.log(`User disconnected: ${socket.id}, Reason: ${reason}`);
         });
     });
 

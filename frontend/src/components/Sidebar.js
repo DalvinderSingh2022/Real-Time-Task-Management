@@ -17,7 +17,7 @@ import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
 import { TasksContext } from '../store/TasksContext';
-import { socket } from '../App';
+import { socket } from '../hooks/useSocket';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);

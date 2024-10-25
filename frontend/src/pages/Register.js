@@ -11,7 +11,7 @@ import Toast from '../components/Toast';
 import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { socket } from '../App';
+import { socket } from '../hooks/useSocket';
 
 const Register = () => {
     const { authState } = useContext(AuthContext);

@@ -9,8 +9,8 @@ import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import { socket } from '../App';
 import Response from '../components/Response';
+import { socket } from '../hooks/useSocket';
 
 const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);

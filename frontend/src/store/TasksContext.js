@@ -8,7 +8,7 @@ const initialState = {
 const tasksReducer = (state, action) => {
     switch (action.type) {
         case 'LOAD_TASKS':
-            return { tasks: [...state.tasks, ...action.payload.tasks], loaded: true }
+            return { tasks: action.payload.tasks, loaded: true }
         case 'CREATE_TASK':
             return { ...state, tasks: [...state.tasks, action.payload.task] };
         case 'DELETE_TASK':
