@@ -59,7 +59,11 @@ const removeNotification = async (req, res) => {
 const taskAssign = async (req, res, next) => {
     const { task } = req.body;
 
-    req.message = `You have been assigned new task by ${task.assignedBy.name}.`;
+    if (!task || !task.assignedBy || !task.assignedTo) {
+        return res.status(400).send('Invalid task data');
+    }
+
+    req.message = `New Task: You have been assigned "${task.title}" by ${task.assignedBy.name}.`;
     req.data = { task };
     req.users = [task.assignedTo._id];
     req.type = NotificationTypes.TASK_ASSIGNMENT;
@@ -67,11 +71,15 @@ const taskAssign = async (req, res, next) => {
     next();
 };
 
-// Notification for Task update
+// Notification for Task Update
 const taskUpdate = async (req, res, next) => {
     const { changes, task, oldTask } = req.body;
 
-    req.message = `Task ${task._id} has been updated.`;
+    if (!task || !changes) {
+        return res.status(400).send('Invalid task update data');
+    }
+
+    req.message = `Task Update: The task "${task.title}" has been updated.`;
     req.data = { changes, task };
     req.type = NotificationTypes.TASK_UPDATE;
 
@@ -87,12 +95,15 @@ const taskUpdate = async (req, res, next) => {
     next();
 };
 
-
-// Task Assignment Notification
+// Task Deletion Notification
 const taskDelete = async (req, res, next) => {
     const { task } = req.body;
 
-    req.message = `Task ${task._id} has been deleted by ${task.assignedBy.name}.`;
+    if (!task || !task.assignedBy) {
+        return res.status(400).send('Invalid task data');
+    }
+
+    req.message = `Task Deleted: The task "${task.title}" has been deleted by ${task.assignedBy.name}.`;
     req.data = { task };
     req.type = NotificationTypes.TASK_DELETED;
 
@@ -105,26 +116,50 @@ const taskDelete = async (req, res, next) => {
     next();
 };
 
-// Notification for new follower
+// Notification for New Follower
 const followUser = (req, res, next) => {
     const { authUser, userToFollow } = req.body;
 
-    req.type = NotificationTypes.USER_UNFOLLOW;
+    if (!authUser || !userToFollow) {
+        return res.status(400).send('Invalid follow data');
+    }
+
+    req.type = NotificationTypes.USER_FOLLOW;
     req.users = [userToFollow._id];
-    req.message = `${authUser.name} started following you.`;
+    req.message = `${authUser.name} is now following you!`;
     req.data = { user: authUser };
 
     next();
 };
 
-// Notification for unfollow
+// Notification for Unfollow
 const unFollowUser = (req, res, next) => {
     const { authUser, userToUnfollow } = req.body;
 
-    req.type = NotificationTypes.USER_FOLLOW;
+    if (!authUser || !userToUnfollow) {
+        return res.status(400).send('Invalid unfollow data');
+    }
+
+    req.type = NotificationTypes.USER_UNFOLLOW;
     req.users = [userToUnfollow._id];
     req.message = `${authUser.name} has unfollowed you.`;
     req.data = { user: authUser };
+
+    next();
+};
+
+// Notification for Due Date Reminder
+const dueDate = (req, res, next) => {
+    const { tasks } = req.body;
+
+    if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
+        return res.status(400).send('Invalid tasks data');
+    }
+
+    req.type = NotificationTypes.SYSTEM_DUE_DATE;
+    req.users = [tasks[0].assignedTo];
+    req.message = `Reminder: You have ${tasks.length} task(s) due today (${new Date().toDateString()}).`;
+    req.data = { tasks };
 
     next();
 };
@@ -146,4 +181,4 @@ const generateNotification = async (req, res) => {
     }
 }
 
-module.exports = { allNotifications, updateNotification, removeNotification, taskAssign, taskUpdate, taskDelete, followUser, unFollowUser, generateNotification };
+module.exports = { allNotifications, updateNotification, removeNotification, taskAssign, taskUpdate, taskDelete, followUser, unFollowUser, dueDate, generateNotification };

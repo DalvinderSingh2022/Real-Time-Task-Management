@@ -1,15 +1,14 @@
 const mongoose = require("mongoose");
 
 const NotificationTypes = {
-    TASK_UPDATE: 'Task_update',
-    TASK_DELETED: 'Task_deleted',
-    TASK_ASSIGNMENT: 'Task_assignment',
-    USER_FOLLOW: 'User_follow',
-    USER_UNFOLLOW: 'USer_unfollow',
-    // COMMENT: 'COMMENT',
-    // DUE_DATE_REMINDER: 'DUE_DATE_REMINDER',
-    // USER_MENTION: 'USER_MENTION',
-    // SYSTEM_ALERT: 'SYSTEM_ALERT',
+    TASK_UPDATE: 'Task update',
+    TASK_DELETED: 'Task deleted',
+    TASK_ASSIGNMENT: 'Task assignment',
+    USER_FOLLOW: 'User follow',
+    USER_UNFOLLOW: 'USer unfollow',
+    SYSTEM_DUE_DATE: 'System due date',
+    // USER_MENTION: 'User mention',
+    // SYSTEM_ALERT: 'System alert',
 };
 
 const NotificationSchema = new mongoose.Schema({
@@ -40,14 +39,16 @@ const NotificationSchema = new mongoose.Schema({
 
 const Notification = mongoose.model("Notification", NotificationSchema);
 
-(async () => {
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+setInterval(() => async () => {
     try {
-        const notifications = await Notification.deleteMany({ createdAt: { $lt: thirtyDaysAgo } });
-        console.log(notifications);
+        if (new Date().getHours() === 0) {
+            const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+            const result = await Notification.deleteMany({ createdAt: { $lt: thirtyDaysAgo } });
+            console.log(result);
+        }
     } catch (error) {
         console.error(error);
     }
-})();
+}, 60 * 60 * 1000);
 
 module.exports = { Notification, NotificationTypes };

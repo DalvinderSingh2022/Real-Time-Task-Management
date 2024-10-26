@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const axios = require('axios');
 
 const taskSchema = new mongoose.Schema({
     title: {
@@ -32,5 +33,24 @@ const taskSchema = new mongoose.Schema({
 });
 
 const Task = mongoose.model('Task', taskSchema);
+
+setInterval(async () => {
+    try {
+        if (new Date().getHours() === 0) {
+            const today = new Date().setHours(0, 0, 0, 0);
+            const overDueTasks = await Task.find({ dueDate: { $lt: today } });
+            const groupedTasks = overDueTasks.reduce((acc, task) => {
+                (!acc[task.assignedTo]) ? acc[task.assignedTo] = [task] : acc[assignedToId].push(task);
+                return acc;
+            }, {});
+
+            Object.values(groupedTasks).forEach(async (tasks) => {
+                await axios.post('https://task-manager-v4zl.onrender.com/api/notifications/system-due-date', { tasks });
+            });
+        }
+    } catch (error) {
+        console.error(error);
+    }
+}, 1000 * 60 * 60);
 
 module.exports = Task;
