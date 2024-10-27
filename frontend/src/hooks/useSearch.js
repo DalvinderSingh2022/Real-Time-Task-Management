@@ -10,7 +10,7 @@ const useSearch = (initialData, query, filter) => {
 
         setData(initialData.filter(item =>
             (!filter || (!search.has(filter) || item[filter] === search.get(filter))) &&
-            (!query || item[query].toLowerCase().replaceAll(" ", '').includes(search.get('q') || ''))
+            (!query || item[query].toLowerCase().includes((search.get('q') || '').toLowerCase()))
         ));
     }, [initialData, filter, query, search]);
 
@@ -18,7 +18,7 @@ const useSearch = (initialData, query, filter) => {
         const { name, value } = e.target;
 
         setSearch(prevParams => {
-            value ? prevParams.set(name, value) : prevParams.delete(name);
+            value ? prevParams.set(name, value.replaceAll("%20", "+")) : prevParams.delete(name);
             return prevParams
         });
     };
