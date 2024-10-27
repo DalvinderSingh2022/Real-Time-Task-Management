@@ -156,7 +156,7 @@ const dueDate = (req, res, next) => {
         return res.status(400).send('Invalid tasks data');
     }
 
-    req.type = NotificationTypes.SYSTEM_DUE_DATE;
+    req.type = NotificationTypes.DUE_DATE_REMINDER;
     req.users = [tasks[0].assignedTo];
     req.message = `Reminder: You have ${tasks.length} task(s) due today (${new Date().toDateString()}).`;
     req.data = { tasks };

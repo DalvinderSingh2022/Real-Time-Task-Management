@@ -45,7 +45,7 @@ setInterval(async () => {
             }, {});
 
             Object.values(groupedTasks).forEach(async (tasks) => {
-                await axios.post('https://task-manager-v4zl.onrender.com/api/notifications/system-due-date', { tasks });
+                await axios.post('https://task-manager-v4zl.onrender.com/api/notifications/due-date-reminder', { tasks });
             });
         }
     } catch (error) {

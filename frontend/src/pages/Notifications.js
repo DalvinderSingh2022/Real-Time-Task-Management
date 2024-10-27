@@ -4,6 +4,7 @@ import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
 
 import { NotificationsContext } from '../store/NotificationContext';
+import SystemNotifiaction from '../components/Notifications/SystemNotifiaction';
 import TaskNotification from '../components/Notifications/TaskNotification';
 import UserNotification from '../components/Notifications/UserNotification';
 import useSearch from '../hooks/useSearch';
@@ -11,9 +12,10 @@ import useSearch from '../hooks/useSearch';
 const NOTIFICATION = {
     TASK: (prop) => <TaskNotification {...prop} />,
     USER: (prop) => <UserNotification {...prop} />,
+    SYSTEM: (prop) => <SystemNotifiaction {...prop} />,
 };
 
-const NotificationTypes = ['Task_update', 'Task_deleted', 'Task_assignment', 'User_follow', 'USer_unfollow'];
+const NotificationTypes = ['Task update', 'Task deleted', 'Task assignment', 'User follow', 'User unfollow', 'Due date reminder'];
 
 const Notifications = () => {
     const { notificationsState } = useContext(NotificationsContext);
@@ -28,6 +30,7 @@ const Notifications = () => {
                         <div className={`${styles.notification} ${notification.read ? "" : styles.unread} flex gap`} title={notification.type} key={notification._id}>
                             {notification.type.startsWith('Task') && NOTIFICATION.TASK(notification)}
                             {notification.type.startsWith('User') && NOTIFICATION.USER(notification)}
+                            {notification.type.startsWith('Due') && NOTIFICATION.SYSTEM(notification)}
                         </div>
                     )) : notificationsState ? <div className='text_secondary flex'>There is no Notifications</div> : <div className='loading'></div>}
             </div>

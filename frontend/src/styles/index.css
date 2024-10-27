@@ -181,8 +181,7 @@ article {
 }
 
 .button.primary,
-.link.active,
-.side_nav .link.active {
+.button.link.active {
     color: var(--white);
     background-color: var(--purple-light);
 }
@@ -301,7 +300,7 @@ main.close .side_nav .link {
     margin-inline: auto;
 }
 
-.side_nav .link:hover {
+.side_nav .link:hover:not(.link.active) {
     color: var(--text);
 }
 
@@ -310,6 +309,7 @@ main.close .side_nav .link {
     height: 24px;
     margin: -16px;
     margin-left: auto;
+    font-size: .8em;
 }
 
 .modal {

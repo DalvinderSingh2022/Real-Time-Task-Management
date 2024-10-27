@@ -81,7 +81,7 @@ const Sidebar = () => {
                     <NavLink to='/notifications' className="button flex link gap2" title='Users'>
                         <IoNotificationsSharp />
                         <p>Notifications</p>
-                        {count > 0 && <span className='notifications_count flex button secondary round'>{count}</span>}
+                        {count > 0 && <span className='notifications_count flex button primary round'>{count}</span>}
                     </NavLink>
                 </div>
                 <div className="flex col gap2 w_full">

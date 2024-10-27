@@ -5,8 +5,8 @@ const NotificationTypes = {
     TASK_DELETED: 'Task deleted',
     TASK_ASSIGNMENT: 'Task assignment',
     USER_FOLLOW: 'User follow',
-    USER_UNFOLLOW: 'USer unfollow',
-    SYSTEM_DUE_DATE: 'System due date',
+    USER_UNFOLLOW: 'User unfollow',
+    DUE_DATE_REMINDER: 'Due date reminder',
     // USER_MENTION: 'User mention',
     // SYSTEM_ALERT: 'System alert',
 };
