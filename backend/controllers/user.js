@@ -148,7 +148,6 @@ const removeUser = async (req, res) => {
     }
 };
 
-
 // Get all users
 const allUsers = async (req, res) => {
     try {
@@ -166,6 +165,33 @@ const allUsers = async (req, res) => {
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
 }
+
+// Retrieve a User
+const getUser = async (req, res) => {
+    try {
+        // Retrieve the User with the given _id
+        // and Populate the followers and following fields with the corresponding users data
+        const userId = req.params.id;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "Invalid Id User Not found" });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User Not found" });
+        }
+
+        await user.populate([
+            { path: 'followers', select: '_id name followers' },
+            { path: 'following', select: '_id name followers' }
+        ]);
+
+        res.status(200).json({ message: 'User fetched successfully', user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
+};
 
 // Follow another user
 const followUser = async (req, res) => {
@@ -278,4 +304,4 @@ const unfolloweUser = async (req, res) => {
     }
 };
 
-module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser };
+module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser, getUser };

@@ -1,4 +1,5 @@
 import React, { memo, useContext, useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 import styles from '../styles/users.module.css';
@@ -7,14 +8,12 @@ import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
 import Response from './Response';
-import AddTask from './AddTask';
 
 const User = ({ name, followers, _id }) => {
     const { authState } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
     const [response, setResponse] = useState(false);
-    const [addTask, setAddTask] = useState(false);
 
     useEffect(() => {
         if (authState.authenticated) {
@@ -63,12 +62,9 @@ const User = ({ name, followers, _id }) => {
     return (
         <>
             {response && <Response />}
-            {addTask && <AddTask assignedTo={_id} remove={() => setAddTask(false)} />}
             <div className={`flex ${styles.user}`} title={name}>
                 <div>
-                    {authState.user.followers.find(user => user._id === _id)
-                        ? <div className={`text_primary ${styles.user_title}`} style={{ cursor: 'pointer' }} onClick={() => setAddTask(true)} >{name}</div>
-                        : <div className={`text_primary ${styles.user_title}`}>{name}</div>}
+                    <Link to={`/users/${_id}`} className={`text_primary ${styles.user_title}`}>{name}</Link>
                     <div className='text_secondary'>Followers: {followers.length}</div>
                 </div>
                 {authState.user._id !== _id &&

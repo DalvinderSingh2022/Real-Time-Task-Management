@@ -1,0 +1,11 @@
+ .container section.wrapper {
+     gap: 1em;
+     background-color: unset;
+     align-items: stretch;
+     padding: 0;
+ }
+
+ .wrapper .users,
+ .wrapper .tasks {
+     grid-column: span 3;
+ }

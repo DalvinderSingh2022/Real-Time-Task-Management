@@ -17,6 +17,7 @@ const Register = lazy(() => import('./pages/Register'));
 const Home = lazy(() => import('./pages/Home'));
 const Tasks = lazy(() => import('./pages/Tasks'));
 const Users = lazy(() => import('./pages/Users/AllUsers'));
+const UserDetails = lazy(() => import('./pages/UserDetails'));
 const Followers = lazy(() => import('./pages/Users/Followers'));
 const Following = lazy(() => import('./pages/Users/Following'));
 const Notfound = lazy(() => import('./pages/NotFound'));
@@ -59,13 +60,14 @@ const App = () => {
                 <Route path='/' element={<Layout />}>
                     <Route index element={<Home />} />
                     <Route path='tasks'>
-                        <Route index element={<DragAndDropProvider><Tasks /></DragAndDropProvider>} ></Route>
-                        <Route path=':id' element={<TaskDetails />}></Route>
+                        <Route index element={<DragAndDropProvider><Tasks /></DragAndDropProvider>} />
+                        <Route path=':id' element={<TaskDetails />} />
                     </Route>
                     <Route path="users">
                         <Route index element={<Users />} />
                         <Route path='followers' element={<Followers />} />
                         <Route path='following' element={<Following />} />
+                        <Route path=':id' element={<UserDetails />} />
                     </Route>
                     <Route path="notifications" element={<Notifications />} />
                     <Route path='*' element={<Notfound />} />
