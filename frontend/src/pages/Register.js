@@ -64,7 +64,6 @@ const Register = () => {
                                 id='name'
                                 name='name'
                                 placeholder='batman'
-                                required
                                 autoComplete="username"
                             />
                         </div>
@@ -75,7 +74,6 @@ const Register = () => {
                                 id='email'
                                 name='email'
                                 placeholder='exapmle@domain.com'
-                                required
                                 autoComplete="email"
                             />
                         </div>
@@ -86,7 +84,6 @@ const Register = () => {
                                 id='password'
                                 name='password'
                                 placeholder='12345678'
-                                required
                                 autoComplete="current-password"
                             />
                             <span className={`${styles.password_eye} flex`} onClick={() => setShow(prev => !prev)}>{show ? <FiEyeOff /> : <FiEye />}</span>

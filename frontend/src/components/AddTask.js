@@ -59,7 +59,6 @@ const AddTask = ({ remove, assignedTo }) => {
                                 id='title'
                                 name='title'
                                 placeholder='title'
-                                required
                             />
                         </div>
                         <div className={`flex col w_full ${authStyles.group}`}>
@@ -70,7 +69,6 @@ const AddTask = ({ remove, assignedTo }) => {
                                 id='description'
                                 name='description'
                                 placeholder='description'
-                                required
                             />
                         </div>
 
@@ -83,7 +81,6 @@ const AddTask = ({ remove, assignedTo }) => {
                                         id='dueDate'
                                         name='dueDate'
                                         placeholder='dueDate'
-                                        required
                                         className='w_full'
                                     />
                                 </div>
@@ -96,7 +93,6 @@ const AddTask = ({ remove, assignedTo }) => {
                                         id="assignedTo"
                                         disabled={!!assignedTo}
                                         defaultValue={assignedTo || authState.user._id}
-                                        required
                                         className='w_full'
                                     >
                                         <option value={authState.user._id}>{authState.user.name + " (You)"}</option>

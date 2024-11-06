@@ -109,7 +109,6 @@ const TaksComments = ({ task }) => {
                                         type="text"
                                         placeholder='comment'
                                         className='w_full'
-                                        required
                                         value={comment}
                                         onChange={e => setComment(e.target.value)}
                                     />

@@ -3,7 +3,10 @@ const mongoose = require("mongoose");
 const commentSchema = new mongoose.Schema({
     comment: {
         type: String,
-        require: true
+        validate: {
+            validator: (val) => val.trim().length > 0,
+            message: 'Comment cannot be an empty'
+        }
     },
     task: {
         type: mongoose.Schema.Types.ObjectId,

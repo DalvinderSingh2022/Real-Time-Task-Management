@@ -66,7 +66,6 @@ const Login = () => {
                                 id='email'
                                 name='email'
                                 placeholder='exapmle@domain.com'
-                                required
                                 autoComplete="email"
                             />
                         </div>
@@ -77,7 +76,6 @@ const Login = () => {
                                 id='password'
                                 name='password'
                                 placeholder='12345678'
-                                required
                                 autoComplete="current-password"
                             />
                             <span className={`${styles.password_eye} flex`} onClick={() => setShow(prev => !prev)}>{show ? <FiEyeOff /> : <FiEye />}</span>

@@ -27,7 +27,7 @@ const updateNotification = async (req, res) => {
         const updatedNotification = await Notification.findByIdAndUpdate(
             notificationId,
             req.body,
-            { new: true }
+            { new: true, runValidators: true }
         );
 
         return res.status(200).json({ message: 'Notification updated successfully', updatedNotification });

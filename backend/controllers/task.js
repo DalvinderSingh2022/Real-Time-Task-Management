@@ -106,7 +106,7 @@ const updateTask = async (req, res) => {
         const updatedTask = await Task.findByIdAndUpdate(
             taskId,
             req.body,
-            { new: true }
+            { new: true, runValidators: true, }
         ).populate([
             { path: 'assignedTo', select: '_id name' },
             { path: 'assignedBy', select: '_id name' }

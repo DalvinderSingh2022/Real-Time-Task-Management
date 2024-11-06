@@ -125,7 +125,6 @@ const ViewTask = (prop) => {
                                     title={task.description}
                                     value={task.description}
                                     onChange={e => handlechange(e)}
-                                    required
                                     className='w_full'
                                 />
                             </div>
@@ -144,7 +143,6 @@ const ViewTask = (prop) => {
                                         title={(task.dueDate).substring(0, 10)}
                                         value={(task.dueDate).substring(0, 10)}
                                         onChange={e => handlechange(e)}
-                                        required
                                         className='w_full'
                                     />
                                 </div>
@@ -162,7 +160,6 @@ const ViewTask = (prop) => {
                                         title={task.status}
                                         value={task.status}
                                         onChange={(e) => handlechange(e)}
-                                        required
                                         className='w_full'
                                     >
                                         <option value="Not Started">Not Started</option>
@@ -184,7 +181,6 @@ const ViewTask = (prop) => {
                                         title={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
                                         value={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
                                         onChange={(e) => handlechange(e)}
-                                        required
                                         className='w_full'
                                     />
                                 </div>
@@ -198,7 +194,6 @@ const ViewTask = (prop) => {
                                         id="assignedTo"
                                         defaultValue={task.assignedTo._id}
                                         onChange={(e) => handlechange(e)}
-                                        required
                                         className='w_full'
                                     >
                                         <option value={authState.user._id}>{authState.user.name + ' (You)'}</option>

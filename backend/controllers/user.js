@@ -10,6 +10,11 @@ const Comment = require('../models/comment.model');
 const register = async (req, res) => {
     const { name, email, password } = req.body;
 
+    // Return an error response if either name, email or password is not provided
+    if (!email || !password || !name) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
     // Hash the given password using bcrypt
     if (password) {
         var hashedPassword = await bcrypt.hash(password, 10);
@@ -193,6 +198,33 @@ const getUser = async (req, res) => {
     }
 };
 
+// Update a User
+const updateUser = async (req, res) => {
+    // Find the User with the given _id
+    const userId = req.params.id;
+
+    try {
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return res.status(400).json({ message: "Invalid Id User Not found" });
+        }
+
+        // Update the User with the new data
+        // and Populate the followers and following fields with the corresponding users data
+        const user = await User.findByIdAndUpdate(
+            userId,
+            req.body,
+            { new: true, runValidators: true }
+        ).populate([
+            { path: 'followers', select: '_id name followers' },
+            { path: 'following', select: '_id name followers' }
+        ]);;
+
+        return res.status(200).json({ message: 'User updated successfully', user });
+    } catch (error) {
+        return res.status(500).json({ message: error.message || "Internal Server Error" });
+    }
+};
+
 // Follow another user
 const followUser = async (req, res) => {
     const userId = req.params.userId;
@@ -304,4 +336,4 @@ const unfolloweUser = async (req, res) => {
     }
 };
 
-module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser, getUser };
+module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser, getUser, updateUser };
