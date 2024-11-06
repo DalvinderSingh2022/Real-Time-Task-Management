@@ -10,9 +10,9 @@ import { UsersContext } from '../../store/UsersContext';
 import DeleteButton from './DeleteButton';
 
 const icons = {
-    Task_update: <VscGitPullRequestGoToChanges />,
-    Task_deleted: <CgFileRemove />,
-    Task_assignment: <MdOutlineNoteAdd />
+    'Task update': <VscGitPullRequestGoToChanges />,
+    'Task deleted': <CgFileRemove />,
+    'Task assignment': <MdOutlineNoteAdd />
 }
 
 const TaskNotification = (prop) => {
@@ -34,12 +34,12 @@ const TaskNotification = (prop) => {
         <>
             <div className={`${styles.icon} button round flex`}>{icons[prop.type]}</div>
             <div className="w_full">
-                {prop.type === 'Task_deleted'
+                {prop.type === 'Task deleted'
                     ? <div className={`text_primary ${styles.message}`}>{prop.message}</div>
                     : <Link to={`/tasks?q=${prop.data.task.title}`} className={`text_primary ${styles.message}`}>{prop.message}</Link>
                 }
                 <div className={styles.data}>
-                    {prop.type === 'Task_update' ?
+                    {prop.type === 'Task update' ?
                         <>
                             <div>{field.toUpperCase()}</div>
                             <div>OldValue: {oldValue}</div>
@@ -48,8 +48,8 @@ const TaskNotification = (prop) => {
                         :
                         <>
                             <div className='text_primary'>Title: {title}</div>
-                            {prop.type === 'Task_assignment' && <div className='text_primary'>Due Date: {new Date(dueDate).toDateString()}</div>}
-                            {prop.type === 'Task_deleted' && <div className='text_primary'>Description: {description}</div>}
+                            {prop.type === 'Task assignment' && <div className='text_primary'>Due Date: {new Date(dueDate).toDateString()}</div>}
+                            {prop.type === 'Task deleted' && <div className='text_primary'>Description: {description}</div>}
                         </>
                     }
                     <div className='text_secondary'>{(new Date(prop.createdAt).toDateString()) + " at " + (new Date(prop.createdAt).toLocaleTimeString())}</div>
