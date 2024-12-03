@@ -1,14 +1,14 @@
 const express = require("express");
 const routes = require("./routes/index");
 const cors = require("cors");
-const dotenv = require("dotenv").config();
 const { handleSocketEvents } = require("./config/SocketEvents.js");
 const connectMongo = require("./config/Database.js");
 const http = require('http');
 const { Server } = require('socket.io');
+require("dotenv").config();
 
-const PORT = process.env.PORT || 4000;
-const ORIGIN = process.env.ORIGIN || 'http://localhost:3000';
+const PORT = process.env.PORT;
+const ORIGIN = process.env.ORIGIN;
 
 const app = express();
 const server = http.createServer(app);

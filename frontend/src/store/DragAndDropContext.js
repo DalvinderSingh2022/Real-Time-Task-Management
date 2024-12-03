@@ -67,7 +67,7 @@ const DragAndDropProvider = ({ children }) => {
                     axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task, oldTask })
                         .then(({ data: notificationData }) => {
                             const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                            socket.emit('task_updated', data, authState.user, notification, oldTask);
+                            socket.emit('task_updated', data.updatedTask, authState.user, notification, oldTask);
                         });
                 })
                 .catch((error) => {
