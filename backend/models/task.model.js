@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const axios = require('axios');
+require("dotenv").config();
 
 const taskSchema = new mongoose.Schema({
     title: {
@@ -45,7 +46,7 @@ setInterval(async () => {
             }, {});
 
             Object.values(groupedTasks).forEach(async (tasks) => {
-                await axios.post('https://task-manager-v4zl.onrender.com/api/notifications/due-date-reminder', { tasks });
+                await axios.post(process.env.API_BASE_URL + 'notifications/due-date-reminder', { tasks });
             });
         }
     } catch (error) {

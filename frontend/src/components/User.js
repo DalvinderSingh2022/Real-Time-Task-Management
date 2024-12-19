@@ -6,6 +6,8 @@ import styles from '../styles/users.module.css';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
+import { notifications, users } from '../utils/apiendpoints';
+import AddTask from './AddTask';
 import Response from './Response';
 
 const User = ({ name, followers, _id }) => {
@@ -23,38 +25,38 @@ const User = ({ name, followers, _id }) => {
 
     const handleFollow = () => {
         setResponse(true);
-        axios.post(`https://task-manager-v4zl.onrender.com/api/users/follow/${_id}`, { userId: authState.user._id })
+        axios.post(users.follow_user(_id), { userId: authState.user._id })
             .then(({ data }) => {
                 const { authUser, userToFollow } = data;
 
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/follow-user', { authUser, userToFollow })
+                axios.post(notifications.follow_user, { authUser, userToFollow })
                     .then(({ data: notificationData }) => {
                         const [notification] = notificationData.notifications;
                         socket.emit('user_followed', authUser, userToFollow, notification);
                     });
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }
 
     const handleUnfollow = () => {
         setResponse(true);
-        axios.post(`https://task-manager-v4zl.onrender.com/api/users/unfollow/${_id}`, { userId: authState.user._id })
+        axios.post(users.unfollow_user(_id), { userId: authState.user._id })
             .then(({ data }) => {
                 const { authUser, userToUnfollow } = data;
 
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/unfollow-user', { authUser, userToUnfollow })
+                axios.post(notifications.unfollow_user, { authUser, userToUnfollow })
                     .then(({ data: notificationData }) => {
                         const [notification] = notificationData.notifications;
                         socket.emit('user_unfollowed', authUser, userToUnfollow, notification);
                     });
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

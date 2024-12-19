@@ -7,6 +7,7 @@ import modalStyles from "../styles/modal.module.css";
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
+import { notifications, tasks } from '../utils/apiendpoints';
 import Response from './Response';
 
 const AddTask = ({ remove, assignedTo }) => {
@@ -25,11 +26,11 @@ const AddTask = ({ remove, assignedTo }) => {
         }
 
         setResponse(true);
-        axios.post("https://task-manager-v4zl.onrender.com/api/tasks", task)
+        axios.post(tasks.create_task, task)
             .then(({ data: taskData }) => {
                 const { task } = taskData;
 
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/assign-task', { task })
+                axios.post(notifications.assign_task, { task })
                     .then(({ data: notificationData }) => {
                         const [notification] = notificationData.notifications;
                         socket.emit('task_created', task, notification);
@@ -37,8 +38,8 @@ const AddTask = ({ remove, assignedTo }) => {
                     });
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

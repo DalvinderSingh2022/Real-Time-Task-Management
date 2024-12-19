@@ -4,6 +4,7 @@ import axios from 'axios';
 import { TasksContext } from '../store/TasksContext';
 import { UsersContext } from '../store/UsersContext';
 import { NotificationsContext } from '../store/NotificationContext';
+import { notifications, tasks, users } from '../utils/apiendpoints';
 
 const useLoadStates = (user) => {
     const { loadTasks, tasksState } = useContext(TasksContext);
@@ -12,25 +13,25 @@ const useLoadStates = (user) => {
 
     useEffect(() => {
         if (!usersState.loaded && user) {
-            axios.get("https://task-manager-v4zl.onrender.com/api/users/all")
+            axios.get(users.all_users)
                 .then(({ data }) => loadUsers(data.users))
-                .catch(err => console.error(err));
+                .catch(error => console.log(".....API ERROR....." + error));
         }
     }, [loadUsers, usersState, user]);
 
     useEffect(() => {
         if (!notificationsState.loaded && user) {
-            axios.get(`https://task-manager-v4zl.onrender.com/api/notifications/all/${user._id}`)
+            axios.get(notifications.all_notifications(user._id))
                 .then(({ data }) => loadNotifications(data.notifications))
-                .catch(err => console.error(err));
+                .catch(error => console.log(".....API ERROR....." + error));
         }
     }, [loadNotifications, notificationsState, user]);
 
     useEffect(() => {
         if (!tasksState.loaded && user) {
-            axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/all/${user._id}`)
+            axios.get(tasks.all_tasks(user._id))
                 .then(({ data }) => loadTasks(data.tasks))
-                .catch(err => console.error(err));
+                .catch(error => console.log(".....API ERROR....." + error));
         }
     }, [loadTasks, tasksState, user]);
 }

@@ -5,6 +5,7 @@ import { IoCloseSharp } from "react-icons/io5";
 
 import { NotificationsContext } from '../../store/NotificationContext';
 import { AppContext } from '../../store/AppContext';
+import { notifications } from '../../utils/apiendpoints';
 import Response from '../Response';
 
 const DeleteButton = ({ response, setResponse, prop }) => {
@@ -16,13 +17,9 @@ const DeleteButton = ({ response, setResponse, prop }) => {
 
         const handleNotification = () => {
             if (notification && !notification.read) {
-                axios.put(`https://task-manager-v4zl.onrender.com/api/notifications/${prop._id}`, { ...notification, read: true })
-                    .then(({ data }) => {
-                        readNotification(data.updatedNotification._id);
-                    })
-                    .catch(error => {
-                        console.error(error);
-                    });
+                axios.put(notifications.update_notification(prop._id), { ...notification, read: true })
+                    .then(({ data }) => readNotification(data.updatedNotification._id))
+                    .catch(error => console.log(".....API ERROR....." + error));
             }
         }
 
@@ -31,13 +28,11 @@ const DeleteButton = ({ response, setResponse, prop }) => {
 
     const handleDelete = () => {
         setResponse(true);
-        axios.delete(`https://task-manager-v4zl.onrender.com/api/notifications/${prop._id}`)
-            .then(() => {
-                deleteNotification(prop._id);
-            })
+        axios.delete(notifications.delete_notifications(prop._id))
+            .then(() => deleteNotification(prop._id))
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
-                console.error(error);
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

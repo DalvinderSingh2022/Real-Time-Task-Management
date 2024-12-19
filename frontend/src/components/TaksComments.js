@@ -9,12 +9,13 @@ import styles from '../styles/taskdetails.module.css';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
+import { comments } from '../utils/apiendpoints';
 import Response from './Response';
 
 const TaksComments = ({ task }) => {
     const { addToast } = useContext(AppContext);
     const { authState } = useContext(AuthContext);
-    const [comments, setComments] = useState(null);
+    const [allComments, setAllComments] = useState(null);
     const [comment, setComment] = useState('');
     const [response, setResponse] = useState(false);
     const { id } = useParams();
@@ -22,13 +23,11 @@ const TaksComments = ({ task }) => {
 
     useEffect(() => {
         (async () => {
-            await axios.get(`https://task-manager-v4zl.onrender.com/api/comments/${id}`)
-                .then(({ data }) => {
-                    setComments(data.comments);
-                })
+            await axios.get(comments.get_comments(id))
+                .then(({ data }) => setAllComments(data.comments))
                 .catch((error) => {
-                    console.error(error);
                     addToast({ type: 'error', message: error?.response?.data?.message });
+                    console.log(".....API ERROR....." + error);
                 });
         })();
     }, [id, addToast]);
@@ -52,26 +51,26 @@ const TaksComments = ({ task }) => {
 
     useEffect(() => {
         socket.on('update_comments', (comment) => {
-            setComments(prev => [...prev, comment]);
+            setAllComments(prev => [...prev, comment]);
             if (authState.user._id !== comment.user._id) {
                 addToast({ type: 'info', message: `${task.title}: new comment by ${comment.user.name}` });
             }
         });
 
         return () => socket.off("update_comments");
-    }, [comments, addToast, task, authState]);
+    }, [allComments, addToast, task, authState]);
 
     useEffect(() => {
         if (messagesRef.current) {
             setTimeout(() => messagesRef.current.scrollTop = messagesRef.current.scrollHeight, 0);
         }
-    }, [comments, task]);
+    }, [allComments, task]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
         setResponse(true);
-        await axios.post(`https://task-manager-v4zl.onrender.com/api/comments/${id}`,
+        await axios.post(comments.create_comment(id),
             {
                 comment,
                 userId: authState.user._id
@@ -81,8 +80,8 @@ const TaksComments = ({ task }) => {
                 setComment('');
             })
             .catch((error) => {
-                console.error(error);
                 addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }
@@ -97,9 +96,9 @@ const TaksComments = ({ task }) => {
                 {task ?
                     <>
                         <div className={`flex col ${styles.messages}`} ref={messagesRef}>
-                            {comments?.length > 0
-                                ? comments.map(comment => <Comment {...comment} authState={authState} key={comment._id} />)
-                                : comments ? <div className='text_secondary flex'>No comments</div> : <div className='loading'></div>
+                            {allComments?.length > 0
+                                ? allComments.map(comment => <Comment {...comment} authState={authState} key={comment._id} />)
+                                : allComments ? <div className='text_secondary flex'>No comments</div> : <div className='loading'></div>
                             }
                         </div>
                         <form className={`flex col gap w_full modal_child`} onSubmit={handleSubmit}>

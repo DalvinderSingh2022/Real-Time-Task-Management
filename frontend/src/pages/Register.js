@@ -12,6 +12,7 @@ import Response from '../components/Response';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
+import { users } from '../utils/apiendpoints';
 
 const Register = () => {
     const { authState } = useContext(AuthContext);
@@ -29,7 +30,7 @@ const Register = () => {
         }
 
         setResponse(true);
-        axios.post("https://task-manager-v4zl.onrender.com/api/users/register", user)
+        axios.post(users.register_user, user)
             .then(({ data }) => {
                 socket.emit('user_join', data.user);
                 addToast({ type: 'success', message: data.message });
@@ -37,7 +38,7 @@ const Register = () => {
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
-                console.error(error);
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

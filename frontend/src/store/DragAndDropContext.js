@@ -4,6 +4,7 @@ import axios from 'axios';
 import { AppContext } from './AppContext';
 import { AuthContext } from './AuthContext';
 import { socket } from '../hooks/useSocket';
+import { notifications, tasks } from '../utils/apiendpoints';
 
 const initialState = {
     task: null,
@@ -60,19 +61,19 @@ const DragAndDropProvider = ({ children }) => {
             }
 
             setResponse(true);
-            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${oldTask._id}`, { ...oldTask, status: dragAndDropState.status })
+            axios.put(tasks.update_task(oldTask._id), { ...oldTask, status: dragAndDropState.status })
                 .then(({ data }) => {
                     const { updatedTask: task } = data;
 
-                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task, oldTask })
+                    axios.post(notifications.update_task, { changes, task, oldTask })
                         .then(({ data: notificationData }) => {
                             const notification = notificationData.notifications.find(n => n.user === authState.user._id);
                             socket.emit('task_updated', data.updatedTask, authState.user, notification, oldTask);
                         });
                 })
                 .catch((error) => {
-                    addToast({ type: 'error', message: error?.response?.data?.message })
-                    console.error(error);
+                    addToast({ type: 'error', message: error?.response?.data?.message });
+                    console.log(".....API ERROR....." + error);
                 })
                 .finally(() => {
                     reset();

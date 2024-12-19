@@ -7,7 +7,7 @@ import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
 
 import io from 'socket.io-client';
-export const socket = io.connect('https://task-manager-v4zl.onrender.com/');
+export const socket = io.connect(process.env.REACT_APP_API_BASE_URL);
 
 const useSocket = () => {
     const { authState, login } = useContext(AuthContext);

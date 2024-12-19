@@ -6,6 +6,7 @@ import styles from '../styles/taskdetails.module.css';
 import homeStyles from "../styles/home.module.css";
 
 import { AppContext } from '../store/AppContext';
+import { tasks } from '../utils/apiendpoints';
 import NotFound from '../pages/NotFound';
 import ViewTasks from '../components/ViewTasks';
 import TaksComments from '../components/TaksComments';
@@ -18,14 +19,12 @@ const TaskDetails = () => {
 
     useEffect(() => {
         (async () => {
-            axios.get(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
-                .then(({ data }) => {
-                    setTask(data.task);
-                })
+            axios.get(tasks.get_task(id))
+                .then(({ data }) => setTask(data.task))
                 .catch((error) => {
                     setInvalidId(true);
-                    addToast({ type: 'error', message: error?.response?.data?.message })
-                    console.error(error);
+                    addToast({ type: 'error', message: error?.response?.data?.message });
+                    console.log(".....API ERROR....." + error);
                 });
         })();
     }, [id, addToast]);

@@ -18,6 +18,7 @@ import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
 import { TasksContext } from '../store/TasksContext';
 import { socket } from '../hooks/useSocket';
+import { users } from '../utils/apiendpoints';
 
 const Sidebar = () => {
     const { authState, logout } = useContext(AuthContext);
@@ -38,14 +39,14 @@ const Sidebar = () => {
 
     const handleDelete = () => {
         setResponse(true);
-        axios.delete(`https://task-manager-v4zl.onrender.com/api/users/${authState.user._id}`)
+        axios.delete(users.delete_user(authState.user._id))
             .then(() => {
                 socket.emit('user_left', authState.user);
                 handleLogout();
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

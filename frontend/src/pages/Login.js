@@ -13,6 +13,7 @@ import Response from '../components/Response';
 import useLoadStates from '../hooks/useLoadStates';
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
+import { users } from '../utils/apiendpoints';
 
 const Login = () => {
     const { authState, login } = useContext(AuthContext);
@@ -30,7 +31,7 @@ const Login = () => {
         }
 
         setResponse(true);
-        axios.put("https://task-manager-v4zl.onrender.com/api/users/login", user)
+        axios.put(users.login_user, user)
             .then(({ data }) => {
                 login(data.user);
                 localStorage.setItem("jwt", data.token);
@@ -38,8 +39,8 @@ const Login = () => {
                 navigate("/");
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(false));
     }

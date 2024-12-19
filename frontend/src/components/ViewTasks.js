@@ -9,8 +9,9 @@ import styles from '../styles/taskdetails.module.css';
 
 import { AuthContext } from '../store/AuthContext';
 import { AppContext } from '../store/AppContext';
-import Response from '../components/Response';
 import { socket } from '../hooks/useSocket';
+import { notifications, tasks } from '../utils/apiendpoints';
+import Response from '../components/Response';
 
 const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);
@@ -50,12 +51,12 @@ const ViewTask = (prop) => {
 
         if (Object.keys(changes).length) {
             setResponse('save');
-            axios.put(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`, task)
+            axios.put(tasks.update_task(id), task)
                 .then(({ data }) => {
                     setTask(data.updatedTask);
                     setOriginalTask(data.updatedTask);
 
-                    axios.post('https://task-manager-v4zl.onrender.com/api/notifications/update-task', { changes, task: data.updatedTask, oldTask: originalTask })
+                    axios.post(notifications.update_task, { changes, task: data.updatedTask, oldTask: originalTask })
                         .then(({ data: notificationData }) => {
                             const notification = notificationData.notifications.find(n => n.user === authState.user._id);
                             socket.emit('task_updated', data.updatedTask, authState.user, notification, originalTask);
@@ -63,7 +64,7 @@ const ViewTask = (prop) => {
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.error(error);
+                    console.log(".....API ERROR....." + error);
                 })
                 .finally(() => setResponse(''));
         }
@@ -71,9 +72,9 @@ const ViewTask = (prop) => {
 
     const handelDelete = () => {
         setResponse('delete');
-        axios.delete(`https://task-manager-v4zl.onrender.com/api/tasks/${id}`)
+        axios.delete(tasks.delete_task(id))
             .then(() => {
-                axios.post('https://task-manager-v4zl.onrender.com/api/notifications/delete-task', { task })
+                axios.post(notifications.delete_task, { task })
                     .then(({ data: notificationData }) => {
                         const notification = notificationData.notifications.find(n => n.user === authState.user._id);
                         socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy, notification);
@@ -81,8 +82,8 @@ const ViewTask = (prop) => {
                     });
             })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message })
-                console.error(error);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setResponse(''));
     }
