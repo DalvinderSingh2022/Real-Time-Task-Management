@@ -73,7 +73,7 @@ const DragAndDropProvider = ({ children }) => {
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.log(".....API ERROR....." + error);
+                    console.log(".....API ERROR.....", error);
                 })
                 .finally(() => {
                     reset();

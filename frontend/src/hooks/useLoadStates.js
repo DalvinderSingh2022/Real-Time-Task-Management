@@ -15,7 +15,7 @@ const useLoadStates = (user) => {
         if (!usersState.loaded && user) {
             axios.get(users.all_users)
                 .then(({ data }) => loadUsers(data.users))
-                .catch(error => console.log(".....API ERROR....." + error));
+                .catch(error => console.log(".....API ERROR.....", error));
         }
     }, [loadUsers, usersState, user]);
 
@@ -23,7 +23,7 @@ const useLoadStates = (user) => {
         if (!notificationsState.loaded && user) {
             axios.get(notifications.all_notifications(user._id))
                 .then(({ data }) => loadNotifications(data.notifications))
-                .catch(error => console.log(".....API ERROR....." + error));
+                .catch(error => console.log(".....API ERROR.....", error));
         }
     }, [loadNotifications, notificationsState, user]);
 
@@ -31,7 +31,7 @@ const useLoadStates = (user) => {
         if (!tasksState.loaded && user) {
             axios.get(tasks.all_tasks(user._id))
                 .then(({ data }) => loadTasks(data.tasks))
-                .catch(error => console.log(".....API ERROR....." + error));
+                .catch(error => console.log(".....API ERROR.....", error));
         }
     }, [loadTasks, tasksState, user]);
 }

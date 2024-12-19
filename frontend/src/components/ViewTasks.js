@@ -64,7 +64,7 @@ const ViewTask = (prop) => {
                 })
                 .catch((error) => {
                     addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.log(".....API ERROR....." + error);
+                    console.log(".....API ERROR.....", error);
                 })
                 .finally(() => setResponse(''));
         }
@@ -83,7 +83,7 @@ const ViewTask = (prop) => {
             })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR....." + error);
+                console.log(".....API ERROR.....", error);
             })
             .finally(() => setResponse(''));
     }

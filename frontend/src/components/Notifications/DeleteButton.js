@@ -19,7 +19,7 @@ const DeleteButton = ({ response, setResponse, prop }) => {
             if (notification && !notification.read) {
                 axios.put(notifications.update_notification(prop._id), { ...notification, read: true })
                     .then(({ data }) => readNotification(data.updatedNotification._id))
-                    .catch(error => console.log(".....API ERROR....." + error));
+                    .catch(error => console.log(".....API ERROR.....", error));
             }
         }
 
@@ -32,7 +32,7 @@ const DeleteButton = ({ response, setResponse, prop }) => {
             .then(() => deleteNotification(prop._id))
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR....." + error);
+                console.log(".....API ERROR.....", error);
             })
             .finally(() => setResponse(false));
     }
