@@ -1,7 +1,6 @@
 
 const Task = require('../models/task.model');
 const Comment = require('../models/comment.model');
-const mongoose = require('mongoose');
 
 // Create a new task
 const addTask = async (req, res) => {
@@ -14,8 +13,10 @@ const addTask = async (req, res) => {
         // Save the new task to the database
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         await newTask.save();
-        await newTask.populate({ path: 'assignedTo', select: '_id name' })
-        const task = await newTask.populate({ path: 'assignedBy', select: '_id name' });
+        const task = await newTask.populate([
+            { path: 'assignedTo', select: '_id name' },
+            { path: 'assignedBy', select: '_id name' }
+        ]);
 
         return res.status(201).json({ message: 'Task created successfully', task });
     } catch (error) {
@@ -25,11 +26,15 @@ const addTask = async (req, res) => {
 
 // Retrieve all tasks for a user
 const allTasks = async (req, res) => {
+    const userId = req.params.userId;
+
+    if (!userId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const userId = req.params.userId;
-
         const tasks = await Task.find({
             $or: [{ assignedTo: userId }, { assignedBy: userId }]
         })
@@ -47,24 +52,23 @@ const allTasks = async (req, res) => {
 
 // Retrieve a task
 const getTask = async (req, res) => {
+    const taskId = req.params.id;
+
+    if (!taskId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Retrieve the task with the given _id
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const taskId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return res.status(400).json({ message: "Invalid Id Task Not found" });
-        }
-
-        const task = await Task.findById(taskId);
-        if (!task) {
-            return res.status(404).json({ message: "Task Not found" });
-        }
-
-        await task.populate([
+        const task = await Task.findById(taskId).populate([
             { path: 'assignedTo', select: '_id name' },
             { path: 'assignedBy', select: '_id name' }
         ]);
+
+        if (!task) {
+            return res.status(404).json({ message: "Task Not found" });
+        }
 
         res.status(200).json({ message: 'Task fetched successfully', task });
     } catch (error) {
@@ -74,16 +78,23 @@ const getTask = async (req, res) => {
 
 // Delete a task
 const removeTask = async (req, res) => {
+    const taskId = req.params.id;
+
+    if (!taskId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Delete the task with the given _id 
-        const taskId = req.params.id;
+        const [deletedTask] = await Promise.all([
+            Task.findByIdAndDelete(taskId),
+            Comment.deleteMany({ task: taskId })
+        ]);
 
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return res.status(400).json({ message: "Invalid Id Task Not found" });
+        // Check if the task was found and deleted
+        if (!deletedTask) {
+            return res.status(404).json({ message: "Task not found" });
         }
-
-        await Task.findByIdAndDelete(taskId);
-        await Comment.deleteMany({ task: taskId });
 
         return res.status(201).json({ message: "Task deleted Succesfully" });
     } catch (error) {
@@ -96,11 +107,11 @@ const updateTask = async (req, res) => {
     // Find the task with the given _id
     const taskId = req.params.id;
 
-    try {
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return res.status(400).json({ message: "Invalid Id Task Not found" });
-        }
+    if (!taskId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
 
+    try {
         // Update the task with the new data 
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         const updatedTask = await Task.findByIdAndUpdate(

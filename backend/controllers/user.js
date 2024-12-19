@@ -1,10 +1,9 @@
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
-const dotenv = require("dotenv").config();
 const User = require('../models/user.model');
 const Task = require('../models/task.model');
-const mongoose = require('mongoose');
 const Comment = require('../models/comment.model');
+require("dotenv").config();
 
 // Register a new user
 const register = async (req, res) => {
@@ -15,15 +14,14 @@ const register = async (req, res) => {
         return res.status(400).json({ message: "All fields are required" });
     }
 
-    // Hash the given password using bcrypt
-    if (password) {
-        var hashedPassword = await bcrypt.hash(password, 10);
-    }
-    const user = new User({ name, email, password: hashedPassword });
-
     try {
+        // Hash the given password using bcrypt
+        if (password) {
+            var hashedPassword = await bcrypt.hash(password, 10);
+        }
+        const user = new User({ name, email, password: hashedPassword });
+
         // Save the user to the database
-        // Generate a JSON Web Token (JWT) for the user
         await user.save();
 
         res.status(200).json({ message: 'User Registered successfully', user });
@@ -86,11 +84,6 @@ const currentUser = async (req, res) => {
             return res.status(401).json({ message: "User is not authorized" });
         }
 
-        // Find the user by _id (stored in token)
-        if (!mongoose.Types.ObjectId.isValid(validUser.id)) {
-            return res.status(404).json({ message: "User Not found, incorrect Token" });
-        }
-
         const user = await User.findById(validUser.id);
         if (!user) {
             return res.status(404).json({ message: "User Not found, Refresh Page" });
@@ -102,7 +95,6 @@ const currentUser = async (req, res) => {
         ]);
 
         return res.status(200).json({ message: "Current user data fetched successfully", user });
-
     } catch (error) {
         return res.status(401).json({ message: 'User is not authorized or token expired' });
     }
@@ -110,14 +102,14 @@ const currentUser = async (req, res) => {
 
 // Delete a user
 const removeUser = async (req, res) => {
+    const userId = req.params.id;
+
+    if (!userId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Delete the user by given _id 
-        const userId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(404).json({ message: "User Not found, incorrect Id" });
-        }
-
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User  not found" });
@@ -145,7 +137,7 @@ const removeUser = async (req, res) => {
         await User.updateMany({ following: user._id }, { $pull: { following: user._id } });
 
         // Delete user
-        await User.deleteOne({ _id: userId });
+        await User.findByIdAndDelete({ _id: userId });
 
         return res.status(201).json({ message: "Account deleted successfully" });
     } catch (error) {
@@ -171,43 +163,16 @@ const allUsers = async (req, res) => {
     }
 }
 
-// Retrieve a User
-const getUser = async (req, res) => {
-    try {
-        // Retrieve the User with the given _id
-        // and Populate the followers and following fields with the corresponding users data
-        const userId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: "Invalid Id User Not found" });
-        }
-
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: "User Not found" });
-        }
-
-        await user.populate([
-            { path: 'followers', select: '_id name followers' },
-            { path: 'following', select: '_id name followers' }
-        ]);
-
-        res.status(200).json({ message: 'User fetched successfully', user });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
-    }
-};
-
 // Update a User
 const updateUser = async (req, res) => {
     // Find the User with the given _id
     const userId = req.params.id;
 
-    try {
-        if (!mongoose.Types.ObjectId.isValid(userId)) {
-            return res.status(400).json({ message: "Invalid Id User Not found" });
-        }
+    if (!userId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
 
+    try {
         // Update the User with the new data
         // and Populate the followers and following fields with the corresponding users data
         const user = await User.findByIdAndUpdate(
@@ -230,17 +195,13 @@ const followUser = async (req, res) => {
     const userId = req.params.userId;
     const authUserId = req.body.userId;
 
+    if (!userId || !authUserId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     // Check if the user is trying to follow themselves
     if (userId === authUserId) {
         return res.status(400).json({ message: "You can't follow/unfollow yourself" });
-    }
-
-    let isValidId = mongoose.Types.ObjectId.isValid(userId);
-    if (isValidId) {
-        isValidId = mongoose.Types.ObjectId.isValid(authUserId);
-    }
-    if (!isValidId) {
-        return res.status(404).json({ message: "User Not found, incorrect userId" });
     }
 
     try {
@@ -286,17 +247,13 @@ const unfolloweUser = async (req, res) => {
     const userId = req.params.userId;
     const authUserId = req.body.userId;
 
+    if (!userId || !authUserId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     // Check if the user is trying to Unfollow themselves
     if (userId === authUserId) {
         return res.status(400).json({ message: "You can't follow/unfollow yourself" });
-    }
-
-    let isValidId = mongoose.Types.ObjectId.isValid(userId);
-    if (isValidId) {
-        isValidId = mongoose.Types.ObjectId.isValid(authUserId);
-    }
-    if (!isValidId) {
-        return res.status(404).json({ message: "User Not found, incorrect userId" });
     }
 
     try {
@@ -336,4 +293,4 @@ const unfolloweUser = async (req, res) => {
     }
 };
 
-module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser, getUser, updateUser };
+module.exports = { register, login, currentUser, removeUser, allUsers, followUser, unfolloweUser, updateUser };

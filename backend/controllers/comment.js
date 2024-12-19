@@ -1,18 +1,17 @@
-const express = require("express");
 const Comment = require("../models/comment.model");
 const mongoose = require("mongoose");
 
 // Get comments for a specific task
 const allComments = async (req, res) => {
+    const taskId = req.params.taskId;
+
+    if (!taskId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Find all comments of task with _id equal to taskId
         // and Populate the task and user fields with the corresponding data
-        const taskId = req.params.taskId;
-
-        if (!mongoose.Types.ObjectId.isValid(taskId)) {
-            return res.status(404).json({ message: "Comments Not found, incorrect taskId" });
-        }
-
         const comments = await Comment.find({ task: taskId })
             .sort({ updatedAt: 'asc' })
             .populate({
@@ -31,12 +30,8 @@ const addComment = async (req, res) => {
     const { comment, userId } = req.body;
     const taskId = req.params.taskId;
 
-    let isValidId = mongoose.Types.ObjectId.isValid(userId);
-    if (isValidId) {
-        isValidId = mongoose.Types.ObjectId.isValid(taskId);
-    }
-    if (!isValidId) {
-        return res.status(404).json({ message: "Comments Not found, incorrect Id" });
+    if (!taskId || !userId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
     }
 
     // Create a new Comment instance

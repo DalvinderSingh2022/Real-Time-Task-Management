@@ -1,11 +1,14 @@
 const { NotificationTypes, Notification } = require("../models/notification.model");
-const mongoose = require("mongoose");
 
 // Find all notifications for current user 
 const allNotifications = async (req, res) => {
-    try {
-        const userId = req.params.userId;
+    const userId = req.params.userId;
 
+    if (!userId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
+    try {
         const notifications = await Notification.find({ user: userId }).sort({ updatedAt: 'desc' });
 
         res.status(200).json({ message: 'All Notifications fetched successfully', notifications });
@@ -19,10 +22,11 @@ const updateNotification = async (req, res) => {
     // Find the Notification with the given _id
     const notificationId = req.params.id;
 
+    if (!notificationId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
-        if (!mongoose.Types.ObjectId.isValid(notificationId)) {
-            return res.status(400).json({ message: "Invalid Id Notification Not found" });
-        }
         // Update the Notification with the new data
         const updatedNotification = await Notification.findByIdAndUpdate(
             notificationId,
@@ -39,14 +43,14 @@ const updateNotification = async (req, res) => {
 
 // Delete a Notification
 const removeNotification = async (req, res) => {
+    const notificationId = req.params.id;
+
+    if (!notificationId) {
+        return res.status(400).json({ message: "Missing requirements to process request" });
+    }
+
     try {
         // Delete the Notification with the given _id
-        const notificationId = req.params.id;
-
-        if (!mongoose.Types.ObjectId.isValid(notificationId)) {
-            return res.status(400).json({ message: "Invalid Id Notification Not found" });
-        }
-
         await Notification.findByIdAndDelete(notificationId);
 
         res.status(200).json({ message: "Notification deleted Succesfully" });
