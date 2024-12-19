@@ -8,6 +8,7 @@ import Loading from './components/Loading';
 import { AuthContext } from './store/AuthContext';
 import { AppContext } from './store/AppContext';
 import { DragAndDropProvider } from './store/DragAndDropContext';
+import { users } from './utils/apiendpoints.js';
 
 import useSocket from './hooks/useSocket.js';
 import useLoadStates from './hooks/useLoadStates.js';
@@ -17,7 +18,6 @@ const Register = lazy(() => import('./pages/Register'));
 const Home = lazy(() => import('./pages/Home'));
 const Tasks = lazy(() => import('./pages/Tasks'));
 const Users = lazy(() => import('./pages/Users/AllUsers'));
-const UserDetails = lazy(() => import('./pages/UserDetails'));
 const Followers = lazy(() => import('./pages/Users/Followers'));
 const Following = lazy(() => import('./pages/Users/Following'));
 const Notfound = lazy(() => import('./pages/NotFound'));
@@ -35,14 +35,12 @@ const App = () => {
         if (authState.verified) return;
 
         setLoadingMsg("Fetching user details, please wait...");
-        axios.get("https://task-manager-v4zl.onrender.com/api/users/current", {
-            headers: { Authorization: localStorage.getItem("jwt") }
-        })
+        axios.get(users.current_user, { headers: { Authorization: localStorage.getItem("jwt") } })
             .then(({ data }) => login(data.user))
             .catch((error) => {
                 verify();
-                console.error(error);
                 addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR....." + error);
             })
             .finally(() => setLoadingMsg(''));
 
@@ -67,7 +65,6 @@ const App = () => {
                         <Route index element={<Users />} />
                         <Route path='followers' element={<Followers />} />
                         <Route path='following' element={<Following />} />
-                        <Route path=':id' element={<UserDetails />} />
                     </Route>
                     <Route path="notifications" element={<Notifications />} />
                     <Route path='*' element={<Notfound />} />

@@ -1,5 +1,4 @@
 import React, { memo, useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import axios from 'axios';
 
 import styles from '../styles/users.module.css';
@@ -14,6 +13,7 @@ const User = ({ name, followers, _id }) => {
     const { addToast } = useContext(AppContext);
     const [following, setFollowing] = useState(false);
     const [response, setResponse] = useState(false);
+    const [show, setShow] = useState(false);
 
     useEffect(() => {
         if (authState.authenticated) {
@@ -62,9 +62,10 @@ const User = ({ name, followers, _id }) => {
     return (
         <>
             {response && <Response />}
+            {show && <AddTask remove={() => setShow(false)} assignedTo={_id} />}
             <div className={`flex ${styles.user}`} title={name}>
                 <div>
-                    <Link to={`/users/${_id}`} className={`text_primary ${styles.user_title}`}>{name}</Link>
+                    <div onClick={() => setShow(true)} className={`text_primary ${styles.user_title}`}>{name}</div>
                     <div className='text_secondary'>Followers: {followers.length}</div>
                 </div>
                 {authState.user._id !== _id &&
