@@ -20,12 +20,22 @@ const Home = () => {
     const [byOthers, setByOthers] = useState(0);
 
     useEffect(() => {
-        setNotStarted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted').length);
-        setProgress(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'inprogress').length);
-        setCompleted(tasksState.tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'completed').length);
+        const taskCounts = tasksState.tasks.reduce((acc, task) => {
+            const status = task.status.toLowerCase().replaceAll(" ", '');
+            if (status === 'notstarted') acc.notStarted += 1;
+            if (status === 'inprogress') acc.inProgress += 1;
+            if (status === 'completed') acc.completed += 1;
+            if (task.assignedBy._id === authState.user._id) acc.bySelf += 1;
+            if (task.assignedBy._id !== authState.user._id) acc.byOthers += 1;
+            return acc;
+        }, { notStarted: 0, inProgress: 0, completed: 0, bySelf: 0, byOthers: 0 });
 
-        setBySelf(tasksState.tasks.filter(task => task.assignedBy._id === authState.user._id).length);
-        setByOthers(tasksState.tasks.filter(task => task.assignedBy._id !== authState.user._id).length);
+        setNotStarted(taskCounts.notStarted);
+        setProgress(taskCounts.inProgress);
+        setCompleted(taskCounts.completed);
+
+        setBySelf(taskCounts.bySelf);
+        setByOthers(taskCounts.byOthers);
     }, [tasksState, authState]);
 
     return (

@@ -19,10 +19,16 @@ const Tasks = () => {
 
     useEffect(() => {
         if (!tasks) return;
+        const groupedTasks = tasks.reduce((acc, task) => {
+            const status = task.status.toLowerCase().replaceAll(" ", '');
+            if (!acc[status]) acc[status] = [];
+            acc[status].push(task);
+            return acc;
+        }, { notstarted: [], inprogress: [], completed: [] });
 
-        setNotStarted(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'notstarted'));
-        setProgress(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'inprogress'));
-        setCompleted(tasks.filter(task => task.status.toLowerCase().replaceAll(" ", '') === 'completed'));
+        setNotStarted(groupedTasks.notstarted);
+        setProgress(groupedTasks.inprogress);
+        setCompleted(groupedTasks.completed);
     }, [tasks]);
 
     return (
