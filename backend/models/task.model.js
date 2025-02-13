@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const axios = require('axios');
+const cron = require('node-cron');
 require("dotenv").config();
 
 const taskSchema = new mongoose.Schema({
@@ -35,23 +36,21 @@ const taskSchema = new mongoose.Schema({
 
 const Task = mongoose.model('Task', taskSchema);
 
-setInterval(async () => {
+cron.schedule('0 0 * * *', async () => {
     try {
-        if (new Date().getHours() === 0) {
-            const today = new Date().setHours(0, 0, 0, 0);
-            const overDueTasks = await Task.find({ dueDate: { $lt: today } });
-            const groupedTasks = overDueTasks.reduce((acc, task) => {
-                (!acc[task.assignedTo]) ? acc[task.assignedTo] = [task] : acc[assignedToId].push(task);
-                return acc;
-            }, {});
+        const today = new Date().setHours(0, 0, 0, 0);
+        const overDueTasks = await Task.find({ dueDate: { $lt: today } });
+        const groupedTasks = overDueTasks.reduce((acc, task) => {
+            (!acc[task.assignedTo]) ? acc[task.assignedTo] = [task] : acc[task.assignedTo].push(task);
+            return acc;
+        }, {});
 
-            Object.values(groupedTasks).forEach(async (tasks) => {
-                await axios.post(process.env.API_BASE_URL + 'notifications/due-date-reminder', { tasks });
-            });
-        }
+        Object.values(groupedTasks).forEach(async (tasks) => {
+            await axios.post(process.env.API_BASE_URL + 'notifications/due-date-reminder', { tasks });
+        });
     } catch (error) {
         console.error(error);
     }
-}, 1000 * 60 * 60);
+});
 
 module.exports = Task;
