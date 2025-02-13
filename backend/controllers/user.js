@@ -19,7 +19,9 @@ const register = async (req, res) => {
         if (password) {
             var hashedPassword = await bcrypt.hash(password, 10);
         }
-        const user = new User({ name, email, password: hashedPassword });
+        const avatar = `https://api.dicebear.com/9.x/fun-emoji/svg?seed=${name}&radius=50&scale=75`;
+
+        const user = new User({ name, email, avatar, password: hashedPassword });
 
         // Save the user to the database
         await user.save();

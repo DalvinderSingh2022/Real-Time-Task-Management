@@ -14,6 +14,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Password is required'],
     },
+    avatar: {
+        type: String,
+        required: [true, 'Avatar is required']
+    },
     followers: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
@@ -21,7 +25,7 @@ const userSchema = new mongoose.Schema({
     following: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User'
-    }]
+    }],
 }, {
     timestamps: true
 });

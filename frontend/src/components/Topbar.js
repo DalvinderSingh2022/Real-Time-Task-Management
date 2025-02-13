@@ -25,6 +25,7 @@ const Topbar = () => {
                 <div className='greeting text_primary'>{"Welcome, " + greeting()}</div>
             </div>
             <div className="user_profile flex gap2">
+                <img src={authState.user.avatar || `https://api.dicebear.com/9.x/fun-emoji/svg?seed=${authState.user.name}&radius=50&scale=75`} alt="User Avatar" className="avatar" />
                 <div className="flex col">
                     <div className="name">{authState.user.name}</div>
                     <div className="email">{authState.user.email}</div>
