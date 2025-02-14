@@ -76,6 +76,8 @@ const ViewTask = (prop) => {
                     console.log(".....API ERROR.....", error);
                 })
                 .finally(() => setResponse(''));
+        } else {
+            addToast({ type: 'error', message: "No changes made to save" });
         }
     }
 
@@ -223,7 +225,7 @@ const ViewTask = (prop) => {
                             {authState.user._id === task.assignedBy._id &&
                                 <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
                             }
-                            {(authState.user._id === task.assignedBy._id || task.assignedTo.includes(authState.user._id)) &&
+                            {(authState.user._id === task.assignedBy._id || task.assignedTo.find(user => user._id === authState.user._id)) &&
                                 <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
                             }
                         </div>
