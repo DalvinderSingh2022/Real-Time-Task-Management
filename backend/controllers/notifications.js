@@ -154,14 +154,14 @@ const unFollowUser = (req, res, next) => {
 
 // Notification for Due Date Reminder
 const dueDate = (req, res, next) => {
-    const { tasks } = req.body;
+    const { tasks, user } = req.body;
 
     if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
         return res.status(400).send('Invalid tasks data');
     }
 
     req.type = NotificationTypes.DUE_DATE_REMINDER;
-    req.users = [tasks[0].assignedTo];
+    req.users = [user];
     req.message = `Reminder: You have ${tasks.length} task(s) due today (${new Date().toDateString()}).`;
     req.data = { tasks };
 

@@ -50,8 +50,8 @@ cron.schedule('0 0 * * *', async () => {
             return acc;
         }, {});
 
-        Object.values(groupedTasks).forEach(async (tasks) => {
-            await axios.post(process.env.API_BASE_URL + 'notifications/due-date-reminder', { tasks });
+        Object.entries(groupedTasks).forEach(async ([user, tasks]) => {
+            await axios.post(process.env.API_BASE_URL + 'notifications/due-date-reminder', { user, tasks });
         });
     } catch (error) {
         console.error(error);
