@@ -36,7 +36,7 @@ const TaksComments = ({ task }) => {
         if (!task) return;
 
         const userId = authState.user._id;
-        const isUserAssigned = userId === task.assignedBy._id || userId === task.assignedTo._id;
+        const isUserAssigned = userId === task.assignedBy._id || task.assignedTo.some(user => user._id === userId);
 
         if (!isUserAssigned) {
             socket.emit("join_room", id);

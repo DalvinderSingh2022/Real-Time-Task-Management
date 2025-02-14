@@ -60,20 +60,25 @@ const handleSocketEvents = (io) => {
         if (notification.type === NotificationTypes.TASK_ASSIGNMENT) {
             const { task } = notification.data;
 
-            io.in(task.assignedTo._id).emit('new_notification', notification);
+            task.assignedTo.forEach(user => {
+                io.in(user._id).emit('new_notification', notification);
+            });
         }
 
         if (notification.type === NotificationTypes.TASK_UPDATE) {
             const { task, oldTask } = payload;
 
-            io.in(task.assignedTo._id).emit('new_notification', notification);
+            task.assignedTo.forEach(user => {
+                io.in(user._id).emit('new_notification', notification);
+            });
 
-            if (task.assignedTo._id !== task.assignedBy._id) {
+            if (!task.assignedTo.some(user => user._id === task.assignedBy._id)) {
                 io.in(task.assignedBy._id).emit('new_notification', notification);
             }
-            if (task.assignedTo._id !== oldTask.assignedTo._id) {
-                io.in(oldTask.assignedTo._id).emit('new_notification', notification);
-            }
+            oldTask.assignedTo.forEach(user => {
+                if (!task.assignedTo.some(newUser => newUser._id === user._id))
+                    io.in(user._id).emit('new_notification', notification);
+            });
         }
 
         if (notification.type === NotificationTypes.USER_FOLLOW || notification.type === NotificationTypes.USER_UNFOLLOW) {
@@ -85,9 +90,12 @@ const handleSocketEvents = (io) => {
         if (notification.type == NotificationTypes.TASK_DELETED) {
             const { task } = notification.data;
 
-            io.in(task.assignedBy._id).emit('new_notification', notification);
-            if (task.assignedTo._id !== task.assignedBy._id) {
-                io.in(task.assignedTo._id).emit('new_notification', notification);
+            task.assignedTo.forEach(user => {
+                io.in(user._id).emit('new_notification', notification);
+            });
+
+            if (!task.assignedTo.some(user => user._id === task.assignedBy._id)) {
+                io.in(task.assignedBy._id).emit('new_notification', notification);
             }
         }
     };

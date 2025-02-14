@@ -23,14 +23,22 @@ const Task = (task) => {
                     context?.setTask(task);
                 }}
                 onDragEnd={() => setDragging(false)}
-                title={`${task.title} : ${task.status}`}
+                title={`Assigned To: ${task.assignedTo.map(user => user._id !== authState.user._id ? user.name : "(You)").join(", ")}`}
                 className={`${styles.task} flex col ${task.status.replaceAll(" ", '').toLowerCase()} ${dragging ? "task over" : ""}`}
             >
                 <Link className={`text_primary ${styles.task_title}`} to={`/tasks/${task._id}`}>{task.title}</Link>
-                <div className={`text_secondary ${styles.task_description}`}>{task.description}</div>
+                <div className={`text_secondary ${styles.task_description}`}>{task.description.substring(0, 115)}{task.description.length > 115 ? "..." : ""}</div>
                 <div className={`flex ${styles.group}`}>
-                    <span title={`Assigned To: ${task.assignedTo.name}`}>{task.assignedTo.name}{authState.user._id === task.assignedTo._id ? "(You)" : ""}</span>
-                    <span title={`DueDate : ${new Date(task.dueDate).toDateString()}`}>{new Date(task.dueDate).toDateString().slice(4)}</span>
+                    {task.assignedTo.slice(-5).map(user => (
+                        <img
+                            title={user.name}
+                            key={user._id}
+                            src={user.avatar}
+                            alt="User Avatar"
+                            className={`avatar ${styles.avatar}`}
+                        />
+                    ))}
+                    {task.assignedTo.length > 5 && <div className={`avatar flex ${styles.avatar}`}>+{(5 - task.assignedTo.length)}</div>}
                 </div>
             </div>
         </>

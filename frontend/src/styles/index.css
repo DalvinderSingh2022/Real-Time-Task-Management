@@ -231,6 +231,11 @@ main .top_nav {
     align-self: flex-start;
 }
 
+img.avatar {
+    width: 40px;
+    aspect-ratio: 1;
+}
+
 main .side_nav {
     box-sizing: border-box;
     grid-row: 1 / -1;

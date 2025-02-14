@@ -10,7 +10,7 @@
     justify-content: flex-start;
 }
 
-.wrapper .user {
+.wrapper>.user {
     background-color: var(--background-color);
     padding: 1em;
     height: fit-content;
@@ -25,9 +25,10 @@
     font-weight: 500;
     font-size: 1.05em;
     cursor: pointer;
+    line-height: 1.2;
 }
 
-.wrapper .user:hover {
+.wrapper>.user:hover {
     box-shadow: 0 0 12px 2px var(--shadow-color);
     transform: scale(1.01);
 }

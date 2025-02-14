@@ -12,12 +12,16 @@
     padding: 1em;
     background-color: var(--white);
     min-width: 240px;
+    justify-content: flex-start;
 }
 
 .container .comments {
     grid-column: span 2;
     padding: 1em;
     justify-content: space-between;
+    height: 80vh;
+    position: sticky;
+    top: 6em;
 }
 
 .comments .messages {

@@ -1,5 +1,5 @@
 .container {
-    padding: 2em 2em 0;
+    padding: 2em 1em 0;
     max-width: calc(100% - 3em);
 }
 
@@ -11,4 +11,28 @@ button.delete_button {
     background-color: var(--red);
     color: var(--white);
     border-color: var(--red);
+}
+
+.check_container {
+    justify-content: flex-start;
+}
+
+.check_label {
+    border: 2px solid var(--grey);
+    padding: 6px 10px;
+    scale: .9;
+    border-radius: 8px;
+}
+
+.check_container label .check_label {
+    cursor: pointer;
+}
+
+.checkbox input[type='checkbox'] {
+    display: none;
+}
+
+.checkbox input[type='checkbox']:checked+.check_label {
+    border-color: var(--purple-dark);
+    color: var(--purple-dark);
 }

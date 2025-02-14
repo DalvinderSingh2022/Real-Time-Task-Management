@@ -20,6 +20,7 @@
 .container .group {
     align-items: stretch;
     position: relative;
+    margin-bottom: auto;
 }
 
 .container .form {

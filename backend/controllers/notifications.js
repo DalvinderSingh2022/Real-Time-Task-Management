@@ -63,13 +63,13 @@ const removeNotification = async (req, res) => {
 const taskAssign = async (req, res, next) => {
     const { task } = req.body;
 
-    if (!task || !task.assignedBy || !task.assignedTo) {
+    if (!task || !task.assignedBy || !Array.isArray(task.assignedTo) || task.assignedTo.length === 0) {
         return res.status(400).send('Invalid task data');
     }
 
     req.message = `New Task: You have been assigned "${task.title}" by ${task.assignedBy.name}.`;
     req.data = { task };
-    req.users = [task.assignedTo._id];
+    req.users = task.assignedTo.map(user => user._id);
     req.type = NotificationTypes.TASK_ASSIGNMENT;
 
     next();
@@ -87,13 +87,13 @@ const taskUpdate = async (req, res, next) => {
     req.data = { changes, task };
     req.type = NotificationTypes.TASK_UPDATE;
 
-    const users = [task.assignedTo._id];
-    if (task.assignedTo._id !== task.assignedBy._id) {
+    const users = task.assignedTo.map(user => user._id);
+    if (!users.includes(task.assignedBy._id)) {
         users.push(task.assignedBy._id);
     }
-    if (task.assignedTo._id !== oldTask.assignedTo._id) {
-        users.push(oldTask.assignedTo._id);
-    }
+    oldTask.assignedTo.forEach(user => {
+        if (!users.includes(user._id)) users.push(user._id);
+    });
     req.users = users;
 
     next();
@@ -111,9 +111,9 @@ const taskDelete = async (req, res, next) => {
     req.data = { task };
     req.type = NotificationTypes.TASK_DELETED;
 
-    const users = [task.assignedBy._id];
-    if (task.assignedTo._id !== task.assignedBy._id) {
-        users.push(task.assignedTo._id);
+    const users = task.assignedTo.map(user => user._id);
+    if (!users.includes(task.assignedBy._id)) {
+        users.push(task.assignedBy._id);
     }
     req.users = users;
 

@@ -19,7 +19,7 @@ const register = async (req, res) => {
         if (password) {
             var hashedPassword = await bcrypt.hash(password, 10);
         }
-        const avatar = `https://api.dicebear.com/9.x/fun-emoji/svg?seed=${name}&radius=50&scale=75`;
+        const avatar = `https://api.dicebear.com/9.x/fun-emoji/svg?seed=${name}&radius=50&scale=75&backgroundColor=A2D9FF,0099FF,00CBA9,FD81CB,FC9561,FFE55A,E3E3E3,FF4848`;
 
         const user = new User({ name, email, avatar, password: hashedPassword });
 
@@ -46,8 +46,8 @@ const login = async (req, res) => {
         // and Populate the followers and following fields with the corresponding users data
         const user = await User.findOne({ email })
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         if (!user) {
@@ -92,8 +92,8 @@ const currentUser = async (req, res) => {
         }
 
         await user.populate([
-            { path: 'followers', select: '_id name followers' },
-            { path: 'following', select: '_id name followers' }
+            { path: 'followers', select: '_id name avatar followers' },
+            { path: 'following', select: '_id name avatar followers' }
         ]);
 
         return res.status(200).json({ message: "Current user data fetched successfully", user });
@@ -126,9 +126,12 @@ const removeUser = async (req, res) => {
         }));
 
         // Reassign tasks assigned to the user
-        const tasksAssignedToUser = await Task.find({ assignedTo: user._id });
+        const tasksAssignedToUser = await Task.find({ assignedTo: { $in: [user._id] } });
         await Promise.all(tasksAssignedToUser.map(async (task) => {
-            task.assignedTo = task.assignedBy;
+            task.assignedTo = task.assignedTo.filter(id => id.toString() !== user._id.toString());
+            if (task.assignedTo.length === 0) {
+                task.assignedTo.push(task.assignedBy);
+            }
             await task.save();
         }));
 
@@ -155,8 +158,8 @@ const allUsers = async (req, res) => {
         const users = await User.find()
             .sort({ updatedAt: 'desc' })
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         res.status(200).json({ message: "All users Data fteched succesfully", users });
@@ -182,8 +185,8 @@ const updateUser = async (req, res) => {
             req.body,
             { new: true, runValidators: true }
         ).populate([
-            { path: 'followers', select: '_id name followers' },
-            { path: 'following', select: '_id name followers' }
+            { path: 'followers', select: '_id name avatar followers' },
+            { path: 'following', select: '_id name avatar followers' }
         ]);;
 
         return res.status(200).json({ message: 'User updated successfully', user });
@@ -210,8 +213,8 @@ const followUser = async (req, res) => {
         // Find the user to follow by given _id
         const userToFollow = await User.findById(userId)
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         if (!userToFollow) {
@@ -221,8 +224,8 @@ const followUser = async (req, res) => {
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         if (!authUser) {
@@ -262,8 +265,8 @@ const unfolloweUser = async (req, res) => {
         // Find the user to unfollow by given _id
         const userToUnfollow = await User.findById(userId)
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         if (!userToUnfollow) {
@@ -273,8 +276,8 @@ const unfolloweUser = async (req, res) => {
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
             .populate([
-                { path: 'followers', select: '_id name followers' },
-                { path: 'following', select: '_id name followers' }
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
             ]);
 
         if (!authUser) {

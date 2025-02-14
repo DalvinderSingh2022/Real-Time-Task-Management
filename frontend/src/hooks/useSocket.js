@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react';
 
 import { TasksContext } from '../store/TasksContext';
 import { UsersContext } from '../store/UsersContext';
@@ -45,9 +45,10 @@ const useSocket = () => {
             if (authState.user._id === assignedBy._id) {
                 addToast({ type: 'warning', message: `Task : ${task.title} Deleted` });
             }
-            else if (authState.user._id === assignedTo._id) {
-                addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
-            }
+            assignedTo.forEach(user => {
+                if (authState.user._id === user._id)
+                    addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
+            });
             deleteTask(task._id);
         });
 
@@ -57,11 +58,12 @@ const useSocket = () => {
     useEffect(() => {
         socket.on('task_created', (task) => {
             if (authState.user._id === task.assignedBy._id) {
-                addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo._id === authState.user._id ? `to ${task.assignedTo.name}` : ''}` });
+                addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo.some(user => user._id === authState.user._id) ? `to ${task.assignedTo.map(user => user.name).join(', ')}` : ''}` });
             }
-            else if (authState.user._id === task.assignedTo._id) {
-                addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
-            }
+            task.assignedTo.forEach(user => {
+                if (authState.user._id === user._id)
+                    addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
+            });
             createTask(task);
         });
 
@@ -70,7 +72,7 @@ const useSocket = () => {
 
     useEffect(() => {
         socket.on('task_updated', (task, user) => {
-            if (authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) {
+            if (authState.user._id === task.assignedBy._id || task.assignedTo.some(u => u._id === authState.user._id)) {
                 updateTask(task);
                 addToast({ type: 'info', message: `Task: ${task.title} updated ${user._id !== authState.user._id ? `by ${user.name}` : ''}` });
             }

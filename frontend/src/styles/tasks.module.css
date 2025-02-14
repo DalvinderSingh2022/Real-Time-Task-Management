@@ -55,8 +55,25 @@
 }
 
 .task .group {
-    justify-content: space-between;
+    margin-top: .4em;
+    justify-content: flex-start;
     align-self: stretch;
+}
+
+.task .group .avatar {
+    width: 32px;
+}
+
+.task .group .avatar:not(:first-child) {
+    margin-left: -14px;
+}
+
+.task .group .avatar:last-child {
+    aspect-ratio: 1;
+    border-radius: 50%;
+    color: var(--color);
+    font-size: .9em;
+    background-color: var(--white);
 }
 
 .task .group button {
@@ -71,18 +88,13 @@
 
 .task_title {
     text-transform: capitalize;
-    font-weight: 600;
-    font-size: 1.05em;
+    font-weight: 500;
+    font-size: 1.1em;
 }
 
 .task_description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
-    overflow: hidden;
-    text-overflow: ellipsis;
     line-height: 1.5;
-    max-height: calc(1.5em * 3);
+    text-wrap: wrap;
 }
 
 .tasks_container .task:hover {

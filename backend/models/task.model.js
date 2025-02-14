@@ -16,10 +16,10 @@ const taskSchema = new mongoose.Schema({
         type: Date,
         required: [true, 'Due date is required']
     },
-    assignedTo: {
+    assignedTo: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-    },
+    }],
     assignedBy: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
@@ -41,7 +41,12 @@ cron.schedule('0 0 * * *', async () => {
         const today = new Date().setHours(0, 0, 0, 0);
         const overDueTasks = await Task.find({ dueDate: { $lt: today } });
         const groupedTasks = overDueTasks.reduce((acc, task) => {
-            (!acc[task.assignedTo]) ? acc[task.assignedTo] = [task] : acc[task.assignedTo].push(task);
+            task.assignedTo.forEach(user => {
+                if (!acc[user])
+                    acc[user] = [task];
+                else
+                    acc[user].push(task);
+            });
             return acc;
         }, {});
 

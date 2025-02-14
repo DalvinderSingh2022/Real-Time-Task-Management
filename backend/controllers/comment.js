@@ -16,7 +16,7 @@ const allComments = async (req, res) => {
             .sort({ updatedAt: 'asc' })
             .populate({
                 path: 'user',
-                select: '_id name'
+                select: '_id name avatar'
             });
 
         res.status(200).json({ message: 'All Comments fetched successfully', comments });
@@ -47,7 +47,7 @@ const addComment = async (req, res) => {
         await newComment.save();
         const Comment = await newComment.populate({
             path: 'user',
-            select: '_id name'
+            select: '_id name avatar'
         });
 
         return res.status(201).json({ message: 'Comment added successfully', comment: Comment });

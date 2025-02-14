@@ -12,6 +12,7 @@ import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
 import { notifications, tasks } from '../utils/apiendpoints';
 import Response from '../components/Response';
+import User from './User';
 
 const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);
@@ -28,6 +29,14 @@ const ViewTask = (prop) => {
         setTask(prop.task);
         setOriginalTask(prop.task);
     }, [prop, task, originalTask]);
+
+    const handleAssignedToToggle = (user) => {
+        const newAssignedTo = task.assignedTo.find(u => u._id === user._id)
+            ? task.assignedTo.filter((u) => u._id !== user._id)
+            : [...task.assignedTo, user];
+
+        setTask(prev => ({ ...prev, assignedTo: newAssignedTo }));
+    };
 
     const handlechange = (e) => {
         const name = e.target.name;
@@ -97,22 +106,42 @@ const ViewTask = (prop) => {
                         <header className={`flex ${homeStyles.header}`}>
                             <h3 className='text_primary'>{task.title}</h3>
                         </header>
-                        <div className={`flex col w_full ${authStyles.group}`}>
-                            <label htmlFor="title" className='text_primary'>Title</label>
-                            <div className='flex'>
-                                <input
-                                    disabled={authState.user._id !== task.assignedBy._id}
-                                    type="text"
-                                    id='title'
-                                    name='title'
-                                    placeholder='title'
-                                    title={task.title}
-                                    value={task.title}
-                                    onChange={e => handlechange(e)}
-                                    className='w_full'
-                                />
+
+                        <div className={`flex gap w_full ${authStyles.group}`}>
+                            <div className={`flex col w_full ${authStyles.group}`}>
+                                <label htmlFor="title" className='text_primary'>Title</label>
+                                <div className='flex'>
+                                    <input
+                                        disabled={authState.user._id !== task.assignedBy._id}
+                                        type="text"
+                                        id='title'
+                                        name='title'
+                                        placeholder='title'
+                                        title={task.title}
+                                        value={task.title}
+                                        onChange={e => handlechange(e)}
+                                        className='w_full'
+                                    />
+                                </div>
+                            </div>
+                            <div className={`flex col ${authStyles.group}`}>
+                                <label htmlFor="dueDate" className='text_primary'>DueDate</label>
+                                <div className="flex">
+                                    <input
+                                        disabled={authState.user._id !== task.assignedBy._id}
+                                        type='date'
+                                        id='dueDate'
+                                        name='dueDate'
+                                        placeholder='dueDate'
+                                        title={(task.dueDate).substring(0, 10)}
+                                        value={(task.dueDate).substring(0, 10)}
+                                        onChange={e => handlechange(e)}
+                                        className='w_full'
+                                    />
+                                </div>
                             </div>
                         </div>
+
                         <div className={`flex col w_full ${authStyles.group}`}>
                             <label htmlFor="description" className='text_primary'>Description</label>
                             <div className="flex">
@@ -133,109 +162,68 @@ const ViewTask = (prop) => {
 
                         <div className={`flex gap w_full ${authStyles.group}`}>
                             <div className={`flex col w_full ${authStyles.group}`}>
-                                <label htmlFor="dueDate" className='text_primary'>DueDate</label>
-                                <div className="flex">
-                                    <input
-                                        disabled={authState.user._id !== task.assignedBy._id}
-                                        type='date'
-                                        id='dueDate'
-                                        name='dueDate'
-                                        placeholder='dueDate'
-                                        title={(task.dueDate).substring(0, 10)}
-                                        value={(task.dueDate).substring(0, 10)}
-                                        onChange={e => handlechange(e)}
-                                        className='w_full'
-                                    />
-                                </div>
-                            </div>
-                            <div className={`flex col w_full ${authStyles.group}`}>
                                 <label htmlFor="status" className='text_primary'>Status</label>
-                                <div className="flex">
-                                    <select
-                                        disabled={
-                                            authState.user._id !== task.assignedBy._id &&
-                                            authState.user._id !== task.assignedTo._id
-                                        }
-                                        name="status"
-                                        id="status"
-                                        title={task.status}
-                                        value={task.status}
-                                        onChange={(e) => handlechange(e)}
-                                        className='w_full'
-                                    >
-                                        <option value="Not Started">Not Started</option>
-                                        <option value="In Progress">In Progress</option>
-                                        <option value="Completed">Completed</option>
-                                    </select>
+                                <div className={`flex wrap ${modalStyles.check_container}`}>
+                                    {["Not Started", "In Progress", "Completed"].map((status) => (
+                                        <label key={status} htmlFor={status} className={modalStyles.checkbox}>
+                                            <input
+                                                type="checkbox"
+                                                id={status}
+                                                checked={task.status === status}
+                                                onChange={() => setTask(prev => ({ ...prev, status }))}
+                                            />
+                                            <div className={`flex ${modalStyles.check_label}`}>{status}</div>
+                                        </label>
+                                    ))}
                                 </div>
                             </div>
-                        </div>
 
-                        <div className={`flex gap w_full ${authStyles.group}`}>
                             <div className={`flex col w_full ${authStyles.group}`}>
                                 <label htmlFor="assignedBy" className='text_primary'>Assign By</label>
-                                <div className="flex">
-                                    <input
-                                        disabled={true}
-                                        name="assignedBy"
-                                        id="assignedBy"
-                                        title={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
-                                        value={`${task.assignedBy.name} ${authState.user._id === task.assignedBy._id ? "(You)" : ""}`}
-                                        onChange={(e) => handlechange(e)}
-                                        className='w_full'
-                                    />
-                                </div>
-                            </div>
-                            <div className={`flex col w_full ${authStyles.group}`}>
-                                <label htmlFor="assignedTo" className='text_primary'>Assign To</label>
-                                <div className="flex">
-                                    <select
-                                        disabled={authState.user._id !== task.assignedBy._id}
-                                        name="assignedTo"
-                                        id="assignedTo"
-                                        defaultValue={task.assignedTo._id}
-                                        onChange={(e) => handlechange(e)}
-                                        className='w_full'
-                                    >
-                                        <option value={authState.user._id}>{authState.user.name + ' (You)'}</option>
-                                        {authState.user.followers.map(user => <option key={user._id} value={user._id}>{user.name}</option>)}
-                                    </select>
+                                <div className={`flex ${modalStyles.check_container}`}>
+                                    <div className={`flex ${modalStyles.check_label}`}>
+                                        <User {...task.assignedBy} removeButton={true} />
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div className={`flex gap w_full ${authStyles.group}`}>
-                            <div className={`flex col w_full ${authStyles.group}`}>
-                                <label className='text_primary'>Assigned on</label>
-                                <div className="flex">
-                                    <input
-                                        type="text"
-                                        title={new Date(task.createdAt).toLocaleString()}
-                                        value={new Date(task.createdAt).toLocaleString()}
-                                        disabled
-                                        className='w_full'
-                                    />
-                                </div>
-                            </div>
-                            <div className={`flex col w_full ${authStyles.group}`}>
-                                <label className='text_primary'>Last updated</label>
-                                <div className="flex">
-                                    <input
-                                        type="text"
-                                        title={new Date(task.updatedAt).toLocaleString()}
-                                        value={new Date(task.updatedAt).toLocaleString()}
-                                        disabled
-                                        className='w_full'
-                                    />
-                                </div>
+                        <div className={`flex col w_full ${authStyles.group}`}>
+                            <label htmlFor="assignedTo" className='text_primary'>Assign To</label>
+                            <div className={`flex wrap ${modalStyles.check_container}`}>
+                                {task.assignedTo.map((user) => (
+                                    <div key={user._id} className={`flex ${modalStyles.check_label}`}>
+                                        <User {...user} removeButton={true} />
+                                    </div>
+                                ))}
                             </div>
                         </div>
+
+                        {task.assignedBy._id === authState.user._id &&
+                            <div className={`flex col w_full ${authStyles.group}`}>
+                                <label htmlFor="assignedTo" className='text_primary'>Assign task to more users</label>
+                                <div className={`flex wrap ${modalStyles.check_container}`}>
+                                    {authState.user.followers.map((user) => (
+                                        <label key={user._id} htmlFor={user._id} className={modalStyles.checkbox}>
+                                            <input
+                                                type="checkbox"
+                                                id={user._id}
+                                                checked={task.assignedTo.find(u => user._id === u._id)}
+                                                onChange={() => handleAssignedToToggle(user)}
+                                            />
+                                            <div className={`flex ${modalStyles.check_label}`}>
+                                                <User {...user} removeButton={true} />
+                                            </div>
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>}
 
                         <div className={`flex gap w_full`}>
                             {authState.user._id === task.assignedBy._id &&
                                 <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
                             }
-                            {(authState.user._id === task.assignedBy._id || authState.user._id === task.assignedTo._id) &&
+                            {(authState.user._id === task.assignedBy._id || task.assignedTo.includes(authState.user._id)) &&
                                 <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
                             }
                         </div>

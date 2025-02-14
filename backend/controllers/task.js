@@ -1,4 +1,3 @@
-
 const Task = require('../models/task.model');
 const Comment = require('../models/comment.model');
 
@@ -14,8 +13,8 @@ const addTask = async (req, res) => {
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         await newTask.save();
         const task = await newTask.populate([
-            { path: 'assignedTo', select: '_id name' },
-            { path: 'assignedBy', select: '_id name' }
+            { path: 'assignedTo', select: '_id name avatar' },
+            { path: 'assignedBy', select: '_id name avatar' }
         ]);
 
         return res.status(201).json({ message: 'Task created successfully', task });
@@ -35,13 +34,11 @@ const allTasks = async (req, res) => {
     try {
         // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const tasks = await Task.find({
-            $or: [{ assignedTo: userId }, { assignedBy: userId }]
-        })
+        const tasks = await Task.find({ $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }] })
             .sort({ updatedAt: 'desc' })
             .populate([
-                { path: 'assignedTo', select: '_id name' },
-                { path: 'assignedBy', select: '_id name' }
+                { path: 'assignedTo', select: '_id name avatar' },
+                { path: 'assignedBy', select: '_id name avatar' }
             ]);
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
@@ -62,8 +59,8 @@ const getTask = async (req, res) => {
         // Retrieve the task with the given _id
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         const task = await Task.findById(taskId).populate([
-            { path: 'assignedTo', select: '_id name' },
-            { path: 'assignedBy', select: '_id name' }
+            { path: 'assignedTo', select: '_id name avatar' },
+            { path: 'assignedBy', select: '_id name avatar' }
         ]);
 
         if (!task) {
@@ -119,8 +116,8 @@ const updateTask = async (req, res) => {
             req.body,
             { new: true, runValidators: true, }
         ).populate([
-            { path: 'assignedTo', select: '_id name' },
-            { path: 'assignedBy', select: '_id name' }
+            { path: 'assignedTo', select: '_id name avatar' },
+            { path: 'assignedBy', select: '_id name avatar' }
         ]);
 
         return res.status(200).json({ message: 'Task updated successfully', updatedTask });
