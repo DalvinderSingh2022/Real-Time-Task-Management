@@ -6,8 +6,8 @@ import { VscGitPullRequestGoToChanges } from "react-icons/vsc";
 import { CgFileRemove } from "react-icons/cg";
 
 import styles from "../../styles/notifications.module.css";
-import { UsersContext } from '../../store/UsersContext';
 import DeleteButton from './DeleteButton';
+import { AuthContext } from '../../store/AuthContext';
 
 const icons = {
     'Task update': <VscGitPullRequestGoToChanges />,
@@ -17,7 +17,7 @@ const icons = {
 
 const TaskNotification = (prop) => {
     const [response, setResponse] = useState(false);
-    const { usersState } = useContext(UsersContext);
+    const { authState } = useContext(AuthContext);
     const { title, description, dueDate, assignedTo, status } = prop.data.changes || prop.data.task;
     const notificationData = title || description || dueDate || status || assignedTo;
     let { field, oldValue, newValue } = notificationData;
@@ -26,8 +26,8 @@ const TaskNotification = (prop) => {
         oldValue = new Date(oldValue).toDateString();
         newValue = new Date(newValue).toDateString();
     } else if (field === 'assignedTo') {
-        oldValue = oldValue.name;
-        newValue = usersState.users.find(user => user._id === newValue)?.name || newValue;
+        oldValue = oldValue.map(user => user._id !== authState.user._id ? user.name : "(You)").join(", ");
+        newValue = newValue.map(user => user._id !== authState.user._id ? user.name : "(You)").join(", ");
     }
 
     return (
