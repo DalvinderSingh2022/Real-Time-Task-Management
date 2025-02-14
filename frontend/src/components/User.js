@@ -77,7 +77,7 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
                 <div className='flex gap2'>
                     <img src={avatar} alt="User Avatar" className="avatar" />
                     <div>
-                        <div onClick={handleClick} className={`text_primary ${styles.user_title}`}>{name}</div>
+                        <div onClick={handleClick} className={`text_primary ${!removeButton ? styles.user_title : ""}`}>{name}</div>
                         {!removeButton && <div className='text_secondary'>Followers: {followers.length}</div>}
                     </div>
                 </div>
@@ -91,4 +91,4 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
     )
 }
 
-export default memo(User, (prev, next) => prev?._id === next?._id);
+export default memo(User, (prev, next) => (prev?._id === next?._id) && (prev?.removeButton === next?.removeButton));

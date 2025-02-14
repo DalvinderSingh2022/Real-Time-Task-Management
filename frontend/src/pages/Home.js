@@ -22,11 +22,13 @@ const Home = () => {
     useEffect(() => {
         const taskCounts = tasksState.tasks.reduce((acc, task) => {
             const status = task.status.toLowerCase().replaceAll(" ", '');
-            if (status === 'notstarted') acc.notStarted += 1;
-            if (status === 'inprogress') acc.inProgress += 1;
-            if (status === 'completed') acc.completed += 1;
-            if (task.assignedBy._id === authState.user._id) acc.bySelf += 1;
-            if (task.assignedBy._id !== authState.user._id) acc.byOthers += 1;
+
+            if (status === 'notstarted') acc.notStarted++;
+            if (status === 'inprogress') acc.inProgress++;
+            if (status === 'completed') acc.completed++;
+
+            acc[task.assignedBy._id === authState.user._id ? "bySelf" : "byOthers"]++;
+
             return acc;
         }, { notStarted: 0, inProgress: 0, completed: 0, bySelf: 0, byOthers: 0 });
 
