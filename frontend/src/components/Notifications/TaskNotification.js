@@ -41,7 +41,7 @@ const TaskNotification = (prop) => {
                 <div className={styles.data}>
                     {prop.type === 'Task update' ?
                         <>
-                            <div>{field.toUpperCase()}</div>
+                            <div>{field.slice(0, 1).toUpperCase() + field.slice(1)}</div>
                             <div>OldValue: {oldValue}</div>
                             <div>NewValue: {newValue}</div>
                         </>

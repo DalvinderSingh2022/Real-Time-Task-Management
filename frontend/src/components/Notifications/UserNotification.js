@@ -5,6 +5,7 @@ import { RiUserFollowLine } from "react-icons/ri";
 
 import styles from "../../styles/notifications.module.css";
 import DeleteButton from './DeleteButton';
+import { Link } from 'react-router-dom';
 
 const UserNotification = (prop) => {
     const [response, setResponse] = useState(false);
@@ -12,10 +13,11 @@ const UserNotification = (prop) => {
     return (
         <>
             <div className={`${styles.icon} button round flex`}>
-                {prop.type === 'User_follow' ? <RiUserUnfollowLine /> : <RiUserFollowLine />}
+                {prop.type === 'User follow' ? <RiUserUnfollowLine /> : <RiUserFollowLine />}
             </div>
             <div className="w_full">
-                <span className={`text_primary ${styles.message}`}>{prop.message}</span>
+                <div className={`text_primary ${styles.message}`}>{prop.message}</div>
+                <Link to={`/users?q=${prop.data.user.name}`}>{prop.data.user.name}</Link>
                 <div className={styles.data}>
                     <div className='text_secondary'>{(new Date(prop.createdAt).toDateString()) + " at " + (new Date(prop.createdAt).toLocaleTimeString())}</div>
                 </div>
