@@ -38,7 +38,7 @@ const App = () => {
         users.current().then(({ data }) => login(data.user))
             .catch((error) => {
                 verify();
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             })
             .finally(() => setLoadingMsg(''));

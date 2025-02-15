@@ -23,7 +23,7 @@ const TaksComments = ({ task }) => {
     useEffect(() => {
         comments.get(id).then(({ data }) => setAllComments(data.comments))
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             });
     }, [id, addToast]);
@@ -71,7 +71,7 @@ const TaksComments = ({ task }) => {
             setComment('');
         })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             })
             .finally(() => setResponse(false));

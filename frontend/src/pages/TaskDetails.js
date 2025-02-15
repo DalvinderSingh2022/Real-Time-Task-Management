@@ -21,7 +21,7 @@ const TaskDetails = () => {
             .then(({ data }) => setTask(data.task))
             .catch((error) => {
                 setInvalidId(true);
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             });
     }, [id, addToast]);

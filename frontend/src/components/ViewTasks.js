@@ -70,7 +70,7 @@ const ViewTask = (prop) => {
                 socket.emit('task_updated', data.task, authState.user, notification, originalTask);
 
             } catch (error) {
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             } finally {
                 setResponse('');
@@ -91,7 +91,7 @@ const ViewTask = (prop) => {
             navigate('/tasks');
 
         } catch (error) {
-            addToast({ type: 'error', message: error?.response?.data?.message });
+            addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
             console.log(".....API ERROR.....", error);
         } finally {
             setResponse('');

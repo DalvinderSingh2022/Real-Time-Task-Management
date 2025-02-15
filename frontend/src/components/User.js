@@ -33,7 +33,7 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
             socket.emit('user_followed', authUser, userToFollow, notification);
 
         } catch (error) {
-            addToast({ type: 'error', message: error?.response?.data?.message });
+            addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
             console.log(".....API ERROR.....", error);
         } finally {
             setResponse(false);
@@ -52,7 +52,7 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
             socket.emit('user_unfollowed', authUser, userToUnfollow, notification);
 
         } catch (error) {
-            addToast({ type: 'error', message: error?.response?.data?.message });
+            addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
             console.log(".....API ERROR.....", error);
         } finally {
             setResponse(false);

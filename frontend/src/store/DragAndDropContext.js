@@ -69,7 +69,7 @@ const DragAndDropProvider = ({ children }) => {
                     const notification = notificationData.notifications.find(n => n.user === authState.user._id);
                     socket.emit('task_updated', task, authState.user, notification, oldTask);
                 } catch (error) {
-                    addToast({ type: 'error', message: error?.response?.data?.message });
+                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                     console.log(".....API ERROR.....", error);
                 } finally {
                     reset();

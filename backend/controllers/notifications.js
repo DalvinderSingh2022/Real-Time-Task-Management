@@ -9,7 +9,7 @@ const allNotifications = async (req, res) => {
     }
 
     try {
-        const notifications = await Notification.find({ user: userId }).sort({ updatedAt: 'desc' });
+        const notifications = await Notification.find({ user: userId }).sort({ createdAt: -1 });
 
         res.status(200).json({ message: 'All Notifications fetched successfully', notifications });
     } catch (error) {

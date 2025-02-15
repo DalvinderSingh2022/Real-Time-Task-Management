@@ -43,7 +43,7 @@ const Sidebar = () => {
             handleLogout();
         })
             .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
+                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);
             })
             .finally(() => setResponse(false));
