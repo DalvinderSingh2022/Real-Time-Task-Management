@@ -8,6 +8,7 @@ export const users = {
     delete_user: (id) => BASE_URL + '/users/' + id,
     follow_user: (id) => BASE_URL + '/users/follow/' + id,
     unfollow_user: (id) => BASE_URL + '/users/unfollow/' + id,
+    update_user: (id) => BASE_URL + '/users/' + id,
 }
 
 export const tasks = {

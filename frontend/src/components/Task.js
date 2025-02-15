@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import styles from "../styles/tasks.module.css";
@@ -45,4 +45,4 @@ const Task = (task) => {
     )
 }
 
-export default memo(Task, (prev, next) => prev?.task?._id === next?.task?._id);
+export default Task;

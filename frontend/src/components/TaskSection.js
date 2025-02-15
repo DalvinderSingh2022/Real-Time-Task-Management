@@ -1,4 +1,4 @@
-import React, { memo, useContext } from 'react';
+import React, { useContext } from 'react';
 
 import Task from "./Task";
 
@@ -43,4 +43,4 @@ const TaskSection = ({ tasks, status }) => {
     )
 }
 
-export default memo(TaskSection, (prev, next) => prev?.tasks?.length === next?.tasks?.length && prev?.status === next?.status);
+export default TaskSection;

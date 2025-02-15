@@ -77,6 +77,9 @@ const login = async (req, res) => {
             return res.status(401).json({ message: 'Invalid username or password' });
         }
 
+        // Removing password so it doesn't reflect in frontend
+        user.password = null;
+
         // Generate a JWT for the user
         const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, { expiresIn: "1h" });
 
@@ -103,7 +106,7 @@ const currentUser = async (req, res) => {
             return res.status(401).json({ message: "User is not authorized" });
         }
 
-        const user = await User.findById(validUser.id);
+        const user = await User.findById(validUser.id).select("-password");
         if (!user) {
             return res.status(404).json({ message: "User Not found, Refresh Page" });
         }
@@ -173,6 +176,7 @@ const allUsers = async (req, res) => {
         // Find all users
         // and Populate the followers and following fields with the corresponding users data
         const users = await User.find()
+            .select("-password")
             .sort({ updatedAt: 'desc' })
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
@@ -197,14 +201,12 @@ const updateUser = async (req, res) => {
     try {
         // Update the User with the new data
         // and Populate the followers and following fields with the corresponding users data
-        const user = await User.findByIdAndUpdate(
-            userId,
-            req.body,
-            { new: true, runValidators: true }
-        ).populate([
-            { path: 'followers', select: '_id name avatar followers' },
-            { path: 'following', select: '_id name avatar followers' }
-        ]);;
+        const user = await User.findByIdAndUpdate(userId, req.body, { new: true, runValidators: true })
+            .select("-password")
+            .populate([
+                { path: 'followers', select: '_id name avatar followers' },
+                { path: 'following', select: '_id name avatar followers' }
+            ]);;
 
         return res.status(200).json({ message: 'User updated successfully', user });
     } catch (error) {
@@ -229,6 +231,7 @@ const followUser = async (req, res) => {
     try {
         // Find the user to follow by given _id
         const userToFollow = await User.findById(userId)
+            .select("-password")
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }
@@ -240,6 +243,7 @@ const followUser = async (req, res) => {
 
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
+            .select("-password")
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }
@@ -281,6 +285,7 @@ const unfolloweUser = async (req, res) => {
     try {
         // Find the user to unfollow by given _id
         const userToUnfollow = await User.findById(userId)
+            .select("-password")
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }
@@ -292,6 +297,7 @@ const unfolloweUser = async (req, res) => {
 
         // Find the authenticated user by given _id
         const authUser = await User.findById(authUserId)
+            .select("-password")
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }

@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import axios from 'axios';
 
 import styles from '../styles/users.module.css';
@@ -91,4 +91,4 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
     )
 }
 
-export default memo(User, (prev, next) => (prev?._id === next?._id) && (prev?.removeButton === next?.removeButton));
+export default User;

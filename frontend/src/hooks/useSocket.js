@@ -74,7 +74,7 @@ const useSocket = () => {
         socket.on('task_updated', (task, user) => {
             if (authState.user._id === task.assignedBy._id || task.assignedTo.some(u => u._id === authState.user._id)) {
                 updateTask(task);
-                addToast({ type: 'info', message: `Task: ${task.title} updated ${user._id !== authState.user._id ? `by ${user.name}` : ''}` });
+                if (user) addToast({ type: 'info', message: `Task: ${task.title} updated ${user._id !== authState.user._id ? `by ${user.name}` : ''}` });
             }
         });
 
@@ -130,6 +130,12 @@ const useSocket = () => {
 
         return () => socket.off('user_join');
     }, [addUser]);
+
+    useEffect(() => {
+        socket.on('user_update', user => updateUser(user));
+
+        return () => socket.off('user_update');
+    }, [updateUser]);
 }
 
 export default useSocket;

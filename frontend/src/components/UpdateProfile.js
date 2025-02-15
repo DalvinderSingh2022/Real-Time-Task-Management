@@ -1,9 +1,14 @@
 import React, { memo, useCallback, useContext, useEffect, useState } from 'react';
+import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
 
 import { AuthContext } from '../store/AuthContext';
+import { AppContext } from '../store/AppContext';
+import { tasks, users } from '../utils/apiendpoints';
+import { socket } from '../hooks/useSocket';
+import Response from './Response';
 
 const baseUrl = 'https://api.dicebear.com/9.x/fun-emoji/svg?radius=50&scale=75';
 const options = {
@@ -13,7 +18,9 @@ const options = {
 }
 
 const UpdateProfile = ({ remove }) => {
-    const { authState } = useContext(AuthContext);
+    const { authState, login } = useContext(AuthContext);
+    const { addToast } = useContext(AppContext);
+    const [response, setResponse] = useState(false);
     const [profile, setProfile] = useState({ name: authState.user.name, avatar: authState.user.avatar });
 
     const getAvatar = useCallback(({ mouth, eyes, backgroundColor }) => {
@@ -28,6 +35,43 @@ const UpdateProfile = ({ remove }) => {
 
     const handlesubmit = (e) => {
         e.preventDefault();
+        const user = {
+            name: profile.name,
+            avatar: getAvatar(profile)
+        }
+
+        setResponse(true);
+        axios.put(users.update_user(authState.user._id), user)
+            .then(({ data: userData }) => {
+                socket.emit('user_update', userData.user);
+                login(userData.user);
+                addToast({ type: 'success', message: userData.message });
+                remove();
+
+                axios.get(tasks.all_tasks(userData.user._id))
+                    .then(({ data: taskData }) => {
+                        taskData.tasks.forEach(task => {
+                            let updatedTask = task;
+
+                            if (updatedTask.assignedBy._id === userData.user._id) {
+                                updatedTask = { ...updatedTask, assignedBy: { ...updatedTask.assignedBy, avatar: userData.user.avatar } };
+                            }
+                            if (updatedTask.assignedTo.some(user => user._id === userData.user._id)) {
+                                updatedTask = {
+                                    ...updatedTask,
+                                    assignedTo: updatedTask.assignedTo.map(user => user._id === userData.user._id ? { ...user, avatar: userData.user.avatar } : user)
+                                };
+                            }
+
+                            socket.emit('task_updated', updatedTask);
+                        });
+                    })
+            })
+            .catch((error) => {
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR.....", error);
+            })
+            .finally(() => setResponse(false));
     }
 
     useEffect(() => {
@@ -40,12 +84,11 @@ const UpdateProfile = ({ remove }) => {
                 setProfile(prev => ({ ...prev, [key]: value }));
             }
         });
-
-        setProfile(prev => ({ ...prev, avatar: getAvatar(prev) }));
     }, [authState.user.avatar, getAvatar]);
 
     return (
         <>
+            {response && <Response />}
             <div className="modal flex full_container profile_update" onClick={remove}>
                 <div className={` flex col ${authStyles.container} ${modalStyles.container}`} onClick={e => e.stopPropagation()}>
                     <form className={`flex col gap w_full modal_child`} onSubmit={handlesubmit}>
@@ -82,7 +125,7 @@ const UpdateProfile = ({ remove }) => {
                         ))}
 
                         <div className={`flex gap`}>
-                            <button type='submit' className={`button primary flex gap2 ${authStyles.submit_button}`}>Save</button>
+                            <button type='submit' className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response && <div className='loading'></div>}</button>
                             <button type='button' className={`button secondary ${authStyles.submit_button}`} onClick={remove}>Cancel</button>
                         </div>
                     </form>

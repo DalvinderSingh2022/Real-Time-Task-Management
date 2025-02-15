@@ -6,27 +6,27 @@ const handleSocketEvents = (io) => {
 
         socket.on('user_followed', (authUser, userToFollow, notification) => {
             io.emit('user_followed', authUser, userToFollow);
-            addNotification({ notification });
+            if (notification) addNotification({ notification });
         });
 
         socket.on('user_unfollowed', (authUser, userToUnfollow, notification) => {
             io.emit('user_unfollowed', authUser, userToUnfollow);
-            addNotification({ notification });
+            if (notification) addNotification({ notification });
         });
 
         socket.on('task_created', (task, notification) => {
             io.emit('task_created', task);
-            addNotification({ notification });
+            if (notification) addNotification({ notification });
         });
 
         socket.on('task_updated', (task, user, notification, oldTask) => {
             io.emit('task_updated', task, user);
-            addNotification({ notification, task, oldTask });
+            if (notification) addNotification({ notification, task, oldTask });
         });
 
         socket.on('task_deleted', (task, assignedTo, assignedBy, notification) => {
             io.emit('task_deleted', task, assignedTo, assignedBy);
-            addNotification({ notification });
+            if (notification) addNotification({ notification });
         });
 
         socket.on('user_left', user => {
@@ -35,6 +35,10 @@ const handleSocketEvents = (io) => {
 
         socket.on('user_join', user => {
             io.emit('user_join', user);
+        });
+
+        socket.on('user_update', user => {
+            io.emit('user_update', user);
         });
 
         socket.on("join_room", id => {
