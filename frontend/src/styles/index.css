@@ -231,6 +231,43 @@ main .top_nav {
     align-self: flex-start;
 }
 
+.top_nav .avatar {
+    cursor: pointer;
+}
+
+.profile_update .profile_avatar {
+    margin-top: -1em;
+    width: 88px;
+}
+
+.profile_update input.profile_name {
+    text-align: center;
+    font-size: 1.05em;
+    width: 80%;
+    margin: auto;
+}
+
+.profile_update .profile_group {
+    overflow: auto;
+}
+
+.profile_update *::-webkit-scrollbar {
+    height: 4px;
+}
+
+.profile_update *::-webkit-scrollbar-track {
+    background-color: var(--grey);
+}
+
+.profile_update *::-webkit-scrollbar-thumb {
+    background-color: var(--purple-light);
+    border-radius: 10px;
+}
+
+.profile_update *::-webkit-scrollbar-thumb:hover {
+    background-color: var(--purple-dark);
+}
+
 img.avatar {
     width: 40px;
     aspect-ratio: 1;
@@ -319,8 +356,6 @@ main.close .side_nav .link {
 
 .modal {
     backdrop-filter: blur(4px);
-    display: grid;
-    place-items: center;
     background-color: var(--shadow-color);
 }
 

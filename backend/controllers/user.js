@@ -5,6 +5,23 @@ const Task = require('../models/task.model');
 const Comment = require('../models/comment.model');
 require("dotenv").config();
 
+//helper function to generate avatar
+const getAvatar = (name) => {
+    const baseUrl = 'https://api.dicebear.com/9.x/fun-emoji/svg?radius=50&scale=75';
+    const mouthOptions = ["plain", "lilSmile", "sad", "shy", "cute", "wideSmile", "shout", "smileTeeth", "smileLol", "pissed", "drip", "tongueOut", "kissHeart", "sick", "faceMask"];
+    const eyesOptions = ["sad", "tearDrop", "pissed", "cute", "wink", "wink2", "plain", "glasses", "closed", "love", "stars", "shades", "closed2", "crying", "sleepClose"];
+    const backgroundColorOptions = ["A2D9FF", "0099FF", "00CBA9", "FD81CB", "FC9561", "FFE55A", "E3E3E3", "FF4848"];
+
+    const url = {
+        seed: name.replace(" ", "%20"),
+        mouth: mouthOptions[Math.floor(Math.random() * mouthOptions.length)],
+        eyes: eyesOptions[Math.floor(Math.random() * eyesOptions.length)],
+        backgroundColor: backgroundColorOptions[Math.floor(Math.random() * backgroundColorOptions.length)]
+    }
+
+    return baseUrl + Object.entries(url).reduce((acc, [option, value]) => acc + `&${option}=${value}`, "");
+}
+
 // Register a new user
 const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -19,7 +36,7 @@ const register = async (req, res) => {
         if (password) {
             var hashedPassword = await bcrypt.hash(password, 10);
         }
-        const avatar = `https://api.dicebear.com/9.x/fun-emoji/svg?seed=${name}&radius=50&scale=75&backgroundColor=A2D9FF,0099FF,00CBA9,FD81CB,FC9561,FFE55A,E3E3E3,FF4848`;
+        const avatar = getAvatar(name);
 
         const user = new User({ name, email, avatar, password: hashedPassword });
 

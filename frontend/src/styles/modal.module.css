@@ -1,6 +1,7 @@
 .container {
     padding: 2em 1em 0;
     max-width: calc(100% - 3em);
+    margin: auto;
 }
 
 .group {
@@ -13,7 +14,7 @@ button.delete_button {
     border-color: var(--red);
 }
 
-.check_container {
+div.check_container {
     justify-content: flex-start;
 }
 

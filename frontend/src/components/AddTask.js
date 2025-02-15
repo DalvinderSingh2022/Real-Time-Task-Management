@@ -15,7 +15,7 @@ const AddTask = ({ remove, initialAssignedTo }) => {
     const { authState } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
     const [response, setResponse] = useState(false);
-    const [assignedTo, setAssignedTo] = useState(initialAssignedTo.length ? initialAssignedTo : []);
+    const [assignedTo, setAssignedTo] = useState(initialAssignedTo?.length ? initialAssignedTo : []);
 
     const handleAssignedToToggle = (userId) => {
         setAssignedTo((prev) =>
@@ -57,7 +57,7 @@ const AddTask = ({ remove, initialAssignedTo }) => {
     return (
         <>
             {response && <Response />}
-            <div className="modal full_container" onClick={remove}>
+            <div className="modal flex full_container" onClick={remove}>
                 <div className={` flex col ${authStyles.container} ${modalStyles.container}`} onClick={e => e.stopPropagation()}>
                     <div>
                         <div className={`w_full text_primary ${authStyles.heading}`}>New Task</div>
