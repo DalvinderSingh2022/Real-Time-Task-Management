@@ -1,37 +1,48 @@
-const BASE_URL = process.env.REACT_APP_API_BASE_URL + 'api';
+import axios from 'axios';
+
+const BASE_URL = `${process.env.REACT_APP_API_BASE_URL}api`;
+const token = localStorage.getItem('jwt');
+
+const axiosInstance = axios.create({
+    baseURL: BASE_URL,
+    headers: {
+        'Authorization': token,
+        'Content-Type': 'application/json',
+    },
+});
 
 export const users = {
-    current_user: BASE_URL + '/users/current',
-    all_users: BASE_URL + '/users/all',
-    login_user: BASE_URL + '/users/login',
-    register_user: BASE_URL + '/users/register',
-    delete_user: (id) => BASE_URL + '/users/' + id,
-    follow_user: (id) => BASE_URL + '/users/follow/' + id,
-    unfollow_user: (id) => BASE_URL + '/users/unfollow/' + id,
-    update_user: (id) => BASE_URL + '/users/' + id,
-}
+    register: (data) => axiosInstance.post('/users/register', data),
+    login: (data) => axiosInstance.put('/users/login', data),
+    all: () => axiosInstance.get('/users/all'),
+    current: () => axiosInstance.get('/users/current'),
+    follow: (userId) => axiosInstance.post(`/users/follow/${userId}`),
+    unfollow: (userId) => axiosInstance.post(`/users/unfollow/${userId}`),
+    update: (data) => axiosInstance.put(`/users`, data),
+    delete: () => axiosInstance.delete(`/users`),
+};
 
 export const tasks = {
-    create_task: BASE_URL + '/tasks',
-    update_task: (id) => BASE_URL + '/tasks/' + id,
-    delete_task: (id) => BASE_URL + '/tasks/' + id,
-    get_task: (id) => BASE_URL + '/tasks/' + id,
-    all_tasks: (userId) => BASE_URL + '/tasks/all/' + userId,
-}
+    all: () => axiosInstance.get('/tasks/all'),
+    create: (data) => axiosInstance.post('/tasks', data),
+    get: (id) => axiosInstance.get(`/tasks/${id}`),
+    update: (id, data) => axiosInstance.put(`/tasks/${id}`, data),
+    delete: (id) => axiosInstance.delete(`/tasks/${id}`),
+};
 
 export const comments = {
-    get_comments: (taskId) => BASE_URL + '/comments/' + taskId,
-    create_comment: (taskId) => BASE_URL + '/comments/' + taskId,
-}
+    get: (taskId) => axiosInstance.get(`/comments/${taskId}`),
+    create: (taskId, data) => axiosInstance.post(`/comments/${taskId}`, data),
+};
 
 export const notifications = {
-    due_date_reminder: BASE_URL + '/notifications/due-date-reminder',
-    assign_task: BASE_URL + '/notifications/assign-task',
-    follow_user: BASE_URL + '/notifications/follow-user',
-    unfollow_user: BASE_URL + '/notifications/unfollow-user',
-    update_task: BASE_URL + '/notifications/update-task',
-    delete_task: BASE_URL + '/notifications/delete-task',
-    update_notification: (id) => BASE_URL + '/notifications/' + id,
-    delete_notifications: (id) => BASE_URL + '/notifications/' + id,
-    all_notifications: (userId) => BASE_URL + '/notifications/all/' + userId,
+    all: () => axiosInstance.get('/notifications/all'),
+    update: (id, data) => axiosInstance.put(`/notifications/${id}`, data),
+    delete: (id) => axiosInstance.delete(`/notifications/${id}`),
+    assignTask: (data) => axiosInstance.post('/notifications/assign-task', data),
+    updateTask: (data) => axiosInstance.post('/notifications/update-task', data),
+    deleteTask: (data) => axiosInstance.post('/notifications/delete-task', data),
+    followUser: (data) => axiosInstance.post('/notifications/follow-user', data),
+    unfollowUser: (data) => axiosInstance.post('/notifications/unfollow-user', data),
+    dueDateReminder: (data) => axiosInstance.post('/notifications/due-date-reminder', data),
 };

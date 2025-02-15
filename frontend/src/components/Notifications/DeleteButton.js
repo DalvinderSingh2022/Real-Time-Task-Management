@@ -1,5 +1,4 @@
 import React, { memo, useContext, useEffect } from 'react';
-import axios from 'axios';
 
 import { IoCloseSharp } from "react-icons/io5";
 
@@ -17,8 +16,8 @@ const DeleteButton = ({ response, setResponse, prop }) => {
 
         const handleNotification = () => {
             if (notification && !notification.read) {
-                axios.put(notifications.update_notification(prop._id), { ...notification, read: true })
-                    .then(({ data }) => readNotification(data.updatedNotification._id))
+                notifications.update(prop._id, { ...notification, read: true })
+                    .then(({ data }) => readNotification(data.notification._id))
                     .catch(error => console.log(".....API ERROR.....", error));
             }
         }
@@ -28,7 +27,7 @@ const DeleteButton = ({ response, setResponse, prop }) => {
 
     const handleDelete = () => {
         setResponse(true);
-        axios.delete(notifications.delete_notifications(prop._id))
+        notifications.delete(prop._id)
             .then(() => deleteNotification(prop._id))
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });

@@ -1,5 +1,4 @@
 import { createContext, useContext, useEffect, useReducer, useState } from 'react';
-import axios from 'axios';
 
 import { AppContext } from './AppContext';
 import { AuthContext } from './AuthContext';
@@ -45,41 +44,39 @@ const DragAndDropProvider = ({ children }) => {
     }
 
     useEffect(() => {
-        const oldTask = dragAndDropState.task;
+        (async () => {
+            const oldTask = dragAndDropState.task;
 
-        if (oldTask && dragAndDropState.status) {
-            if (dragAndDropState.status === oldTask.status) {
-                return reset();
-            }
-
-            const changes = {
-                'status': {
-                    field: 'status',
-                    oldValue: oldTask.status,
-                    newValue: dragAndDropState.status
+            if (oldTask && dragAndDropState.status) {
+                if (dragAndDropState.status === oldTask.status) {
+                    return reset();
                 }
-            }
 
-            setResponse(true);
-            axios.put(tasks.update_task(oldTask._id), { ...oldTask, status: dragAndDropState.status })
-                .then(({ data }) => {
-                    const { updatedTask: task } = data;
+                const changes = {
+                    'status': {
+                        field: 'status',
+                        oldValue: oldTask.status,
+                        newValue: dragAndDropState.status
+                    }
+                }
 
-                    axios.post(notifications.update_task, { changes, task, oldTask })
-                        .then(({ data: notificationData }) => {
-                            const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                            socket.emit('task_updated', data.updatedTask, authState.user, notification, oldTask);
-                        });
-                })
-                .catch((error) => {
+                setResponse(true);
+                try {
+                    const { data } = await tasks.update(oldTask._id, { ...oldTask, status: dragAndDropState.status });
+                    const { task } = data;
+
+                    const { data: notificationData } = await notifications.updateTask({ changes, task, oldTask });
+                    const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                    socket.emit('task_updated', task, authState.user, notification, oldTask);
+                } catch (error) {
                     addToast({ type: 'error', message: error?.response?.data?.message });
                     console.log(".....API ERROR.....", error);
-                })
-                .finally(() => {
+                } finally {
                     reset();
                     setResponse(false);
-                });
-        }
+                }
+            }
+        })();
     }, [dragAndDropState, authState, addToast]);
 
     return (

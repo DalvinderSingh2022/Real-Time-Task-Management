@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 
 import styles from '../styles/users.module.css';
 
@@ -23,42 +22,41 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
         }
     }, [authState, _id]);
 
-    const handleFollow = () => {
+    const handleFollow = async () => {
         setResponse(true);
-        axios.post(users.follow_user(_id), { userId: authState.user._id })
-            .then(({ data }) => {
-                const { authUser, userToFollow } = data;
+        try {
+            const { data } = await users.follow(_id);
+            const { authUser, userToFollow } = data;
 
-                axios.post(notifications.follow_user, { authUser, userToFollow })
-                    .then(({ data: notificationData }) => {
-                        const [notification] = notificationData.notifications;
-                        socket.emit('user_followed', authUser, userToFollow, notification);
-                    });
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(false));
+            const { data: notificationData } = await notifications.followUser({ authUser, userToFollow });
+            const [notification] = notificationData.notifications;
+            socket.emit('user_followed', authUser, userToFollow, notification);
+
+        } catch (error) {
+            addToast({ type: 'error', message: error?.response?.data?.message });
+            console.log(".....API ERROR.....", error);
+        } finally {
+            setResponse(false);
+        }
     }
 
-    const handleUnfollow = () => {
+    const handleUnfollow = async () => {
         setResponse(true);
-        axios.post(users.unfollow_user(_id), { userId: authState.user._id })
-            .then(({ data }) => {
-                const { authUser, userToUnfollow } = data;
+        try {
+            const { data } = await users.unfollow(_id);
+            const { authUser, userToUnfollow } = data;
 
-                axios.post(notifications.unfollow_user, { authUser, userToUnfollow })
-                    .then(({ data: notificationData }) => {
-                        const [notification] = notificationData.notifications;
-                        socket.emit('user_unfollowed', authUser, userToUnfollow, notification);
-                    });
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(false));
+
+            const { data: notificationData } = await notifications.unfollowUser({ authUser, userToUnfollow });
+            const [notification] = notificationData.notifications;
+            socket.emit('user_unfollowed', authUser, userToUnfollow, notification);
+
+        } catch (error) {
+            addToast({ type: 'error', message: error?.response?.data?.message });
+            console.log(".....API ERROR.....", error);
+        } finally {
+            setResponse(false);
+        }
     }
 
     const handleClick = () => {

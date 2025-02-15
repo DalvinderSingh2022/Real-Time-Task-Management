@@ -1,39 +1,38 @@
-import { useContext, useEffect } from 'react'
-import axios from 'axios';
+import { useContext, useEffect } from 'react';
 
 import { TasksContext } from '../store/TasksContext';
 import { UsersContext } from '../store/UsersContext';
 import { NotificationsContext } from '../store/NotificationContext';
 import { notifications, tasks, users } from '../utils/apiendpoints';
 
-const useLoadStates = (user) => {
+const useLoadStates = () => {
     const { loadTasks, tasksState } = useContext(TasksContext);
     const { loadUsers, usersState } = useContext(UsersContext);
     const { loadNotifications, notificationsState } = useContext(NotificationsContext);
 
     useEffect(() => {
-        if (!usersState.loaded && user) {
-            axios.get(users.all_users)
+        if (!usersState.loaded) {
+            users.all()
                 .then(({ data }) => loadUsers(data.users))
                 .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadUsers, usersState, user]);
+    }, [loadUsers, usersState]);
 
     useEffect(() => {
-        if (!notificationsState.loaded && user) {
-            axios.get(notifications.all_notifications(user._id))
+        if (!notificationsState.loaded) {
+            notifications.all()
                 .then(({ data }) => loadNotifications(data.notifications))
                 .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadNotifications, notificationsState, user]);
+    }, [loadNotifications, notificationsState]);
 
     useEffect(() => {
-        if (!tasksState.loaded && user) {
-            axios.get(tasks.all_tasks(user._id))
+        if (!tasksState.loaded) {
+            tasks.all()
                 .then(({ data }) => loadTasks(data.tasks))
                 .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadTasks, tasksState, user]);
+    }, [loadTasks, tasksState]);
 }
 
 export default useLoadStates;

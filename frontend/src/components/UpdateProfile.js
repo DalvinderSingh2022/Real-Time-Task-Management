@@ -1,5 +1,4 @@
 import React, { memo, useCallback, useContext, useEffect, useState } from 'react';
-import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -33,7 +32,7 @@ const UpdateProfile = ({ remove }) => {
         return avatar
     }, [profile.name]);
 
-    const handlesubmit = (e) => {
+    const handlesubmit = async (e) => {
         e.preventDefault();
         const user = {
             name: profile.name,
@@ -41,37 +40,35 @@ const UpdateProfile = ({ remove }) => {
         }
 
         setResponse(true);
-        axios.put(users.update_user(authState.user._id), user)
-            .then(({ data: userData }) => {
-                socket.emit('user_update', userData.user);
-                login(userData.user);
-                addToast({ type: 'success', message: userData.message });
-                remove();
+        try {
+            const { data: userData } = await users.update(user);
+            socket.emit('user_update', userData.user);
+            login(userData.user);
+            addToast({ type: 'success', message: userData.message });
+            remove();
 
-                axios.get(tasks.all_tasks(userData.user._id))
-                    .then(({ data: taskData }) => {
-                        taskData.tasks.forEach(task => {
-                            let updatedTask = task;
+            const { data: taskData } = await tasks.all();
+            taskData.tasks.forEach(task => {
+                let updatedTask = task;
 
-                            if (updatedTask.assignedBy._id === userData.user._id) {
-                                updatedTask = { ...updatedTask, assignedBy: { ...updatedTask.assignedBy, avatar: userData.user.avatar } };
-                            }
-                            if (updatedTask.assignedTo.some(user => user._id === userData.user._id)) {
-                                updatedTask = {
-                                    ...updatedTask,
-                                    assignedTo: updatedTask.assignedTo.map(user => user._id === userData.user._id ? { ...user, avatar: userData.user.avatar } : user)
-                                };
-                            }
+                if (updatedTask.assignedBy._id === userData.user._id) {
+                    updatedTask = { ...updatedTask, assignedBy: { ...updatedTask.assignedBy, avatar: userData.user.avatar } };
+                }
+                if (updatedTask.assignedTo.some(user => user._id === userData.user._id)) {
+                    updatedTask = {
+                        ...updatedTask,
+                        assignedTo: updatedTask.assignedTo.map(user => user._id === userData.user._id ? { ...user, avatar: userData.user.avatar } : user)
+                    };
+                }
 
-                            socket.emit('task_updated', updatedTask);
-                        });
-                    })
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(false));
+                socket.emit('task_updated', updatedTask);
+            });
+        } catch (error) {
+            addToast({ type: 'error', message: error?.response?.data?.message });
+            console.log(".....API ERROR.....", error);
+        } finally {
+            setResponse(false);
+        }
     }
 
     useEffect(() => {

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import axios from 'axios';
 
 import homeStyles from "../styles/home.module.css";
 import authStyles from "../styles/auth.module.css";
@@ -45,7 +44,7 @@ const ViewTask = (prop) => {
         setTask(prev => ({ ...prev, [name]: value }));
     }
 
-    const handlesubmit = (e) => {
+    const handlesubmit = async (e) => {
         e.preventDefault();
 
         const changes = {};
@@ -61,43 +60,42 @@ const ViewTask = (prop) => {
 
         if (Object.keys(changes).length) {
             setResponse('save');
-            axios.put(tasks.update_task(id), task)
-                .then(({ data }) => {
-                    setTask(data.updatedTask);
-                    setOriginalTask(data.updatedTask);
+            try {
+                const { data } = await tasks.update(id, task);
+                setTask(data.task);
+                setOriginalTask(data.task);
 
-                    axios.post(notifications.update_task, { changes, task: data.updatedTask, oldTask: originalTask })
-                        .then(({ data: notificationData }) => {
-                            const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                            socket.emit('task_updated', data.updatedTask, authState.user, notification, originalTask);
-                        });
-                })
-                .catch((error) => {
-                    addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.log(".....API ERROR.....", error);
-                })
-                .finally(() => setResponse(''));
+                const { data: notificationData } = await notifications.updateTask({ changes, task: data.task, oldTask: originalTask });
+                const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+                socket.emit('task_updated', data.task, authState.user, notification, originalTask);
+
+            } catch (error) {
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR.....", error);
+            } finally {
+                setResponse('');
+            }
         } else {
             addToast({ type: 'error', message: "No changes made to save" });
         }
     }
 
-    const handelDelete = () => {
+    const handelDelete = async () => {
         setResponse('delete');
-        axios.delete(tasks.delete_task(id))
-            .then(() => {
-                axios.post(notifications.delete_task, { task })
-                    .then(({ data: notificationData }) => {
-                        const notification = notificationData.notifications.find(n => n.user === authState.user._id);
-                        socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy, notification);
-                        navigate('/tasks');
-                    });
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(''));
+        try {
+            await tasks.delete(id);
+            const { data: notificationData } = await notifications.deleteTask(task);
+
+            const notification = notificationData.notifications.find(n => n.user === authState.user._id);
+            socket.emit('task_deleted', { _id: id, ...task }, task.assignedTo, task.assignedBy, notification);
+            navigate('/tasks');
+
+        } catch (error) {
+            addToast({ type: 'error', message: error?.response?.data?.message });
+            console.log(".....API ERROR.....", error);
+        } finally {
+            setResponse('');
+        }
     }
 
     return (

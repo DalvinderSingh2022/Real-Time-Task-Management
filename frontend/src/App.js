@@ -1,6 +1,5 @@
 import React, { lazy, Suspense, useContext, useEffect, useState } from 'react';
 import { Routes, Route } from 'react-router-dom';
-import axios from 'axios';
 
 import Layout from './components/Layout';
 import Loading from './components/Loading';
@@ -28,15 +27,15 @@ const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
     const { authState, login, verify } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
-    useLoadStates(authState.user);
+    useLoadStates();
     useSocket();
 
     useEffect(() => {
         if (authState.verified) return;
 
         setLoadingMsg("Fetching user details, please wait...");
-        axios.get(users.current_user, { headers: { Authorization: localStorage.getItem("jwt") } })
-            .then(({ data }) => login(data.user))
+
+        users.current().then(({ data }) => login(data.user))
             .catch((error) => {
                 verify();
                 addToast({ type: 'error', message: error?.response?.data?.message });

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 
 import styles from '../styles/taskdetails.module.css';
 import homeStyles from "../styles/home.module.css";
@@ -18,15 +17,13 @@ const TaskDetails = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        (async () => {
-            axios.get(tasks.get_task(id))
-                .then(({ data }) => setTask(data.task))
-                .catch((error) => {
-                    setInvalidId(true);
-                    addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.log(".....API ERROR.....", error);
-                });
-        })();
+        tasks.get(id)
+            .then(({ data }) => setTask(data.task))
+            .catch((error) => {
+                setInvalidId(true);
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR.....", error);
+            });
     }, [id, addToast]);
 
     if (invalidId) return <NotFound />;

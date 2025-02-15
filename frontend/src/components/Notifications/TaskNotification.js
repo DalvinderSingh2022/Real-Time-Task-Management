@@ -26,8 +26,8 @@ const TaskNotification = (prop) => {
         oldValue = new Date(oldValue).toDateString();
         newValue = new Date(newValue).toDateString();
     } else if (field === 'assignedTo') {
-        oldValue = oldValue.map(user => user._id !== authState.user._id ? user.name : "(You)").join(", ");
-        newValue = newValue.map(user => user._id !== authState.user._id ? user.name : "(You)").join(", ");
+        oldValue = oldValue.map(user => user.name += (user._id !== authState.user._id ? "" : "(You)")).join(", ");
+        newValue = newValue.map(user => user.name += (user._id !== authState.user._id ? "" : "(You)")).join(", ");
     }
 
     return (

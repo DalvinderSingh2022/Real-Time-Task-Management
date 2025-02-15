@@ -1,5 +1,4 @@
 import React, { memo, useContext, useState } from 'react';
-import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -25,9 +24,9 @@ const AddTask = ({ remove, initialAssignedTo }) => {
         );
     };
 
-    const handlesubmit = (e) => {
+    const handlesubmit = async (e) => {
         e.preventDefault();
-        const task = {
+        const body = {
             title: e.target.title.value,
             description: e.target.description.value,
             dueDate: e.target.dueDate.value,
@@ -36,22 +35,20 @@ const AddTask = ({ remove, initialAssignedTo }) => {
         }
 
         setResponse(true);
-        axios.post(tasks.create_task, task)
-            .then(({ data: taskData }) => {
-                const { task } = taskData;
+        try {
+            const { data: taskData } = await tasks.create(body);
+            const { task } = taskData;
 
-                axios.post(notifications.assign_task, { task })
-                    .then(({ data: notificationData }) => {
-                        const [notification] = notificationData.notifications;
-                        socket.emit('task_created', task, notification);
-                        remove();
-                    });
-            })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(false));
+            const { data: notificationData } = await notifications.assignTask(task);
+            const [notification] = notificationData.notifications;
+            socket.emit('task_created', task, notification);
+            remove();
+        } catch (taskError) {
+            addToast({ type: 'error', message: taskError?.response?.data?.message });
+            console.log(".....TASK API ERROR.....", taskError);
+        } finally {
+            setResponse(false);
+        }
     }
 
     return (

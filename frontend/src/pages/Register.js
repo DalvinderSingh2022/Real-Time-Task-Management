@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import axios from "axios";
 
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
@@ -30,12 +29,11 @@ const Register = () => {
         }
 
         setResponse(true);
-        axios.post(users.register_user, user)
-            .then(({ data }) => {
-                socket.emit('user_join', data.user);
-                addToast({ type: 'success', message: data.message });
-                navigate("/login");
-            })
+        users.register(user).then(({ data }) => {
+            socket.emit('user_join', data.user);
+            addToast({ type: 'success', message: data.message });
+            navigate("/login");
+        })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
                 console.log(".....API ERROR.....", error);

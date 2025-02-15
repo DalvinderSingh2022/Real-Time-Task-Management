@@ -2,7 +2,7 @@ const { NotificationTypes, Notification } = require("../models/notification.mode
 
 // Find all notifications for current user 
 const allNotifications = async (req, res) => {
-    const userId = req.params.userId;
+    const userId = req.userId;
 
     if (!userId) {
         return res.status(400).json({ message: "Missing requirements to process request" });
@@ -19,10 +19,10 @@ const allNotifications = async (req, res) => {
 
 // Update a Notification
 const updateNotification = async (req, res) => {
-    // Find the Notification with the given _id
     const notificationId = req.params.id;
+    const notification = req.body;
 
-    if (!notificationId) {
+    if (!notificationId || !notification) {
         return res.status(400).json({ message: "Missing requirements to process request" });
     }
 
@@ -30,11 +30,11 @@ const updateNotification = async (req, res) => {
         // Update the Notification with the new data
         const updatedNotification = await Notification.findByIdAndUpdate(
             notificationId,
-            req.body,
+            notification,
             { new: true, runValidators: true }
         );
 
-        return res.status(200).json({ message: 'Notification updated successfully', updatedNotification });
+        return res.status(200).json({ message: 'Notification updated successfully', notification: updatedNotification });
     } catch (error) {
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
@@ -64,7 +64,7 @@ const taskAssign = async (req, res, next) => {
     const { task } = req.body;
 
     if (!task || !task.assignedBy || !Array.isArray(task.assignedTo) || task.assignedTo.length === 0) {
-        return res.status(400).send('Invalid task data');
+        return res.status(400).json({ message: 'Invalid task data' });
     }
 
     req.message = `New Task: You have been assigned "${task.title}" by ${task.assignedBy.name}.`;
@@ -80,7 +80,7 @@ const taskUpdate = async (req, res, next) => {
     const { changes, task, oldTask } = req.body;
 
     if (!task || !changes) {
-        return res.status(400).send('Invalid task update data');
+        return res.status(400).json({ message: 'Invalid task update data' });
     }
 
     req.message = `Task Update: The task "${task.title}" has been updated.`;
@@ -104,7 +104,7 @@ const taskDelete = async (req, res, next) => {
     const { task } = req.body;
 
     if (!task || !task.assignedBy) {
-        return res.status(400).send('Invalid task data');
+        return res.status(400).json({ message: 'Invalid task data' });
     }
 
     req.message = `Task Deleted: The task "${task.title}" has been deleted by ${task.assignedBy.name}.`;
@@ -125,7 +125,7 @@ const followUser = (req, res, next) => {
     const { authUser, userToFollow } = req.body;
 
     if (!authUser || !userToFollow) {
-        return res.status(400).send('Invalid follow data');
+        return res.status(400).json({ message: 'Invalid follow data' });
     }
 
     req.type = NotificationTypes.USER_FOLLOW;
@@ -141,7 +141,7 @@ const unFollowUser = (req, res, next) => {
     const { authUser, userToUnfollow } = req.body;
 
     if (!authUser || !userToUnfollow) {
-        return res.status(400).send('Invalid unfollow data');
+        return res.status(400).json({ message: 'Invalid unfollow data' });
     }
 
     req.type = NotificationTypes.USER_UNFOLLOW;
@@ -157,7 +157,7 @@ const dueDate = (req, res, next) => {
     const { tasks, user } = req.body;
 
     if (!tasks || !Array.isArray(tasks) || tasks.length === 0) {
-        return res.status(400).send('Invalid tasks data');
+        return res.status(400).json({ message: 'Invalid tasks data' });
     }
 
     req.type = NotificationTypes.DUE_DATE_REMINDER;

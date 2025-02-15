@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
-import axios from 'axios';
 
 import { GoHomeFill } from "react-icons/go";
 import { FaUsers } from "react-icons/fa";
@@ -39,11 +38,10 @@ const Sidebar = () => {
 
     const handleDelete = () => {
         setResponse(true);
-        axios.delete(users.delete_user(authState.user._id))
-            .then(() => {
-                socket.emit('user_left', authState.user);
-                handleLogout();
-            })
+        users.delete().then(() => {
+            socket.emit('user_left', authState.user);
+            handleLogout();
+        })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
                 console.log(".....API ERROR.....", error);

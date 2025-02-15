@@ -25,7 +25,7 @@ const addTask = async (req, res) => {
 
 // Retrieve all tasks for a user
 const allTasks = async (req, res) => {
-    const userId = req.params.userId;
+    const userId = req.userId;
 
     if (!userId) {
         return res.status(400).json({ message: "Missing requirements to process request" });
@@ -101,10 +101,10 @@ const removeTask = async (req, res) => {
 
 // Update a task
 const updateTask = async (req, res) => {
-    // Find the task with the given _id
     const taskId = req.params.id;
+    const task = req.body;
 
-    if (!taskId) {
+    if (!taskId || !task) {
         return res.status(400).json({ message: "Missing requirements to process request" });
     }
 
@@ -113,14 +113,14 @@ const updateTask = async (req, res) => {
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
         const updatedTask = await Task.findByIdAndUpdate(
             taskId,
-            req.body,
+            task,
             { new: true, runValidators: true, }
         ).populate([
             { path: 'assignedTo', select: '_id name avatar' },
             { path: 'assignedBy', select: '_id name avatar' }
         ]);
 
-        return res.status(200).json({ message: 'Task updated successfully', updatedTask });
+        return res.status(200).json({ message: 'Task updated successfully', task: updatedTask });
     } catch (error) {
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }

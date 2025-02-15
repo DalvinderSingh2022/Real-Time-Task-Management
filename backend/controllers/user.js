@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/user.model');
 const Task = require('../models/task.model');
 const Comment = require('../models/comment.model');
+const { Notification } = require('../models/notification.model');
 require("dotenv").config();
 
 //helper function to generate avatar
@@ -91,22 +92,10 @@ const login = async (req, res) => {
 
 // Get the current user
 const currentUser = async (req, res) => {
-    const token = req.headers?.Authorization || req.headers?.authorization;
-
-    // Return an error response if JWT token is missing
-    if (!token) {
-        return res.status(401).json({ message: "User is not authorized or token is missing" });
-    }
+    const userId = req.userId;
 
     try {
-        // Verify the JWT token
-        // and Populate the followers and following fields with the corresponding users data
-        const validUser = jwt.verify(token, process.env.SECRET_KEY);
-        if (!validUser) {
-            return res.status(401).json({ message: "User is not authorized" });
-        }
-
-        const user = await User.findById(validUser.id).select("-password");
+        const user = await User.findById(userId).select("-password");
         if (!user) {
             return res.status(404).json({ message: "User Not found, Refresh Page" });
         }
@@ -124,7 +113,7 @@ const currentUser = async (req, res) => {
 
 // Delete a user
 const removeUser = async (req, res) => {
-    const userId = req.params.id;
+    const userId = req.userId;
 
     if (!userId) {
         return res.status(400).json({ message: "Missing requirements to process request" });
@@ -161,6 +150,9 @@ const removeUser = async (req, res) => {
         // Remove the user from all following
         await User.updateMany({ following: user._id }, { $pull: { following: user._id } });
 
+        // Delete all notifications of user
+        await Notification.deleteMany({ user: user._id });
+
         // Delete user
         await User.findByIdAndDelete({ _id: userId });
 
@@ -191,24 +183,24 @@ const allUsers = async (req, res) => {
 
 // Update a User
 const updateUser = async (req, res) => {
-    // Find the User with the given _id
-    const userId = req.params.id;
+    const userId = req.userId;
+    const user = req.body;
 
-    if (!userId) {
+    if (!userId || !user) {
         return res.status(400).json({ message: "Missing requirements to process request" });
     }
 
     try {
         // Update the User with the new data
         // and Populate the followers and following fields with the corresponding users data
-        const user = await User.findByIdAndUpdate(userId, req.body, { new: true, runValidators: true })
+        const updatedUser = await User.findByIdAndUpdate(userId, user, { new: true, runValidators: true })
             .select("-password")
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }
             ]);;
 
-        return res.status(200).json({ message: 'User updated successfully', user });
+        return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
     } catch (error) {
         return res.status(500).json({ message: error.message || "Internal Server Error" });
     }
@@ -217,7 +209,7 @@ const updateUser = async (req, res) => {
 // Follow another user
 const followUser = async (req, res) => {
     const userId = req.params.userId;
-    const authUserId = req.body.userId;
+    const authUserId = req.userId;
 
     if (!userId || !authUserId) {
         return res.status(400).json({ message: "Missing requirements to process request" });
@@ -271,7 +263,7 @@ const followUser = async (req, res) => {
 // Unfollow another user
 const unfolloweUser = async (req, res) => {
     const userId = req.params.userId;
-    const authUserId = req.body.userId;
+    const authUserId = req.userId;
 
     if (!userId || !authUserId) {
         return res.status(400).json({ message: "Missing requirements to process request" });

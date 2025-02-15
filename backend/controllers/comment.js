@@ -27,7 +27,8 @@ const allComments = async (req, res) => {
 
 // Create a new comment
 const addComment = async (req, res) => {
-    const { comment, userId } = req.body;
+    const userId = req.userId;
+    const comment = req.body.comment;
     const taskId = req.params.taskId;
 
     if (!taskId || !userId) {

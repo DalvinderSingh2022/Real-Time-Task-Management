@@ -1,6 +1,5 @@
 import React, { memo, useContext, useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import axios from 'axios';
 
 import authStyles from "../styles/auth.module.css";
 import homeStyles from "../styles/home.module.css";
@@ -22,14 +21,11 @@ const TaksComments = ({ task }) => {
     const messagesRef = useRef(null);
 
     useEffect(() => {
-        (async () => {
-            await axios.get(comments.get_comments(id))
-                .then(({ data }) => setAllComments(data.comments))
-                .catch((error) => {
-                    addToast({ type: 'error', message: error?.response?.data?.message });
-                    console.log(".....API ERROR.....", error);
-                });
-        })();
+        comments.get(id).then(({ data }) => setAllComments(data.comments))
+            .catch((error) => {
+                addToast({ type: 'error', message: error?.response?.data?.message });
+                console.log(".....API ERROR.....", error);
+            });
     }, [id, addToast]);
 
     useEffect(() => {
@@ -70,15 +66,10 @@ const TaksComments = ({ task }) => {
         e.preventDefault();
 
         setResponse(true);
-        await axios.post(comments.create_comment(id),
-            {
-                comment,
-                userId: authState.user._id
-            })
-            .then(({ data }) => {
-                socket.emit('send_comment', data.comment, id);
-                setComment('');
-            })
+        comments.create(id, comment).then(({ data }) => {
+            socket.emit('send_comment', data.comment, id);
+            setComment('');
+        })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
                 console.log(".....API ERROR.....", error);

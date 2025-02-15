@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
-import axios from "axios";
 
 import { FiEye } from "react-icons/fi";
 import { FiEyeOff } from "react-icons/fi";
@@ -31,13 +30,12 @@ const Login = () => {
         }
 
         setResponse(true);
-        axios.put(users.login_user, user)
-            .then(({ data }) => {
-                login(data.user);
-                localStorage.setItem("jwt", data.token);
-                addToast({ type: 'success', message: data.message });
-                navigate("/");
-            })
+        users.login(user).then(({ data }) => {
+            login(data.user);
+            localStorage.setItem("jwt", data.token);
+            addToast({ type: 'success', message: data.message });
+            navigate("/");
+        })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message });
                 console.log(".....API ERROR.....", error);
