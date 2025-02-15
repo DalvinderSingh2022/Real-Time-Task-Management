@@ -106,13 +106,13 @@ const UpdateProfile = ({ remove }) => {
                         {Object.entries(options).map(([key, value]) => (
                             <div key={value} className={`flex col w_full profile_group ${authStyles.group}`}>
                                 <label htmlFor="status" className='text_primary'>{key.slice(0, 1).toUpperCase() + key.slice(1)}</label>
-                                <div key={value} className={`flex col w_full ${authStyles.group}`}>
+                                <div className={`flex col w_full ${authStyles.group}`}>
                                     <div className={`${modalStyles.check_container} flex`}>
                                         {value.map((option) => (
-                                            <label key={option} htmlFor={option} className={modalStyles.checkbox}>
+                                            <label key={option} htmlFor={key + option} className={modalStyles.checkbox}>
                                                 <input
                                                     type="checkbox"
-                                                    id={option}
+                                                    id={key + option}
                                                     checked={profile[key] === option}
                                                     onChange={() => setProfile(prev => ({ ...prev, [key]: option }))}
                                                 />

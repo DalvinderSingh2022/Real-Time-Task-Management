@@ -19,7 +19,7 @@ const User = ({ name, followers, _id, avatar, removeButton }) => {
 
     useEffect(() => {
         if (authState.authenticated) {
-            setFollowing(authState.user.following.find(user => user._id === _id));
+            setFollowing(authState.user.following.some(user => user._id === _id));
         }
     }, [authState, _id]);
 

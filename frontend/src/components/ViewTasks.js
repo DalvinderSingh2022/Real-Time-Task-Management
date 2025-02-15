@@ -31,9 +31,10 @@ const ViewTask = (prop) => {
     }, [prop, task, originalTask]);
 
     const handleAssignedToToggle = (user) => {
-        const newAssignedTo = task.assignedTo.find(u => u._id === user._id)
-            ? task.assignedTo.filter((u) => u._id !== user._id)
-            : [...task.assignedTo, user];
+        let newAssignedTo = task.assignedTo;
+        const userIndex = newAssignedTo.findIndex(u => u._id === user._id);
+
+        (userIndex > -1) ? newAssignedTo.splice(userIndex, 1) : newAssignedTo.push(user);
 
         setTask(prev => ({ ...prev, assignedTo: newAssignedTo }));
     };
@@ -210,7 +211,7 @@ const ViewTask = (prop) => {
                                             <input
                                                 type="checkbox"
                                                 id={user._id}
-                                                checked={task.assignedTo.find(u => user._id === u._id)}
+                                                checked={task.assignedTo.some(u => user._id === u._id)}
                                                 onChange={() => handleAssignedToToggle(user)}
                                             />
                                             <div className={`flex ${modalStyles.check_label}`}>
@@ -225,7 +226,7 @@ const ViewTask = (prop) => {
                             {authState.user._id === task.assignedBy._id &&
                                 <button type='button' className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`} onClick={handelDelete}>Delete{response === 'delete' && <div className='loading' style={{ borderBottomColor: 'var(--red)' }}></div>}</button>
                             }
-                            {(authState.user._id === task.assignedBy._id || task.assignedTo.find(user => user._id === authState.user._id)) &&
+                            {(authState.user._id === task.assignedBy._id || task.assignedTo.some(user => user._id === authState.user._id)) &&
                                 <button className={`button primary flex gap2 ${authStyles.submit_button}`}>Save{response === 'save' && <div className='loading'></div>}</button>
                             }
                         </div>
