@@ -27,7 +27,7 @@ const App = () => {
     const [loadingMsg, setLoadingMsg] = useState('');
     const { authState, login, verify } = useContext(AuthContext);
     const { addToast } = useContext(AppContext);
-    useLoadStates();
+    useLoadStates(authState.user);
     useSocket();
 
     useEffect(() => {

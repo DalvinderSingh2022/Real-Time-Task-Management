@@ -39,6 +39,10 @@ const UpdateProfile = ({ remove }) => {
             avatar: getAvatar(profile)
         }
 
+        if (user.name === authState.user.name && user.avatar === authState.user.avatar) {
+            return addToast({ type: 'error', message: "No changes made to save" });
+        }
+
         setResponse(true);
         try {
             const { data: userData } = await users.update(user);
@@ -113,7 +117,7 @@ const UpdateProfile = ({ remove }) => {
                                                     checked={profile[key] === option}
                                                     onChange={() => setProfile(prev => ({ ...prev, [key]: option }))}
                                                 />
-                                                <img className={`flex avatar ${modalStyles.check_label}`} alt={option} title={option} src={`${getAvatar(({ ...profile, [key]: option }))}`} />
+                                                <img className={`flex avatar ${modalStyles.check_label}`} alt={option} title={option} src={getAvatar(({ ...profile, [key]: option }))} />
                                             </label>
                                         ))}
                                     </div>

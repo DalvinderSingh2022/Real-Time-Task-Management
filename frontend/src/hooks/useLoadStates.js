@@ -6,44 +6,35 @@ import { UsersContext } from '../store/UsersContext';
 import { NotificationsContext } from '../store/NotificationContext';
 import { notifications, tasks, users } from '../utils/apiendpoints';
 
-const useLoadStates = () => {
+const useLoadStates = (user) => {
     const { addToast } = useContext(AppContext);
     const { loadTasks, tasksState } = useContext(TasksContext);
     const { loadUsers, usersState } = useContext(UsersContext);
     const { loadNotifications, notificationsState } = useContext(NotificationsContext);
 
     useEffect(() => {
-        if (!usersState.loaded) {
+        if (!usersState.loaded && user) {
             users.all()
                 .then(({ data }) => loadUsers(data.users))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadUsers, usersState, addToast]);
+    }, [loadUsers, usersState, addToast, user]);
 
     useEffect(() => {
-        if (!notificationsState.loaded) {
+        if (!notificationsState.loaded && user) {
             notifications.all()
                 .then(({ data }) => loadNotifications(data.notifications))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadNotifications, notificationsState, addToast]);
+    }, [loadNotifications, notificationsState, addToast, user]);
 
     useEffect(() => {
-        if (!tasksState.loaded) {
+        if (!tasksState.loaded && user) {
             tasks.all()
                 .then(({ data }) => loadTasks(data.tasks))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadTasks, tasksState, addToast]);
+    }, [loadTasks, tasksState, addToast, user]);
 }
 
 export default useLoadStates;
