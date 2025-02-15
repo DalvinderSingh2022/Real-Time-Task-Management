@@ -61,7 +61,7 @@ const removeNotification = async (req, res) => {
 
 // Task Assignment Notification
 const taskAssign = async (req, res, next) => {
-    const { task } = req.body;
+    const task = req.body;
 
     if (!task || !task.assignedBy || !Array.isArray(task.assignedTo) || task.assignedTo.length === 0) {
         return res.status(400).json({ message: 'Invalid task data' });
@@ -101,7 +101,7 @@ const taskUpdate = async (req, res, next) => {
 
 // Task Deletion Notification
 const taskDelete = async (req, res, next) => {
-    const { task } = req.body;
+    const task = req.body;
 
     if (!task || !task.assignedBy) {
         return res.status(400).json({ message: 'Invalid task data' });

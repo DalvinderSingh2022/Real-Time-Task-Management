@@ -43,9 +43,9 @@ const AddTask = ({ remove, initialAssignedTo }) => {
             const [notification] = notificationData.notifications;
             socket.emit('task_created', task, notification);
             remove();
-        } catch (taskError) {
-            addToast({ type: 'error', message: taskError?.response?.data?.message });
-            console.log(".....TASK API ERROR.....", taskError);
+        } catch (error) {
+            addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
+            console.log(".....TASK API ERROR.....", error);
         } finally {
             setResponse(false);
         }

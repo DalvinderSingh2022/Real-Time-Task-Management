@@ -43,6 +43,5 @@ export const notifications = {
     updateTask: (data) => axiosInstance.post('/notifications/update-task', data),
     deleteTask: (data) => axiosInstance.post('/notifications/delete-task', data),
     followUser: (data) => axiosInstance.post('/notifications/follow-user', data),
-    unfollowUser: (data) => axiosInstance.post('/notifications/unfollow-user', data),
-    dueDateReminder: (data) => axiosInstance.post('/notifications/due-date-reminder', data),
+    unfollowUser: (data) => axiosInstance.post('/notifications/unfollow-user', data)
 };
