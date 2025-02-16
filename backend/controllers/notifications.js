@@ -69,7 +69,7 @@ const taskAssign = async (req, res, next) => {
 
     req.message = `New Task: You have been assigned "${task.title}" by ${task.assignedBy.name}.`;
     req.data = { task };
-    req.users = task.assignedTo.map(user => user._id);
+    req.users = [...new Set(task.assignedTo.map(user => user._id))];
     req.type = NotificationTypes.TASK_ASSIGNMENT;
 
     next();
@@ -94,7 +94,7 @@ const taskUpdate = async (req, res, next) => {
     oldTask.assignedTo.forEach(user => {
         if (!users.includes(user._id)) users.push(user._id);
     });
-    req.users = users;
+    req.users = [...new Set(users)];
 
     next();
 };
@@ -115,7 +115,7 @@ const taskDelete = async (req, res, next) => {
     if (!users.includes(task.assignedBy._id)) {
         users.push(task.assignedBy._id);
     }
-    req.users = users;
+    req.users = [...new Set(users)];
 
     next();
 };

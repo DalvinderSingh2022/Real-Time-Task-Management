@@ -34,12 +34,15 @@ const allTasks = async (req, res) => {
     try {
         // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const tasks = await Task.find({ $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }] })
+        let tasks = await Task.find({ $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }] })
             .sort({ updatedAt: 'desc' })
             .populate([
                 { path: 'assignedTo', select: '_id name avatar' },
                 { path: 'assignedBy', select: '_id name avatar' }
             ]);
+
+        const statusOrder = { "In Progress": 1, "Not Started": 2, "Completed": 3 };
+        tasks = tasks.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
         res.status(200).json({ message: 'All Task fetched successfully', tasks });
     } catch (error) {
