@@ -28,7 +28,10 @@ const DeleteButton = ({ response, setResponse, prop }) => {
     const handleDelete = () => {
         setResponse(true);
         notifications.delete(prop._id)
-            .then(() => deleteNotification(prop._id))
+            .then(() => {
+                addToast({ type: 'success', message: 'Notification deleted' });
+                deleteNotification(prop._id)
+            })
             .catch((error) => {
                 addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
                 console.log(".....API ERROR.....", error);

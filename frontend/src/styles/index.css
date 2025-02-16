@@ -428,6 +428,10 @@ button .loading {
     gap: 1.2em;
     width: 340px;
     justify-content: space-between;
+    box-shadow: 0 0 42px 0 var(--shadow-color);
+    opacity: 0;
+    transform: translateX(20px);
+    animation: slideIn 0.2s ease-out forwards;
 }
 
 .toast .type {
@@ -468,6 +472,18 @@ button .loading {
     width: 100%;
     background-color: var(--color);
     animation: toast 3s ease-in-out forwards;
+}
+
+@keyframes slideIn {
+    0% {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
 }
 
 .response {

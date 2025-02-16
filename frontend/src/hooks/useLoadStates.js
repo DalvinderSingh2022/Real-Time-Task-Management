@@ -7,43 +7,35 @@ import { NotificationsContext } from '../store/NotificationContext';
 import { notifications, tasks, users } from '../utils/apiendpoints';
 
 const useLoadStates = () => {
+    const token = localStorage.getItem("jwt");
     const { addToast } = useContext(AppContext);
     const { loadTasks, tasksState } = useContext(TasksContext);
     const { loadUsers, usersState } = useContext(UsersContext);
     const { loadNotifications, notificationsState } = useContext(NotificationsContext);
 
     useEffect(() => {
-        if (!usersState.loaded) {
+        if (!usersState.loaded && token) {
             users.all()
                 .then(({ data }) => loadUsers(data.users))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadUsers, usersState, addToast]);
+    }, [loadUsers, usersState, addToast, token]);
 
     useEffect(() => {
-        if (!notificationsState.loaded) {
+        if (!notificationsState.loaded && token) {
             notifications.all()
                 .then(({ data }) => loadNotifications(data.notifications))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadNotifications, notificationsState, addToast]);
+    }, [loadNotifications, notificationsState, addToast, token]);
 
     useEffect(() => {
-        if (!tasksState.loaded) {
+        if (!tasksState.loaded && token) {
             tasks.all()
                 .then(({ data }) => loadTasks(data.tasks))
-                .catch(error => {
-                    addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                    console.log(".....API ERROR.....", error);
-                });
+                .catch(error => console.log(".....API ERROR.....", error));
         }
-    }, [loadTasks, tasksState, addToast]);
+    }, [loadTasks, tasksState, addToast, token]);
 }
 
 export default useLoadStates;

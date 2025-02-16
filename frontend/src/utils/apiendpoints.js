@@ -1,14 +1,20 @@
 import axios from 'axios';
 
 const BASE_URL = `${process.env.REACT_APP_API_BASE_URL}api`;
-const token = localStorage.getItem('jwt');
 
 const axiosInstance = axios.create({
     baseURL: BASE_URL,
     headers: {
-        'Authorization': token,
         'Content-Type': 'application/json',
     },
+});
+
+axiosInstance.interceptors.request.use((config) => {
+    const token = localStorage.getItem("jwt");
+    if (token) {
+        config.headers['Authorization'] = token;
+    }
+    return config;
 });
 
 export const users = {
@@ -43,6 +49,5 @@ export const notifications = {
     updateTask: (data) => axiosInstance.post('/notifications/update-task', data),
     deleteTask: (data) => axiosInstance.post('/notifications/delete-task', data),
     followUser: (data) => axiosInstance.post('/notifications/follow-user', data),
-    unfollowUser: (data) => axiosInstance.post('/notifications/unfollow-user', data),
-    dueDateReminder: (data) => axiosInstance.post('/notifications/due-date-reminder', data),
+    unfollowUser: (data) => axiosInstance.post('/notifications/unfollow-user', data)
 };
