@@ -10,13 +10,12 @@ import TaskSection from '../components/TaskSection';
 import AddTask from '../components/AddTask';
 import useSearch from '../hooks/useSearch';
 
+const TaskStatusTypes = ["Not Started", "In Progress", "Completed"]
 const TaskDueTypes = ['Due Today', 'Due Tomorrow', 'Due Yesterday', 'Due This Week', 'Due Last Week', 'Due This Month', 'Over due'];
 
 const Tasks = () => {
     const { tasksState } = useContext(TasksContext);
-    const [notStarted, setNotStarted] = useState(null);
-    const [progress, setProgress] = useState(null);
-    const [completed, setCompleted] = useState(null);
+    const [taskGroups, setTaskGroups] = useState({ notStarted: [], inProgress: [], completed: [] });
     const [handleChange, tasks, query] = useSearch(tasksState.tasks, 'title', 'dueStatus');
 
     useEffect(() => {
@@ -28,18 +27,16 @@ const Tasks = () => {
             return acc;
         }, { notstarted: [], inprogress: [], completed: [] });
 
-        setNotStarted(groupedTasks.notstarted);
-        setProgress(groupedTasks.inprogress);
-        setCompleted(groupedTasks.completed);
+        setTaskGroups(groupedTasks);
     }, [tasks]);
 
     return (
         <article>
             <SearchInput handleChange={handleChange} query={query} />
             <div className={styles.container}>
-                <TaskSection tasks={notStarted} status={'Not Started'} />
-                <TaskSection tasks={progress} status={'In Progress'} />
-                <TaskSection tasks={completed} status={'Completed'} />
+                {TaskStatusTypes.map(status => (
+                    (!query.get('status') || (query.get('status') === status)) && <TaskSection tasks={taskGroups[status.replaceAll(" ", "").toLowerCase()]} status={status} />
+                ))}
             </div>
         </article>
     )
@@ -70,8 +67,17 @@ const SearchInput = ({ handleChange, query }) => {
                     name='dueStatus'
                     className='button primary'
                 >
-                    <option value=''>All</option>
+                    <option value=''>All Due Status</option>
                     {TaskDueTypes.map(status => <option key={status} value={status}>{status}</option>)}
+                </select>
+                <select
+                    defaultValue={query.get('status') || ''}
+                    onChange={handleChange}
+                    name='status'
+                    className='button primary'
+                >
+                    <option value=''>All Status</option>
+                    {TaskStatusTypes.map(status => <option key={status} value={status}>{status}</option>)}
                 </select>
                 {response && <div className="loading" style={{ margin: 0 }}></div>}
             </form>

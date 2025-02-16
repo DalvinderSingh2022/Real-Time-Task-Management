@@ -43,10 +43,12 @@
     padding: 0.5em 1em;
     align-items: stretch;
     align-self: stretch;
+    justify-content: flex-start;
 }
 
 .tasks_container .task {
     border-radius: 12px;
+    width: min(calc(100% - 2em), 420px);
     padding: 1em;
     cursor: move;
     align-items: flex-start;

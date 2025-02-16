@@ -9,6 +9,7 @@ import tasksStyles from "../styles/tasks.module.css";
 import User from '../components/User';
 import Task from '../components/Task';
 import { TasksContext } from '../store/TasksContext';
+import { Link } from 'react-router-dom';
 
 const Home = () => {
     const { authState } = useContext(AuthContext);
@@ -16,8 +17,8 @@ const Home = () => {
     const [notStarted, setNotStarted] = useState(0);
     const [progress, setProgress] = useState(0);
     const [completed, setCompleted] = useState(0);
-    const [bySelf, setBySelf] = useState(0);
-    const [byOthers, setByOthers] = useState(0);
+    const [followers, setFollowers] = useState(0);
+    const [following, setFollowings] = useState(0);
 
     useEffect(() => {
         const taskCounts = tasksState.tasks.reduce((acc, task) => {
@@ -27,35 +28,37 @@ const Home = () => {
             if (status === 'inprogress') acc.inProgress++;
             if (status === 'completed') acc.completed++;
 
-            acc[task.assignedBy._id === authState.user._id ? "bySelf" : "byOthers"]++;
-
             return acc;
-        }, { notStarted: 0, inProgress: 0, completed: 0, bySelf: 0, byOthers: 0 });
+        }, { notStarted: 0, inProgress: 0, completed: 0 });
 
         setNotStarted(taskCounts.notStarted);
         setProgress(taskCounts.inProgress);
         setCompleted(taskCounts.completed);
+    }, [tasksState]);
 
-        setBySelf(taskCounts.bySelf);
-        setByOthers(taskCounts.byOthers);
-    }, [tasksState, authState]);
+    useEffect(() => {
+        if (authState.authenticated) {
+            setFollowers(authState.user.followers.length);
+            setFollowings(authState.user.following.length);
+        }
+    }, [authState])
 
     return (
         <article className={styles.article}>
             <section className={styles.graph}>
                 <header>
                     <h2 className='text_primary'>Tasks</h2>
-                    <h4 className='text_secondary'>Task Allocation by Current Status</h4>
+                    <h4 className='text_secondary'>Tasks Allocated by Current Status</h4>
                 </header>
                 <div className={`flex col gap ${styles.graph_wrapper}`}>
                     <div className="total">
                         <span className={styles.graph_total}>{tasksState.tasks?.length || 0}</span>
-                        <h4>Total</h4>
+                        <h4>Tasks</h4>
                     </div>
                     <div className={`flex ${styles.graph_bar}`}>
-                        <div className={styles.bar_child} style={{ width: `${((completed / (completed + notStarted + progress)) * 100)}%`, backgroundColor: 'var(--green)' }}></div>
-                        <div className={styles.bar_child} style={{ width: `${(progress / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--blue)', transitionDelay: '0.2s' }}></div>
-                        <div className={styles.bar_child} style={{ width: `${(notStarted / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--grey)', transitionDelay: '0.4s' }}></div>
+                        <Link to={`/tasks?status=Completed`} className={styles.bar_child} style={{ width: `${((completed / (completed + notStarted + progress)) * 100)}%`, backgroundColor: 'var(--green)' }}></Link>
+                        <Link to={`/tasks?status=In+Progress`} className={styles.bar_child} style={{ width: `${(progress / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--blue)', transitionDelay: '0.2s' }}></Link>
+                        <Link to={`/tasks?status=Not+Started`} className={styles.bar_child} style={{ width: `${(notStarted / (completed + notStarted + progress)) * 100}%`, backgroundColor: 'var(--grey)', transitionDelay: '0.4s' }}></Link>
                     </div>
                     <div className={`flex col gap2`}>
                         <div className={`flex gap2 ${styles.legend}`}>
@@ -76,26 +79,26 @@ const Home = () => {
 
             <section className={styles.graph}>
                 <header>
-                    <h2 className='text_primary'>Tasks</h2>
-                    <h4 className='text_secondary'>Task Allocation by users</h4>
+                    <h2 className='text_primary'>Users</h2>
+                    <h4 className='text_secondary'>Connected Users by Relation</h4>
                 </header>
                 <div className={`flex col gap ${styles.graph_wrapper}`}>
                     <div className="total">
-                        <span className={styles.graph_total}>{tasksState.tasks?.length || 0}</span>
-                        <h4>Total</h4>
+                        <span className={styles.graph_total}>{(followers + following) || 0}</span>
+                        <h4>Connections</h4>
                     </div>
                     <div className={`flex ${styles.graph_bar}`}>
-                        <div className={styles.bar_child} style={{ width: `${(bySelf / (bySelf + byOthers)) * 100}%`, backgroundColor: 'var(--purple-light)' }}></div>
-                        <div className={styles.bar_child} style={{ width: `${(byOthers / (byOthers + bySelf)) * 100}%`, backgroundColor: 'var(--purple-dark)', transitionDelay: '0.2s' }}></div>
+                        <Link to='/users/followers' className={styles.bar_child} style={{ width: `${(followers / (followers + following)) * 100}%`, backgroundColor: 'var(--purple-light)' }}></Link>
+                        <Link to='/users/following' className={styles.bar_child} style={{ width: `${(following / (following + followers)) * 100}%`, backgroundColor: 'var(--purple-dark)', transitionDelay: '0.2s' }}></Link>
                     </div>
                     <div className={`flex col gap2`}>
                         <div className={`flex gap2 ${styles.legend}`}>
                             <div style={{ backgroundColor: 'var(--purple-light)' }}></div>
-                            <span>Self : {bySelf}</span>
+                            <span>Followers : {followers}</span>
                         </div>
                         <div className={`flex gap2 ${styles.legend}`}>
                             <div style={{ backgroundColor: 'var(--purple-dark)' }}></div>
-                            <span>Others : {byOthers}</span>
+                            <span>Following : {following}</span>
                         </div>
                     </div>
                 </div>

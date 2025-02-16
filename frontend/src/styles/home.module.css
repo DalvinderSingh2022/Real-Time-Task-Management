@@ -32,13 +32,30 @@ section .header {
     height: 16px;
     border-radius: 40px;
     justify-content: flex-start;
-    overflow: hidden;
 }
 
 .graph .bar_child {
-    transition: .2s ease-in-out;
+    transition: 150ms ease-in-out;
     height: 100%;
     width: 0%;
+}
+
+.graph .bar_child:first-child {
+    border-radius: 40px 0 0 40px;
+}
+
+.graph .bar_child:last-child {
+    border-radius: 0 40px 40px 0;
+}
+
+.graph .bar_child:hover {
+    scale: 1.1 1.25;
+    cursor: pointer;
+    z-index: 9;
+}
+
+.graph_bar:hover .bar_child:not(:hover) {
+    scale: 1 .8;
 }
 
 .graph .graph_wrapper .graph_total {
