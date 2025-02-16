@@ -10,19 +10,21 @@ import TaskSection from '../components/TaskSection';
 import AddTask from '../components/AddTask';
 import useSearch from '../hooks/useSearch';
 
+const TaskDueTypes = ['Due Today', 'Due Tomorrow', 'Due Yesterday', 'Due This Week', 'Due Last Week', 'Due This Month', 'Over due'];
+
 const Tasks = () => {
     const { tasksState } = useContext(TasksContext);
     const [notStarted, setNotStarted] = useState(null);
     const [progress, setProgress] = useState(null);
     const [completed, setCompleted] = useState(null);
-    const [handleChange, tasks, query] = useSearch(tasksState.tasks, 'title');
+    const [handleChange, tasks, query] = useSearch(tasksState.tasks, 'title', 'dueStatus');
 
     useEffect(() => {
         if (!tasks) return;
         const groupedTasks = tasks.reduce((acc, task) => {
             const status = task.status.toLowerCase().replaceAll(" ", '');
-            if (!acc[status]) acc[status] = [];
             acc[status].push(task);
+
             return acc;
         }, { notstarted: [], inprogress: [], completed: [] });
 
@@ -50,7 +52,7 @@ const SearchInput = ({ handleChange, query }) => {
     return (
         <>
             {addTask && <AddTask remove={() => setAddTask(false)} />}
-            <form className={`${styles.filters} flex gap2`} onSubmit={e => e.preventDefault()}>
+            <form className={`${styles.filters} wrap flex gap2`} onSubmit={e => e.preventDefault()}>
                 <input
                     type="search"
                     name="q"
@@ -62,6 +64,15 @@ const SearchInput = ({ handleChange, query }) => {
                     <FaPlus />
                     <span>Create</span>
                 </button>
+                <select
+                    defaultValue={query.get('dueStatus') || ''}
+                    onChange={handleChange}
+                    name='dueStatus'
+                    className='button primary'
+                >
+                    <option value=''>All</option>
+                    {TaskDueTypes.map(status => <option key={status} value={status}>{status}</option>)}
+                </select>
                 {response && <div className="loading" style={{ margin: 0 }}></div>}
             </form>
         </>

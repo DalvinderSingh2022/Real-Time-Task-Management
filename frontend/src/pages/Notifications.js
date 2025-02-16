@@ -54,7 +54,7 @@ const SearchInput = ({ handleChange, query }) => {
             className='button primary'
         >
             <option value=''>All</option>
-            {NotificationTypes.map(notification => <option key={notification} value={notification}>{notification.at(0) + notification.slice(1).toLowerCase().replace("_", " ")}</option>)}
+            {NotificationTypes.map(notification => <option key={notification} value={notification}>{notification}</option>)}
         </select>
     </form>
 }

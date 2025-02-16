@@ -1,4 +1,4 @@
-const Task = require('../models/task.model');
+const { Task, getdueStatus } = require('../models/task.model');
 const Comment = require('../models/comment.model');
 
 // Create a new task
@@ -11,7 +11,7 @@ const addTask = async (req, res) => {
     try {
         // Save the new task to the database
         // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        await newTask.save();
+        await getdueStatus([newTask]);
         const task = await newTask.populate([
             { path: 'assignedTo', select: '_id name avatar' },
             { path: 'assignedBy', select: '_id name avatar' }

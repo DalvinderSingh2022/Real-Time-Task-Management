@@ -34,7 +34,7 @@ const useSocket = () => {
 
 
     useEffect(() => {
-        socket.on("new_notification", (notification) => { addNotification(notification); });
+        socket.on("new_notification", (notification) => addNotification(notification));
 
         return () => socket.off("new_notification");
     }, [addNotification]);
@@ -44,11 +44,12 @@ const useSocket = () => {
         socket.on('task_deleted', (task, assignedTo, assignedBy) => {
             if (authState.user._id === assignedBy._id) {
                 addToast({ type: 'warning', message: `Task : ${task.title} Deleted` });
+            } else {
+                assignedTo.forEach(user => {
+                    if (authState.user._id === user._id)
+                        addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
+                });
             }
-            assignedTo.forEach(user => {
-                if (authState.user._id === user._id)
-                    addToast({ type: 'warning', message: `Task : ${task.title} Deleted by ${assignedBy.name} ` });
-            });
             deleteTask(task._id);
         });
 
@@ -59,11 +60,12 @@ const useSocket = () => {
         socket.on('task_created', (task) => {
             if (authState.user._id === task.assignedBy._id) {
                 addToast({ type: 'success', message: `Task created and assigned ${task.assignedTo.some(user => user._id === authState.user._id) ? `to ${task.assignedTo.map(user => user.name).join(', ')}` : ''}` });
+            } else {
+                task.assignedTo.forEach(user => {
+                    if (authState.user._id === user._id)
+                        addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
+                });
             }
-            task.assignedTo.forEach(user => {
-                if (authState.user._id === user._id)
-                    addToast({ type: 'info', message: `Task: ${task.title} assigned by ${task.assignedBy.name}` });
-            });
             createTask(task);
         });
 
@@ -91,7 +93,7 @@ const useSocket = () => {
                 login(authUser);
                 addToast({ type: 'success', message: `Followed ${userToFollow.name} successfully` });
             }
-            if (authState.user._id === userToFollow._id) {
+            else if (authState.user._id === userToFollow._id) {
                 login(userToFollow);
                 addToast({ type: 'info', message: `${authUser.name} followed you` });
             }
@@ -109,7 +111,7 @@ const useSocket = () => {
                 login(authUser);
                 addToast({ type: 'info', message: `Unfollowed ${userToUnfollow.name} successfully` });
             }
-            if (authState.user._id === userToUnfollow._id) {
+            else if (authState.user._id === userToUnfollow._id) {
                 login(userToUnfollow);
                 addToast({ type: 'warning', message: `${authUser.name} Unfollowed you` });
             }

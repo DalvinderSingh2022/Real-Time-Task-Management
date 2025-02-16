@@ -10,7 +10,7 @@ const notificationsReducer = (state, action) => {
         case 'LOAD_NOTIFICATIONS':
             return { notifications: action.payload.notifications, loaded: true }
         case 'ADD_NOTIFICATION':
-            return { ...state, notifications: [...state.notifications, action.payload.notification] };
+            return { ...state, notifications: [action.payload.notification, ...state.notifications] };
         case 'DELETE_NOTIFICATION':
             return { ...state, notifications: state.notifications.filter((notification) => notification._id !== action.payload.notificationId) };
         case 'RESET_NOTIFICATIONS':
@@ -18,12 +18,7 @@ const notificationsReducer = (state, action) => {
         case 'READ_NOTIFICATION':
             return {
                 ...state,
-                notifications: state.notifications.map((notification) => {
-                    if (notification._id === action.payload.notificationId) {
-                        return { ...notification, read: true };
-                    }
-                    return notification;
-                })
+                notifications: state.notifications.map((notification) => (notification._id === action.payload.notificationId) ? { ...notification, read: true } : notification)
             };
         default:
             return state;

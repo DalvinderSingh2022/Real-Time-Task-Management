@@ -16,12 +16,7 @@ const SystemNotification = (prop) => {
       <div className="w_full">
         <span className={`text_primary ${styles.message}`}>{prop.message}</span>
         <div className={styles.data}>
-          {tasks.map((task, index) => {
-            return (<>
-              {index !== 0 && ", "}
-              <Link to={`/tasks?q=${task.title}`} key={task._id}>{task.title}</Link>
-            </>)
-          })}
+          <Link to={`/tasks?dueStatus=Due Today`}>{tasks.map((task, index) => `${index !== 0 ? "," : ""}${task.title}`)}</Link>
           <div className='text_secondary'>{(new Date(prop.createdAt).toDateString()) + " at " + (new Date(prop.createdAt).toLocaleTimeString())}</div>
         </div>
       </div>

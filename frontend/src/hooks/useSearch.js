@@ -18,7 +18,7 @@ const useSearch = (initialData, query, filter) => {
         const { name, value } = e.target;
 
         setSearch(prevParams => {
-            value ? prevParams.set(name, value.replaceAll("%20", "+")) : prevParams.delete(name);
+            value ? prevParams.set(name, value) : prevParams.delete(name);
             return prevParams
         });
     };
