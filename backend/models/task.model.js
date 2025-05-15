@@ -100,6 +100,7 @@ const getdueStatus = async (tasks) => {
 cron.schedule('0 0 * * *', async () => {
     const tasks = await Task.find();
     const dueToday = await getdueStatus(tasks);
+    console.log("Cron task: ", new Date().toLocaleString());
 
     try {
         const groupedTasks = dueToday.reduce((acc, task) => {
