@@ -117,7 +117,17 @@ const UpdateProfile = ({ remove }) => {
                                                     checked={profile[key] === option}
                                                     onChange={() => setProfile(prev => ({ ...prev, [key]: option }))}
                                                 />
-                                                <img className={`flex avatar ${modalStyles.check_label}`} alt={option} title={option} src={getAvatar(({ ...profile, [key]: option }))} />
+                                                <img
+                                                    onError={e => {
+                                                        e.target.src = 'https://png.pngtree.com/png-clipart/20231120/original/pngtree-not-allowed-sign-icon-photo-png-image_13656884.png'
+                                                        e.target.style.cursor = 'not-allowed';
+                                                        e.target.previousSibling.disabled = true;
+                                                    }}
+                                                    className={`flex avatar ${modalStyles.check_label}`}
+                                                    src={getAvatar(({ ...profile, [key]: option }))}
+                                                    alt={option}
+                                                    title={option}
+                                                />
                                             </label>
                                         ))}
                                     </div>

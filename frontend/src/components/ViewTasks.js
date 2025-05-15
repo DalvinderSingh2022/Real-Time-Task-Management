@@ -11,7 +11,6 @@ import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
 import { notifications, tasks } from '../utils/apiendpoints';
 import Response from '../components/Response';
-import User from './User';
 
 const ViewTask = (prop) => {
     const { authState } = useContext(AuthContext);
@@ -166,7 +165,7 @@ const ViewTask = (prop) => {
                                 <label htmlFor="status" className='text_primary'>Status</label>
                                 <div className={`flex wrap ${modalStyles.check_container}`}>
                                     {["Not Started", "In Progress", "Completed"].map((status) => (
-                                        <label key={status} htmlFor={status} className={modalStyles.checkbox}>
+                                        <label key={status} htmlFor={status} className={modalStyles.checkbox + " " + status.replaceAll(" ", "").toLowerCase()}>
                                             <input
                                                 type="checkbox"
                                                 id={status}
@@ -183,7 +182,7 @@ const ViewTask = (prop) => {
                                 <label htmlFor="assignedBy" className='text_primary'>Assign By</label>
                                 <div className={`flex ${modalStyles.check_container}`}>
                                     <div className={`flex ${modalStyles.check_label}`}>
-                                        <User {...task.assignedBy} removeButton={true} />
+                                        <div>{task.assignedBy.name}</div>
                                     </div>
                                 </div>
                             </div>
@@ -194,7 +193,7 @@ const ViewTask = (prop) => {
                             <div className={`flex wrap ${modalStyles.check_container}`}>
                                 {task.assignedTo.map((user) => (
                                     <div key={user._id} className={`flex ${modalStyles.check_label}`}>
-                                        <User {...user} removeButton={true} />
+                                        <div>{user.name}</div>
                                     </div>
                                 ))}
                             </div>
@@ -204,7 +203,7 @@ const ViewTask = (prop) => {
                             <div className={`flex col w_full ${authStyles.group}`}>
                                 <label htmlFor="assignedTo" className='text_primary'>Assign task to more users</label>
                                 <div className={`flex wrap ${modalStyles.check_container}`}>
-                                    {authState.user.followers.map((user) => (
+                                    {[authState.user, ...authState.user.followers].map((user) => (
                                         <label key={user._id} htmlFor={user._id} className={modalStyles.checkbox}>
                                             <input
                                                 type="checkbox"
@@ -213,7 +212,7 @@ const ViewTask = (prop) => {
                                                 onChange={() => handleAssignedToToggle(user)}
                                             />
                                             <div className={`flex ${modalStyles.check_label}`}>
-                                                <User {...user} removeButton={true} />
+                                                <div>{user.name}</div>
                                             </div>
                                         </label>
                                     ))}

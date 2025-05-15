@@ -8,7 +8,6 @@ import { AppContext } from '../store/AppContext';
 import { socket } from '../hooks/useSocket';
 import { notifications, tasks } from '../utils/apiendpoints';
 import Response from './Response';
-import User from './User';
 
 const AddTask = ({ remove, initialAssignedTo }) => {
     const { authState } = useContext(AuthContext);
@@ -107,7 +106,7 @@ const AddTask = ({ remove, initialAssignedTo }) => {
                                             onChange={() => handleAssignedToToggle(user._id)}
                                         />
                                         <div className={`flex ${modalStyles.check_label}`}>
-                                            <User {...user} removeButton={true} />
+                                            <div>{user.name}</div>
                                         </div>
                                     </label>
                                 ))}
