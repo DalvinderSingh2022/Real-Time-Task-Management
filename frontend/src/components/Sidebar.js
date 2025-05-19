@@ -10,22 +10,18 @@ import { IoNotificationsSharp } from "react-icons/io5";
 
 import Logo from "../assects/logo.png";
 
-import Response from './Response';
 import { NotificationsContext } from '../store/NotificationContext';
 import { AuthContext } from '../store/AuthContext';
-import { AppContext } from '../store/AppContext';
 import { UsersContext } from '../store/UsersContext';
 import { TasksContext } from '../store/TasksContext';
-import { socket } from '../hooks/useSocket';
-import { users } from '../utils/apiendpoints';
+import DeleteAccountModal from './DeleteAccountModal';
 
 const Sidebar = () => {
-    const { authState, logout } = useContext(AuthContext);
+    const { logout } = useContext(AuthContext);
     const { notificationsState, resetNotifications } = useContext(NotificationsContext);
     const { resetUsers } = useContext(UsersContext);
     const { resetTasks } = useContext(TasksContext);
-    const { addToast } = useContext(AppContext);
-    const [response, setResponse] = useState(false);
+    const [deleteModal, setDeleteModal] = useState(false);
     const [count, setCount] = useState(0);
 
     const handleLogout = () => {
@@ -36,17 +32,8 @@ const Sidebar = () => {
         logout();
     }
 
-    const handleDelete = () => {
-        setResponse(true);
-        users.delete().then(() => {
-            socket.emit('user_left', authState.user);
-            handleLogout();
-        })
-            .catch((error) => {
-                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                console.log(".....API ERROR.....", error);
-            })
-            .finally(() => setResponse(false));
+    const toggleDeleteModal = () => {
+        setDeleteModal(prev => !prev);
     }
 
     useEffect(() => {
@@ -55,7 +42,7 @@ const Sidebar = () => {
 
     return (
         <>
-            {response && <Response />}
+            {deleteModal && <DeleteAccountModal remove={toggleDeleteModal} handleLogout={handleLogout}/> }
             <aside className='side_nav flex col gap'>
                 <button className='menu_toggle button flex primary round' onClick={() => document.querySelector("main").classList.toggle('close')}>
                     <RiCloseLine />
@@ -88,9 +75,9 @@ const Sidebar = () => {
                         <TbLogout />
                         <p>Logout</p>
                     </button>
-                    <button className='button flex gap2 link' title='Delete Account' onClick={handleDelete}>
-                        {response ? <div className='loading' style={{ borderColor: "var(--text-sec)", borderBottomColor: 'var(--white)' }}></div> : <AiOutlineUserDelete />}
-                        <p>{response ? "Deleting..." : "Delete Account"}</p>
+                    <button className='button flex gap2 link' title='Delete Account' onClick={toggleDeleteModal}>
+                        <AiOutlineUserDelete />
+                        <p>Delete Account</p>
                     </button>
                 </div>
             </aside>
