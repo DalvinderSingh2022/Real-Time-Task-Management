@@ -5,6 +5,11 @@ const Comment = require('../models/comment.model');
 const addTask = async (req, res) => {
     const { title, description, dueDate, assignedBy, assignedTo } = req.body;
 
+    // Return an error response if either title, description, dueDate, assignedBy or assignedTo is not provided
+    if (!title || !description || !dueDate || !assignedBy || !assignedTo) {
+        return res.status(400).json({ message: "All fields are required" });
+    }
+
     // Create a new Task instance
     const newTask = new Task({ title, description, dueDate, assignedTo, assignedBy });
 
