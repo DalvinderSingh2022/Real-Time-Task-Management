@@ -7,12 +7,11 @@ const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
-router.use('/users', usersRouter);
-router.use('/notifications', notificationRouter);
-
 router.use(authMiddleware);
 
-router.use('/tasks', taskRouter);
-router.use('/comments', commentRouter);
+router.use("/users", usersRouter);
+router.use("/notifications", notificationRouter);
+router.use("/tasks", taskRouter);
+router.use("/comments", commentRouter);
 
 module.exports = router;

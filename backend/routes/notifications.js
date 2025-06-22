@@ -1,11 +1,8 @@
 const express = require("express");
 const { allNotifications, updateNotification, removeNotification, taskUpdate, taskAssign, taskDelete, followUser, unFollowUser, dueDate, generateNotification } = require("../controllers/notifications");
-const authMiddleware = require("../middleware/auth");
 const router = express.Router();
 
 router.post('/due-date-reminder', dueDate, generateNotification);
-
-router.use(authMiddleware);
 
 router.get('/all', allNotifications);
 router.route('/:id').put(updateNotification).delete(removeNotification);
