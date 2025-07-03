@@ -20,7 +20,9 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response && error.response.status === 401) {
+    const token = localStorage.getItem("jwt");
+    
+    if (token && error.response && error.response.status === 401) {
       localStorage.removeItem("jwt");
       window.location.href = "/login";
     }
