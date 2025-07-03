@@ -14,27 +14,33 @@ const NotificationTypes = {
 const NotificationSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User '
+        ref: 'User',
+        required: [true, 'User is required']
     },
     type: {
         type: String,
-        required: true,
-        enum: Object.values(NotificationTypes)
+        required: [true, 'Notification type is required'],
+        enum: {
+            values: Object.values(NotificationTypes),
+            message: 'Invalid notification type'
+        }
     },
     message: {
         type: String,
-        required: true
+        required: [true, 'Message is required']
     },
     read: {
         type: Boolean,
+        required: [true, 'Read status is required'],
         default: false
     },
     data: {
         type: Object,
-        required: true
+        required: [true, 'Data is required']
     },
     createdAt: {
         type: Date,
+        required: [true, 'CreatedAt is required'],
         expires: '30d',
         default: Date.now
     }

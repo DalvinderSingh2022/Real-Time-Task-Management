@@ -198,7 +198,14 @@ const updateUser = async (req, res) => {
             .populate([
                 { path: 'followers', select: '_id name avatar followers' },
                 { path: 'following', select: '_id name avatar followers' }
-            ]);;
+            ]);
+
+        if (!updatedUser) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
+        // Validate the updated user document
+        await updatedUser.validate();
 
         return res.status(200).json({ message: 'User updated successfully', user: updatedUser });
     } catch (error) {

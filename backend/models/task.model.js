@@ -29,6 +29,7 @@ const taskSchema = new mongoose.Schema({
     assignedTo: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
+        required: [true, 'Assigned user is required']
     }],
     assignedBy: {
         type: mongoose.Schema.Types.ObjectId,
@@ -37,13 +38,21 @@ const taskSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["Not Started", "In Progress", "Completed"],
-        default: "Not Started"
+        enum: {
+            values: ["Not Started", "In Progress", "Completed"],
+            message: 'Status must be \'Not Started, In Progress, or Completed\''
+        },
+        default: "Not Started",
+        required: [true, 'Status is required']
     },
     dueStatus: {
         type: String,
-        enum: Object.values(DueStatus),
-        default: DueStatus.OVERDUE
+        enum: {
+            values: Object.values(DueStatus),
+            message: 'Invalid due status'
+        },
+        default: DueStatus.OVERDUE,
+        required: [true, 'Due status is required']
     }
 }, {
     timestamps: true

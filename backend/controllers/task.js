@@ -122,11 +122,15 @@ const updateTask = async (req, res) => {
         const updatedTask = await Task.findByIdAndUpdate(
             taskId,
             task,
-            { new: true, runValidators: true, }
+            { new: true, runValidators: true }
         ).populate([
             { path: 'assignedTo', select: '_id name avatar' },
             { path: 'assignedBy', select: '_id name avatar' }
         ]);
+
+        if (!updatedTask) {
+            return res.status(404).json({ message: "Task not found" });
+        }
 
         return res.status(200).json({ message: 'Task updated successfully', task: updatedTask });
     } catch (error) {
