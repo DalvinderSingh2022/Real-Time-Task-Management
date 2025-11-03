@@ -35,7 +35,7 @@ const Tasks = () => {
             <SearchInput handleChange={handleChange} query={query} />
             <div className={styles.container}>
                 {TaskStatusTypes.map(status => (
-                    (!query.get('status') || (query.get('status') === status)) && <TaskSection tasks={taskGroups[status.replaceAll(" ", "").toLowerCase()]} status={status} />
+                    (!query.get('status') || (query.get('status') === status)) && <TaskSection key={status} tasks={taskGroups[status.replaceAll(" ", "").toLowerCase()]} status={status} />
                 ))}
             </div>
         </article>

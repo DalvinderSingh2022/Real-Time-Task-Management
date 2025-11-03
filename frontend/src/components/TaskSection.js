@@ -32,7 +32,7 @@ const TaskSection = ({ tasks, status }) => {
             data-status={status}
             className={`flex col ${styles.wrapper} ${status.replaceAll(" ", '').toLowerCase()}`}
         >
-            <header className={`flex ${styles.header}`}><h1>{status}</h1><h1>{tasks?.length || 0}</h1></header>
+            <header className={`flex ${styles.header}`}><h3>{status}</h3><h3>{tasks?.length || 0}</h3></header>
             <div className={`flex wrap gap2 tasks_container ${styles.tasks_container}`}>
                 {tasks?.length > 0
                     ? tasks.map(task => <Task {...task} key={task._id} />)
