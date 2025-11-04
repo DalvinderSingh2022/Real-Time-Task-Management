@@ -27,19 +27,29 @@ const getAvatar = (name) => {
 const register = async (req, res) => {
     const { name, email, password } = req.body;
 
-    // Return an error response if either name, email or password is not provided
-    if (!email || !password || !name) {
+    // Input validation
+    if (!email?.trim() || !password?.trim() || !name?.trim()) {
         return res.status(400).json({ message: "All fields are required" });
     }
 
     try {
-        // Hash the given password using bcrypt
-        if (password) {
-            var hashedPassword = await bcrypt.hash(password, 10);
+        // Check if user already exists
+        const existingUser = await User.findOne({ email: email.toLowerCase() });
+        if (existingUser) {
+            return res.status(409).json({ message: "Email already registered" });
         }
-        const avatar = getAvatar(name);
 
-        const user = new User({ name, email, avatar, password: hashedPassword });
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const avatar = getAvatar(name.trim());
+
+        // Create new user with sanitized input
+        const user = new User({
+            name: name.trim(),
+            email: email.toLowerCase().trim(),
+            avatar,
+            password: hashedPassword
+        });
 
         // Save the user to the database
         await user.save();
