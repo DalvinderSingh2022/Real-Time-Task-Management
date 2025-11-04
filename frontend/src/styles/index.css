@@ -493,7 +493,7 @@ button .loading {
 .not_found {
     color: var(--purple-light);
     font-size: 1.8em;
-    padding-bottom: 4em;
+    padding: 4em 0;
 }
 
 @keyframes toast {

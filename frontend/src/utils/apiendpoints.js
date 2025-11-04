@@ -33,6 +33,7 @@ axiosInstance.interceptors.response.use(
 export const users = {
   register: (data) => axiosInstance.post("/users/register", data),
   login: (data) => axiosInstance.put("/users/login", data),
+  magicLogin: (data) => axiosInstance.put("/users/magic-login", data),
   all: () => axiosInstance.get("/users/all"),
   current: () => axiosInstance.get("/users/current"),
   follow: (userId) => axiosInstance.post(`/users/follow/${userId}`),

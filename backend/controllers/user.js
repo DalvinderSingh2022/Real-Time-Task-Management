@@ -80,6 +80,38 @@ const getAvatar = (name) => {
   );
 };
 
+const magicLogin = async (req, res) => {
+  try {
+    const { key } = req.body;
+    const decoded = jwt.verify(key, process.env.JWT_SECRET);
+
+    const user = await User.findById(decoded.userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "Invalid or expired link" });
+    }
+
+    await user.populate([
+      { path: "followers", select: "_id name avatar followers" },
+      { path: "following", select: "_id name avatar followers" },
+    ]);
+
+    // Removing password so it doesn't reflect in frontend
+    user.password = null;
+
+    // Generate a JWT for the user
+    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+      expiresIn: "7d",
+    });
+
+    return res
+      .status(200)
+      .json({ message: "Logged in successfully", user, token });
+  } catch (error) {
+    res.status(400).json({ message: "Invalid or expired link" });
+  }
+};
+
 // Register a new user
 const register = async (req, res) => {
   const { name, email, password } = req.body;
@@ -467,6 +499,7 @@ const unfolloweUser = async (req, res) => {
 module.exports = {
   register,
   login,
+  magicLogin,
   currentUser,
   removeUser,
   allUsers,

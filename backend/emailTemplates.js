@@ -1,3 +1,11 @@
+const jwt = require("jsonwebtoken");
+
+const generateLoginToken = (userId) => {
+  return jwt.sign({ userId }, process.env.SECRET_KEY, {
+    expiresIn: "15m",
+  });
+};
+
 const baseEmailTemplate = (
   userId,
   title,
@@ -6,6 +14,9 @@ const baseEmailTemplate = (
   actionUrl,
   infoBlock = ""
 ) => {
+  const token = generateLoginToken(userId);
+  const redirectPath = encodeURIComponent(actionUrl);
+  const link = `${process.env.CLIENT_URL}/magic-login/${token}/${userId}?redirect=${redirectPath}`;
 
   return `
     <!DOCTYPE html>
@@ -71,24 +82,24 @@ const baseEmailTemplate = (
                     ${infoBlock}
 
                     ${
-                      actionLabel && actionUrl
+                      actionLabel && actionUrl && link
                         ? `
-                    <a
-                      href="${actionUrl}"
-                      style="
-                        display: inline-block;
-                        background-color: #7c3aed;
-                        color: #ffffff;
-                        padding: 14px 28px;
-                        text-decoration: none;
-                        border-radius: 8px;
-                        font-weight: 500;
-                        font-size: 16px;
-                        margin-top: 12px;
-                      "
-                    >
-                      ${actionLabel}
-                    </a>`
+                          <a
+                            href="${link}"
+                            style="
+                              display: inline-block;
+                              background-color: #7c3aed;
+                              color: #ffffff;
+                              padding: 14px 28px;
+                              text-decoration: none;
+                              border-radius: 8px;
+                              font-weight: 500;
+                              font-size: 16px;
+                              margin-top: 12px;
+                            "
+                          >
+                            ${actionLabel}
+                          </a>`
                         : ""
                     }
                     ${
