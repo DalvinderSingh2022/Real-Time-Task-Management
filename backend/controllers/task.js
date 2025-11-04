@@ -1,141 +1,221 @@
-const { Task, getdueStatus } = require('../models/task.model');
-const Comment = require('../models/comment.model');
+const { Task, getdueStatus } = require("../models/task.model");
+const Comment = require("../models/comment.model");
+const {
+  taskCreatedTemplate,
+  taskDeletedTemplate,
+  taskUpdatedTemplate,
+} = require("../emailTemplates");
+const { sendMail } = require("../config/MailService");
 
 // Create a new task
 const addTask = async (req, res) => {
-    const { title, description, dueDate, assignedBy, assignedTo } = req.body;
+  const { title, description, dueDate, assignedBy, assignedTo } = req.body;
 
-    // Return an error response if either title, description, dueDate, assignedBy or assignedTo is not provided
-    if (!title || !description || !dueDate || !assignedBy || !assignedTo) {
-        return res.status(400).json({ message: "All fields are required" });
+  // Return an error response if either title, description, dueDate, assignedBy or assignedTo is not provided
+  if (!title || !description || !dueDate || !assignedBy || !assignedTo) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+
+  // Create a new Task instance
+  const newTask = new Task({
+    title,
+    description,
+    dueDate,
+    assignedTo,
+    assignedBy,
+  });
+
+  try {
+    // Save the new task to the database
+    // and Populate the assignedBy and assignedTo fields with the corresponding user data
+    await getdueStatus([newTask]);
+    const task = await newTask.populate([
+      { path: "assignedTo", select: "_id name avatar email" },
+      { path: "assignedBy", select: "_id name avatar" },
+    ]);
+
+    for (const user of task.assignedTo) {
+      await sendMail({
+        to: user.email,
+        subject: "🆕 New Task Assigned",
+        html: taskCreatedTemplate(
+          user._id,
+          user.name,
+          task.assignedBy.name,
+          title,
+          task._id,
+          dueDate
+        ),
+      });
     }
 
-    // Create a new Task instance
-    const newTask = new Task({ title, description, dueDate, assignedTo, assignedBy });
-
-    try {
-        // Save the new task to the database
-        // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        await getdueStatus([newTask]);
-        const task = await newTask.populate([
-            { path: 'assignedTo', select: '_id name avatar' },
-            { path: 'assignedBy', select: '_id name avatar' }
-        ]);
-
-        return res.status(201).json({ message: 'Task created successfully', task });
-    } catch (error) {
-        res.status(500).json({ message: error.message || "Internal Server Error" });
-    }
+    return res.status(201).json({ message: "Task created successfully", task });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 // Retrieve all tasks for a user
 const allTasks = async (req, res) => {
-    const userId = req.userId;
+  const userId = req.userId;
 
-    if (!userId) {
-        return res.status(400).json({ message: "Missing requirements to process request" });
-    }
+  if (!userId) {
+    return res
+      .status(400)
+      .json({ message: "Missing requirements to process request" });
+  }
 
-    try {
-        // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
-        // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        let tasks = await Task.find({ $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }] })
-            .sort({ updatedAt: 'desc' })
-            .populate([
-                { path: 'assignedTo', select: '_id name avatar' },
-                { path: 'assignedBy', select: '_id name avatar' }
-            ]);
+  try {
+    // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
+    // and Populate the assignedBy and assignedTo fields with the corresponding user data
+    let tasks = await Task.find({
+      $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }],
+    })
+      .sort({ updatedAt: "desc" })
+      .populate([
+        { path: "assignedTo", select: "_id name avatar" },
+        { path: "assignedBy", select: "_id name avatar" },
+      ]);
 
-        const statusOrder = { "In Progress": 1, "Not Started": 2, "Completed": 3 };
-        tasks = tasks.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
+    const statusOrder = { "In Progress": 1, "Not Started": 2, Completed: 3 };
+    tasks = tasks.sort((a, b) => statusOrder[a.status] - statusOrder[b.status]);
 
-        res.status(200).json({ message: 'All Task fetched successfully', tasks });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
-    }
+    res.status(200).json({ message: "All Task fetched successfully", tasks });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 // Retrieve a task
 const getTask = async (req, res) => {
-    const taskId = req.params.id;
+  const taskId = req.params.id;
 
-    if (!taskId) {
-        return res.status(400).json({ message: "Missing requirements to process request" });
+  if (!taskId) {
+    return res
+      .status(400)
+      .json({ message: "Missing requirements to process request" });
+  }
+
+  try {
+    // Retrieve the task with the given _id
+    // and Populate the assignedBy and assignedTo fields with the corresponding user data
+    const task = await Task.findById(taskId).populate([
+      { path: "assignedTo", select: "_id name avatar" },
+      { path: "assignedBy", select: "_id name avatar" },
+    ]);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task Not found" });
     }
 
-    try {
-        // Retrieve the task with the given _id
-        // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const task = await Task.findById(taskId).populate([
-            { path: 'assignedTo', select: '_id name avatar' },
-            { path: 'assignedBy', select: '_id name avatar' }
-        ]);
-
-        if (!task) {
-            return res.status(404).json({ message: "Task Not found" });
-        }
-
-        res.status(200).json({ message: 'Task fetched successfully', task });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
-    }
+    res.status(200).json({ message: "Task fetched successfully", task });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 // Delete a task
 const removeTask = async (req, res) => {
-    const taskId = req.params.id;
+  const taskId = req.params.id;
 
-    if (!taskId) {
-        return res.status(400).json({ message: "Missing requirements to process request" });
+  if (!taskId) {
+    return res
+      .status(400)
+      .json({ message: "Missing requirements to process request" });
+  }
+
+  try {
+    const task = await Task.findById(taskId)
+      .populate("assignedTo", "name email")
+      .populate("assignedBy", "name");
+
+    // Delete the task with the given _id
+    const [deletedTask] = await Promise.all([
+      Task.findByIdAndDelete(taskId),
+      Comment.deleteMany({ task: taskId }),
+    ]);
+
+    // Check if the task was found and deleted
+    if (!deletedTask) {
+      return res.status(404).json({ message: "Task not found" });
     }
 
-    try {
-        // Delete the task with the given _id 
-        const [deletedTask] = await Promise.all([
-            Task.findByIdAndDelete(taskId),
-            Comment.deleteMany({ task: taskId })
-        ]);
-
-        // Check if the task was found and deleted
-        if (!deletedTask) {
-            return res.status(404).json({ message: "Task not found" });
-        }
-
-        return res.status(201).json({ message: "Task deleted Succesfully" });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
+    for (const user of task.assignedTo) {
+      await sendMail({
+        to: user.email,
+        subject: "❌ Task Deleted",
+        html: taskDeletedTemplate(
+          user._id,
+          user.name,
+          task.assignedBy.name,
+          task.title
+        ),
+      });
     }
+
+    return res.status(201).json({ message: "Task deleted Succesfully" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 // Update a task
 const updateTask = async (req, res) => {
-    const taskId = req.params.id;
-    const task = req.body;
+  const taskId = req.params.id;
+  const task = req.body;
 
-    if (!taskId || !task) {
-        return res.status(400).json({ message: "Missing requirements to process request" });
+  if (!taskId || !task) {
+    return res
+      .status(400)
+      .json({ message: "Missing requirements to process request" });
+  }
+
+  try {
+    // Update the task with the new data
+    // and Populate the assignedBy and assignedTo fields with the corresponding user data
+    const updatedTask = await Task.findByIdAndUpdate(taskId, task, {
+      new: true,
+      runValidators: true,
+    }).populate([
+      { path: "assignedTo", select: "_id name avatar email" },
+      { path: "assignedBy", select: "_id name avatar" },
+    ]);
+
+    if (!updatedTask) {
+      return res.status(404).json({ message: "Task not found" });
     }
 
-    try {
-        // Update the task with the new data 
-        // and Populate the assignedBy and assignedTo fields with the corresponding user data
-        const updatedTask = await Task.findByIdAndUpdate(
-            taskId,
-            task,
-            { new: true, runValidators: true }
-        ).populate([
-            { path: 'assignedTo', select: '_id name avatar' },
-            { path: 'assignedBy', select: '_id name avatar' }
-        ]);
-
-        if (!updatedTask) {
-            return res.status(404).json({ message: "Task not found" });
-        }
-
-        return res.status(200).json({ message: 'Task updated successfully', task: updatedTask });
-    } catch (error) {
-        return res.status(500).json({ message: error.message || "Internal Server Error" });
+    for (const user of updatedTask.assignedTo) {
+      await sendMail({
+        to: user.email,
+        subject: "🔄 Task Updated",
+        html: taskUpdatedTemplate(
+          user._id,
+          user.name,
+          updatedTask.assignedBy.name,
+          updatedTask.title,
+          updatedTask._id,
+          updatedTask.status,
+          updatedTask.dueDate,
+          updatedTask.description
+        ),
+      });
     }
+
+    return res
+      .status(200)
+      .json({ message: "Task updated successfully", task: updatedTask });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ message: error.message || "Internal Server Error" });
+  }
 };
 
 module.exports = { allTasks, addTask, getTask, removeTask, updateTask };

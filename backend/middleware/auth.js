@@ -7,7 +7,7 @@ const authMiddleware = (req, res, next) => {
   if (!token) {
     return res
       .status(401)
-      .json({ message: "You need to be logged in to access this resource." });
+      .json({ message: "Your session has expired. Please log in again." });
   }
 
   try {
@@ -19,7 +19,7 @@ const authMiddleware = (req, res, next) => {
     res
       .status(401)
       .json({
-        message: "Your session has expired or is invalid. Please log in again.",
+        message: "Your session has expired. Please log in again.",
       });
   }
 };
