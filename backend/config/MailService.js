@@ -9,16 +9,16 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendMail = async ({ to, subject, html }) => {
-  try {
-    await transporter.sendMail({
-      from: `"Task Manager" <${process.env.MAIL_USER}>`,
-      to,
-      subject,
-      html,
-    });
-  } catch (err) {
-    console.error("Mail error:", err);
-  }
+  // try {
+  //   await transporter.sendMail({
+  //     from: `"Task Manager" <${process.env.MAIL_USER}>`,
+  //     to,
+  //     subject,
+  //     html,
+  //   });
+  // } catch (err) {
+  //   console.error("Mail error:", err);
+  // }
 };
 
 module.exports = { sendMail };

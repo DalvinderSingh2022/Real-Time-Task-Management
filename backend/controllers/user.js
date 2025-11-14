@@ -410,9 +410,9 @@ const followUser = async (req, res) => {
     await userToFollow.save();
 
     await sendMail({
-      to: authUser.email,
+      to: userToFollow.email,
       subject: "👋 You Have a New Follower!",
-      html: onFollowTemplate(authUser._id, authUser.name, userToFollow.name),
+      html: onFollowTemplate(authUser._id, userToFollow.name, authUser.name),
     });
 
     res.json({ message: "Followed user successfully", authUser, userToFollow });
@@ -475,12 +475,12 @@ const unfolloweUser = async (req, res) => {
     await userToUnfollow.save();
 
     await sendMail({
-      to: authUser.email,
+      to: userToUnfollow.email,
       subject: "👋 Someone Unfollowed You",
       html: onUnfollowTemplate(
-        authUser._id,
-        authUser.name,
-        userToUnfollow.name
+        userToUnfollow._id,
+        userToUnfollow.name,
+        authUser.name
       ),
     });
 
