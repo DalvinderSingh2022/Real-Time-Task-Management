@@ -16,11 +16,9 @@ const authMiddleware = (req, res, next) => {
     req.userId = decoded.id;
     next();
   } catch (err) {
-    res
-      .status(401)
-      .json({
-        message: "Your session has expired. Please log in again.",
-      });
+    res.status(401).json({
+      message: "Your session has expired. Please log in again.",
+    });
   }
 };
 

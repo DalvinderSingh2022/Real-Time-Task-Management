@@ -1,46 +1,57 @@
-import React, { useContext } from 'react';
+import React, { useContext } from "react";
 
 import Task from "./Task";
 
 import styles from "../styles/tasks.module.css";
-import { DragAndDropContext } from '../store/DragAndDropContext';
+import { DragAndDropContext } from "../store/DragAndDropContext";
 
 let newStatus;
 let closestSection;
 const TaskSection = ({ tasks, status }) => {
-    const { setStatus } = useContext(DragAndDropContext);
+  const { setStatus } = useContext(DragAndDropContext);
 
-    return (
-        <section
-            onDragLeave={() => {
-                if (closestSection) closestSection.classList.remove("over");
-            }}
-            onDragOver={(e) => {
-                e.preventDefault();
-                newStatus = status; const newClosest = e.target.closest('section');
-                if (newClosest) {
-                    closestSection = newClosest;
-                    closestSection.classList.add("over");
-                }
-            }}
-            onDragEndCapture={() => {
-                if (closestSection) {
-                    closestSection.classList.remove("over");
-                }
-                setStatus(newStatus);
-            }}
-            data-status={status}
-            className={`flex col ${styles.wrapper} ${status.replaceAll(" ", '').toLowerCase()}`}
-        >
-            <header className={`flex ${styles.header}`}><h3>{status}</h3><h3>{tasks?.length || 0}</h3></header>
-            <div className={`flex wrap gap2 tasks_container ${styles.tasks_container}`}>
-                {tasks?.length > 0
-                    ? tasks.map(task => <Task {...task} key={task._id} />)
-                    : tasks ? <div className='text_secondary flex'>There is no task</div> : <div className={`loading ${styles.loading}`}></div>
-                }
-            </div>
-        </section>
-    )
-}
+  return (
+    <section
+      onDragLeave={() => {
+        if (closestSection) closestSection.classList.remove("over");
+      }}
+      onDragOver={(e) => {
+        e.preventDefault();
+        newStatus = status;
+        const newClosest = e.target.closest("section");
+        if (newClosest) {
+          closestSection = newClosest;
+          closestSection.classList.add("over");
+        }
+      }}
+      onDragEndCapture={() => {
+        if (closestSection) {
+          closestSection.classList.remove("over");
+        }
+        setStatus(newStatus);
+      }}
+      data-status={status}
+      className={`flex col ${styles.wrapper} ${status
+        .replaceAll(" ", "")
+        .toLowerCase()}`}
+    >
+      <header className={`flex ${styles.header}`}>
+        <h3>{status}</h3>
+        <h3>{tasks?.length || 0}</h3>
+      </header>
+      <div
+        className={`flex wrap gap2 tasks_container ${styles.tasks_container}`}
+      >
+        {tasks?.length > 0 ? (
+          tasks.map((task) => <Task {...task} key={task._id} />)
+        ) : tasks ? (
+          <div className="text_secondary flex">There is no task</div>
+        ) : (
+          <div className={`loading ${styles.loading}`}></div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 export default TaskSection;

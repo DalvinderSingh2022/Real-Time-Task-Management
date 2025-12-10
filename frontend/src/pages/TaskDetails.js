@@ -1,39 +1,43 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
-import styles from '../styles/taskdetails.module.css';
+import styles from "../styles/taskdetails.module.css";
 import homeStyles from "../styles/home.module.css";
 
-import { AppContext } from '../store/AppContext';
-import { tasks } from '../utils/apiendpoints';
-import NotFound from '../pages/NotFound';
-import ViewTasks from '../components/ViewTasks';
-import TaksComments from '../components/TaksComments';
+import { AppContext } from "../store/AppContext";
+import { tasks } from "../utils/apiendpoints";
+import NotFound from "../pages/NotFound";
+import ViewTasks from "../components/ViewTasks";
+import TaksComments from "../components/TaksComments";
 
 const TaskDetails = () => {
-    const { addToast } = useContext(AppContext);
-    const [task, setTask] = useState(null);
-    const [invalidId, setInvalidId] = useState(false);
-    const { id } = useParams();
+  const { addToast } = useContext(AppContext);
+  const [task, setTask] = useState(null);
+  const [invalidId, setInvalidId] = useState(false);
+  const { id } = useParams();
 
-    useEffect(() => {
-        tasks.get(id)
-            .then(({ data }) => setTask(data.task))
-            .catch((error) => {
-                setInvalidId(true);
-                addToast({ type: 'error', message: error?.response?.data?.message || error?.message });
-                console.log(".....API ERROR.....", error);
-            });
-    }, [id, addToast]);
+  useEffect(() => {
+    tasks
+      .get(id)
+      .then(({ data }) => setTask(data.task))
+      .catch((error) => {
+        setInvalidId(true);
+        addToast({
+          type: "error",
+          message: error?.response?.data?.message || error?.message,
+        });
+        console.log(".....API ERROR.....", error);
+      });
+  }, [id, addToast]);
 
-    if (invalidId) return <NotFound />;
+  if (invalidId) return <NotFound />;
 
-    return (
-        <div className={`${styles.container} ${homeStyles.article}`}>
-            <ViewTasks task={task} />
-            <TaksComments task={task} />
-        </div>
-    )
-}
+  return (
+    <div className={`${styles.container} ${homeStyles.article}`}>
+      <ViewTasks task={task} />
+      <TaksComments task={task} />
+    </div>
+  );
+};
 
 export default TaskDetails;
