@@ -357,12 +357,26 @@ main.close .side_nav .link {
 .modal {
     backdrop-filter: blur(4px);
     background-color: var(--shadow-color);
+    animation: fadeZoomIn 150ms ease;
 }
 
 .modal .modal_child {
     padding: 1em 0;
     border-radius: 8px;
     width: min(420px, 100%);
+    animation: fadeZoomIn 200ms ease;
+}
+
+@keyframes fadeZoomIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
 }
 
 .loading {

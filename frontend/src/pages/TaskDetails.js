@@ -8,7 +8,7 @@ import { AppContext } from "../store/AppContext";
 import { tasks } from "../utils/apiendpoints";
 import NotFound from "../pages/NotFound";
 import ViewTasks from "../components/ViewTasks";
-import TaksComments from "../components/TaksComments";
+import TaskComments from "../components/TaskComments";
 
 const TaskDetails = () => {
   const { addToast } = useContext(AppContext);
@@ -35,7 +35,7 @@ const TaskDetails = () => {
   return (
     <div className={`${styles.container} ${homeStyles.article}`}>
       <ViewTasks task={task} />
-      <TaksComments task={task} />
+      <TaskComments task={task} />
     </div>
   );
 };
