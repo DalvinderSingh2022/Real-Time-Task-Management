@@ -184,7 +184,7 @@ const updateTask = async (req, res) => {
       runValidators: true,
     }).populate([
       { path: "assignedTo", select: "_id name avatar email" },
-      { path: "assignedBy", select: "_id name avatar" },
+      { path: "assignedBy", select: "_id name avatar email" },
     ]);
 
     if (!updatedTask) {
@@ -207,6 +207,21 @@ const updateTask = async (req, res) => {
         ),
       });
     }
+
+    await sendMail({
+      to: updatedTask.assignedBy.email,
+      subject: "🔄 Task Updated",
+      html: taskUpdatedTemplate(
+        updatedTask.assignedBy._id,
+        updatedTask.assignedBy.name,
+        updatedTask.assignedBy.name,
+        updatedTask.title,
+        updatedTask._id,
+        updatedTask.status,
+        updatedTask.dueDate,
+        updatedTask.description,
+      ),
+    });
 
     return res
       .status(200)
