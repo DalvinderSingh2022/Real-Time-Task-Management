@@ -7,24 +7,39 @@ const initialState = {
 
 const tasksReducer = (state, action) => {
   switch (action.type) {
-    case "LOAD_TASKS":
-      return { tasks: action.payload.tasks, loaded: true };
+    case "INITIALIZE_TASKS":
+      return {
+        tasks: action.payload.tasks,
+        loaded: true,
+      };
+
     case "CREATE_TASK":
-      return { ...state, tasks: [...state.tasks, action.payload.task] };
+      if (state.tasks.some((t) => t._id === action.payload.task._id)) {
+        return state;
+      }
+
+      return {
+        ...state,
+        tasks: [...state.tasks, action.payload.task],
+      };
+
     case "DELETE_TASK":
       return {
         ...state,
         tasks: state.tasks.filter((task) => task._id !== action.payload.taskId),
       };
-    case "RESET_TASKS":
-      return initialState;
+
     case "UPDATE_TASK":
       return {
         ...state,
         tasks: state.tasks.map((task) =>
-          task._id === action.payload.task._id ? action.payload.task : task
+          task._id === action.payload.task._id ? action.payload.task : task,
         ),
       };
+
+    case "RESET_TASKS":
+      return initialState;
+
     default:
       return state;
   }
@@ -36,7 +51,10 @@ const TasksProvider = ({ children }) => {
   const [tasksState, dispatch] = useReducer(tasksReducer, initialState);
 
   const loadTasks = (tasks) => {
-    dispatch({ type: "LOAD_TASKS", payload: { tasks } });
+    dispatch({
+      type: "INITIALIZE_TASKS",
+      payload: { tasks },
+    });
   };
 
   const createTask = (task) => {

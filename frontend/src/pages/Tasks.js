@@ -1,5 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
-
+import React, { useContext, useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 
 import styles from "../styles/tasks.module.css";
@@ -11,6 +10,7 @@ import AddTask from "../components/AddTask";
 import useSearch from "../hooks/useSearch";
 
 const TaskStatusTypes = ["Not Started", "In Progress", "Completed"];
+
 const TaskDueTypes = [
   "Due Today",
   "Due Tomorrow",
@@ -21,48 +21,48 @@ const TaskDueTypes = [
   "Over due",
 ];
 
+const normalizeStatus = (status) => status.toLowerCase().replace(/\s/g, "");
+
 const Tasks = () => {
   const { tasksState } = useContext(TasksContext);
-  const [taskGroups, setTaskGroups] = useState({
-    notStarted: [],
-    inProgress: [],
-    completed: [],
-  });
-  const [handleChange, tasks, query] = useSearch(
+
+  const [handleChange, filteredTasks, query] = useSearch(
     tasksState.tasks,
     "title",
-    "dueStatus"
+    "dueStatus",
   );
 
-  useEffect(() => {
-    if (!tasks) return;
-    const groupedTasks = tasks.reduce(
-      (acc, task) => {
-        const status = task.status.toLowerCase().replaceAll(" ", "");
-        acc[status].push(task);
+  const taskGroups = useMemo(() => {
+    if (!Array.isArray(filteredTasks)) return {};
 
-        return acc;
-      },
-      { notstarted: [], inprogress: [], completed: [] }
-    );
+    return filteredTasks.reduce((acc, task) => {
+      const key = normalizeStatus(task.status);
 
-    setTaskGroups(groupedTasks);
-  }, [tasks]);
+      if (!acc[key]) acc[key] = [];
+      acc[key].push(task);
+
+      return acc;
+    }, {});
+  }, [filteredTasks]);
 
   return (
     <article>
       <SearchInput handleChange={handleChange} query={query} />
       <div className={styles.container}>
-        {TaskStatusTypes.map(
-          (status) =>
-            (!query.get("status") || query.get("status") === status) && (
-              <TaskSection
-                key={status}
-                tasks={taskGroups[status.replaceAll(" ", "").toLowerCase()]}
-                status={status}
-              />
-            )
-        )}
+        {TaskStatusTypes.map((status) => {
+          const key = normalizeStatus(status);
+
+          if (query.get("status") && query.get("status") !== status)
+            return null;
+
+          return (
+            <TaskSection
+              key={status}
+              tasks={taskGroups[key] || []}
+              status={status}
+            />
+          );
+        })}
       </div>
     </article>
   );

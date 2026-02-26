@@ -1,4 +1,11 @@
-import React, { memo, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  memo,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useParams } from "react-router-dom";
 
 import authStyles from "../styles/auth.module.css";
@@ -10,6 +17,14 @@ import { AppContext } from "../store/AppContext";
 import { socket } from "../hooks/useSocket";
 import { comments } from "../utils/apiendpoints";
 import Response from "./Response";
+
+const escapeHTML = (str) =>
+  str
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 
 const TaskComments = ({ task }) => {
   const { addToast } = useContext(AppContext);
@@ -27,6 +42,8 @@ const TaskComments = ({ task }) => {
   const messagesRef = useRef(null);
   const textAreaRef = useRef(null);
 
+  const currentUserIdRef = useRef(authState.user._id);
+
   const participants = task
     ? task.assignedTo?.find((u) => u._id === task.assignedBy._id)
       ? [...task.assignedTo]
@@ -34,16 +51,20 @@ const TaskComments = ({ task }) => {
     : [];
 
   useEffect(() => {
-    comments
-      .get(id)
-      .then(({ data }) => setAllComments(data.comments))
-      .catch((error) => {
+    const fetchComments = async () => {
+      try {
+        const data = await comments.get(id);
+        setAllComments(data.comments);
+      } catch (error) {
         addToast({
           type: "error",
-          message: error?.response?.data?.message || error?.message,
+          message: error?.message,
         });
         console.log(".....API ERROR.....", error);
-      });
+      }
+    };
+
+    fetchComments();
   }, [id, addToast]);
 
   useEffect(() => {
@@ -59,19 +80,20 @@ const TaskComments = ({ task }) => {
   }, [id, task, authState]);
 
   useEffect(() => {
-    socket.on("update_comments", (comment) => {
-      setAllComments((prev) => [...prev, comment]);
+    const handler = (incomingComment) => {
+      setAllComments((prev) => [...prev, incomingComment]);
 
-      if (authState.user._id !== comment.user._id) {
+      if (currentUserIdRef.current !== incomingComment.user._id) {
         addToast({
           type: "info",
-          message: `${task.title}: new comment by ${comment.user.name}`,
+          message: `${task.title}: new comment by ${incomingComment.user.name}`,
         });
       }
-    });
+    };
 
-    return () => socket.off("update_comments");
-  }, [addToast, task, authState]);
+    socket.on("update_comments", handler);
+    return () => socket.off("update_comments", handler);
+  }, [addToast, task]);
 
   useEffect(() => {
     if (messagesRef.current) {
@@ -108,7 +130,7 @@ const TaskComments = ({ task }) => {
   };
 
   const filteredMentions = participants.filter((u) =>
-    u.name.toLowerCase().includes(mentionQuery.toLowerCase())
+    u.name.toLowerCase().includes(mentionQuery.toLowerCase()),
   );
 
   const handleMentionSelect = (user) => {
@@ -127,26 +149,26 @@ const TaskComments = ({ task }) => {
     }, 0);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!comment.trim()) return;
 
     setResponse(true);
 
-    comments
-      .create(id, { comment })
-      .then(({ data }) => {
-        socket.emit("send_comment", data.comment, id);
-        setComment("");
-      })
-      .catch((error) => {
-        addToast({
-          type: "error",
-          message: error?.response?.data?.message || error?.message,
-        });
-        console.log(".....API ERROR.....", error);
-      })
-      .finally(() => setResponse(false));
+    try {
+      const data = await comments.create(id, { comment });
+      
+      socket.emit("send_comment", data.comment, id);
+      setComment("");
+    } catch (error) {
+      addToast({
+        type: "error",
+        message: error?.message,
+      });
+      console.log(".....API ERROR.....", error);
+    } finally {
+      setResponse(false);
+    }
   };
 
   return (
@@ -165,7 +187,11 @@ const TaskComments = ({ task }) => {
             <div className={`flex col ${styles.messages}`} ref={messagesRef}>
               {allComments?.length > 0 ? (
                 allComments.map((com) => (
-                  <Comment {...com} authState={authState} key={com._id} />
+                  <Comment
+                    key={com._id}
+                    {...com}
+                    currentUserId={authState.user._id}
+                  />
                 ))
               ) : allComments ? (
                 <div className="text_secondary flex">No comments</div>
@@ -192,45 +218,19 @@ const TaskComments = ({ task }) => {
                 </div>
 
                 {showMentions && (
-                  <div
-                    className={styles.mentionDropdown}
-                    style={{
-                      position: "absolute",
-                      bottom: "90px",
-                      left: "0",
-                      zIndex: 20,
-                      background: "white",
-                      borderRadius: "6px",
-                      width: "250px",
-                      maxHeight: "160px",
-                      overflowY: "auto",
-                      padding: "4px 0",
-                      boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
-                    }}
-                  >
+                  <div className={styles.mentionDropdown}>
                     {filteredMentions.length ? (
                       filteredMentions.map((user) => (
                         <div
                           key={user._id}
                           onClick={() => handleMentionSelect(user)}
-                          style={{
-                            padding: "8px 12px",
-                            cursor: "pointer",
-                          }}
                           className={styles.mentionItem}
                         >
                           @{user.name}
                         </div>
                       ))
                     ) : (
-                      <div
-                        style={{
-                          padding: "8px 12px",
-                          color: "#888",
-                        }}
-                      >
-                        No users found
-                      </div>
+                      <div className={styles.mentionItem}>No users found</div>
                     )}
                   </div>
                 )}
@@ -245,30 +245,34 @@ const TaskComments = ({ task }) => {
   );
 };
 
-const highlightMentions = (text) => {
-  return text.replace(
-    /@([A-Za-z0-9 _]+)/g,
-    (match) => `<span style="color:#925bc8;font-weight:600;">${match}</span>`
-  );
-};
-
 const Comment = memo(
-  ({ _id, comment, user, createdAt, authState }) => (
-    <div key={_id} className={styles.message}>
-      <div dangerouslySetInnerHTML={{ __html: highlightMentions(comment) }} />
-      <div className={styles.comment_date}>
-        <span
-          className={
-            user._id === authState.user._id ? "text_primary" : "text_secondary"
-          }
-        >
-          {user.name}
-        </span>{" "}
-        on {new Date(createdAt).toLocaleString()}
+  ({ _id, comment, user, createdAt, currentUserId }) => {
+    const formattedComment = useMemo(() => {
+      const safe = escapeHTML(comment);
+      return safe.replace(
+        /@([A-Za-z0-9 _]+)/g,
+        (match) => `<span class="mention">${match}</span>`,
+      );
+    }, [comment]);
+
+    return (
+      <div className={styles.message}>
+        <div dangerouslySetInnerHTML={{ __html: formattedComment }} />
+
+        <div className={styles.comment_date}>
+          <span
+            className={
+              user._id === currentUserId ? "text_primary" : "text_secondary"
+            }
+          >
+            {user.name}
+          </span>{" "}
+          on {new Date(createdAt).toLocaleString()}
+        </div>
       </div>
-    </div>
-  ),
-  (prev, next) => prev._id === next._id
+    );
+  },
+  (prev, next) => prev._id === next._id,
 );
 
 export default TaskComments;

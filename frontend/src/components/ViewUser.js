@@ -1,13 +1,9 @@
-import React, { useEffect, useState } from "react";
-
+import React, { memo, useRef } from "react";
 import styles from "../styles/userdetails.module.css";
 
-const ViewUser = (prop) => {
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    if (!user) setUser(prop.user);
-  }, [prop, user]);
+const ViewUser = ({ user: incomingUser }) => {
+  const userRef = useRef(incomingUser);
+  const user = userRef.current;
 
   return (
     <section
@@ -34,7 +30,7 @@ const ViewUser = (prop) => {
               name="name"
               className="text_primary"
               value={user.name}
-              disabled={true}
+              disabled
             />
             <div className="text_secondary">{user.email}</div>
             <div className="text-gray-600">
@@ -52,4 +48,4 @@ const ViewUser = (prop) => {
   );
 };
 
-export default ViewUser;
+export default memo(ViewUser);

@@ -1,22 +1,25 @@
-import React, { useContext, useState } from "react";
-
+import React, { memo, useContext, useMemo, useState } from "react";
 import { CgMenuRightAlt } from "react-icons/cg";
 
 import { AuthContext } from "../store/AuthContext";
 import UpdateProfile from "./UpdateProfile";
 
-const greeting = () => {
-  const currentTime = new Date().getHours();
-  const morning = `Good morning`;
-  const afternoon = `Good afternoon`;
-  const evening = `Good evening`;
-
-  return currentTime < 12 ? morning : currentTime < 17 ? afternoon : evening;
+const getGreeting = () => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 };
 
 const Topbar = () => {
   const [show, setShow] = useState(false);
   const { authState } = useContext(AuthContext);
+
+  const greeting = useMemo(() => getGreeting(), []);
+
+  const toggleSidebar = () => {
+    document.querySelector("main")?.classList.toggle("close");
+  };
 
   return (
     <>
@@ -25,15 +28,11 @@ const Topbar = () => {
         <div className="flex gap">
           <button
             className="menu_toggle button flex primary round"
-            onClick={() =>
-              document.querySelector("main").classList.toggle("close")
-            }
+            onClick={toggleSidebar}
           >
             <CgMenuRightAlt />
           </button>
-          <div className="greeting text_primary">
-            {"Welcome, " + greeting()}
-          </div>
+          <div className="greeting text_primary">Welcome, {greeting}</div>
         </div>
         <div className="user_profile flex gap2">
           <img
@@ -52,4 +51,4 @@ const Topbar = () => {
   );
 };
 
-export default Topbar;
+export default memo(Topbar);

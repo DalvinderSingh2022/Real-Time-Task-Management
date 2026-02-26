@@ -1,15 +1,13 @@
 import React, { useContext, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
-
-import { FiEye } from "react-icons/fi";
-import { FiEyeOff } from "react-icons/fi";
+import { FiEye, FiEyeOff } from "react-icons/fi";
 
 import styles from "./../styles/auth.module.css";
 
 import Toast from "../components/Toast";
 import Response from "../components/Response";
-
 import useLoadStates from "../hooks/useLoadStates";
+
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
 import { users } from "../utils/apiendpoints";
@@ -17,45 +15,67 @@ import { users } from "../utils/apiendpoints";
 const Login = () => {
   const { authState, login } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
-  const [response, setResponse] = useState(false);
-  const [show, setShow] = useState(false);
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
   const navigate = useNavigate();
   useLoadStates(authState.user);
 
-  const handlesubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (isLoading) return;
+
+    const form = e.target;
+
     const user = {
-      email: e.target.email.value,
-      password: e.target.password.value,
+      email: form.email.value.trim(),
+      password: form.password.value,
     };
 
-    setResponse(true);
-    users
-      .login(user)
-      .then(({ data }) => {
-        login(data.user);
-        localStorage.setItem("jwt", data.token);
-        addToast({ type: "success", message: data.message });
-        navigate("/");
-      })
-      .catch((error) => {
-        addToast({
-          type: "error",
-          message: error?.response?.data?.message || error?.message,
-        });
-        console.log(".....API ERROR.....", error);
-      })
-      .finally(() => setResponse(false));
+    if (!user.email || !user.password) {
+      addToast({
+        type: "error",
+        message: "Please fill all fields",
+      });
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+
+      const data = await users.login(user);
+
+      login(data.user);
+      localStorage.setItem("jwt", data.token);
+
+      addToast({
+        type: "success",
+        message: data.message,
+      });
+
+      navigate("/");
+    } catch (error) {
+      addToast({
+        type: "error",
+        message: error?.message,
+      });
+
+      console.log(".....API ERROR.....", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   if (authState.authenticated) {
-    return <Navigate to="/" />;
+    return <Navigate to="/" replace />;
   }
 
   return (
     <>
       <Toast />
-      {response && <Response />}
+      {isLoading && <Response />}
       <div className="flex full_container">
         <section className={`flex col gap ${styles.container}`}>
           <div>
@@ -68,7 +88,7 @@ const Login = () => {
           </div>
           <form
             className={`flex col gap w_full ${styles.form}`}
-            onSubmit={(e) => handlesubmit(e)}
+            onSubmit={handleSubmit}
           >
             <div className={`flex col w_full ${styles.group}`}>
               <label htmlFor="email" className="text_primary">
@@ -78,8 +98,9 @@ const Login = () => {
                 type="email"
                 id="email"
                 name="email"
-                placeholder="exapmle@domain.com"
+                placeholder="example@domain.com"
                 autoComplete="email"
+                required
               />
             </div>
             <div className={`flex col w_full ${styles.group}`}>
@@ -87,33 +108,42 @@ const Login = () => {
                 Password
               </label>
               <input
-                type={show ? "text" : "password"}
+                type={showPassword ? "text" : "password"}
                 id="password"
                 name="password"
-                placeholder="12345678"
+                placeholder="Enter your password"
                 autoComplete="current-password"
+                required
               />
               <span
                 className={`${styles.password_eye} flex`}
-                onClick={() => setShow((prev) => !prev)}
+                onClick={() => setShowPassword((prev) => !prev)}
               >
-                {show ? <FiEyeOff /> : <FiEye />}
+                {showPassword ? <FiEyeOff /> : <FiEye />}
               </span>
             </div>
 
             <div className={`flex col w_full ${styles.group}`}>
               <button
                 type="submit"
+                disabled={isLoading}
                 className={`button primary flex gap2 ${styles.submit_button}`}
               >
-                Log In{response && <div className="loading"></div>}
+                {isLoading ? (
+                  <>
+                    Logging in
+                    <div className="loading"></div>
+                  </>
+                ) : (
+                  "Log In"
+                )}
               </button>
             </div>
 
             <div className={styles.link}>
               Don’t have an account?
               <Link to="/register" className={styles.submit_button}>
-                register
+                Register
               </Link>
             </div>
           </form>

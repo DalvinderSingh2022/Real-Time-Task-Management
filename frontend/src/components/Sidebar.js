@@ -15,50 +15,50 @@ import { AuthContext } from "../store/AuthContext";
 import { UsersContext } from "../store/UsersContext";
 import { TasksContext } from "../store/TasksContext";
 import DeleteAccountModal from "./DeleteAccountModal";
+import { socket } from "../hooks/useSocket";
 
 const Sidebar = () => {
-  const { logout } = useContext(AuthContext);
-  const { notificationsState, resetNotifications } =
-    useContext(NotificationsContext);
+  const { logout, authState } = useContext(AuthContext);
+  const { resetNotifications, unreadCount } = useContext(NotificationsContext);
   const { resetUsers } = useContext(UsersContext);
   const { resetTasks } = useContext(TasksContext);
   const [deleteModal, setDeleteModal] = useState(false);
-  const [count, setCount] = useState(0);
+  const [collapsed, setCollapsed] = useState(false);
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     localStorage.removeItem("jwt");
+
+    await new Promise((resolve) => {
+      socket.emit("user_left", authState.user._id, resolve);
+    });
+
     resetTasks();
     resetUsers();
     resetNotifications();
     logout();
   };
 
-  const toggleDeleteModal = () => {
-    setDeleteModal((prev) => !prev);
-  };
-
   useEffect(() => {
-    setCount(
-      notificationsState.notifications.filter(
-        (notification) => !notification.read
-      ).length
-    );
-  }, [notificationsState]);
+    if (collapsed) {
+      document.querySelector("main").classList.add("close");
+    } else {
+      document.querySelector("main").classList.remove("close");
+    }
+  }, [collapsed]);
 
   return (
     <>
       {deleteModal && (
         <DeleteAccountModal
-          remove={toggleDeleteModal}
+          remove={() => setDeleteModal(false)}
           handleLogout={handleLogout}
         />
       )}
+
       <aside className="side_nav flex col gap">
         <button
           className="menu_toggle button flex primary round"
-          onClick={() =>
-            document.querySelector("main").classList.toggle("close")
-          }
+          onClick={() => setCollapsed((p) => !p)}
         >
           <RiCloseLine />
         </button>
@@ -90,26 +90,21 @@ const Sidebar = () => {
           >
             <IoNotificationsSharp />
             <p>Notifications</p>
-            {count > 0 && (
+            {unreadCount > 0 && (
               <span className="notifications_count flex button primary round">
-                {count}
+                {unreadCount}
               </span>
             )}
           </NavLink>
         </div>
         <div className="flex col gap2 w_full">
-          <button
-            className="button flex gap2 link"
-            title="Logout"
-            onClick={handleLogout}
-          >
+          <button className="button flex gap2 link" onClick={handleLogout}>
             <TbLogout />
             <p>Logout</p>
           </button>
           <button
             className="button flex gap2 link"
-            title="Delete Account"
-            onClick={toggleDeleteModal}
+            onClick={() => setDeleteModal(true)}
           >
             <AiOutlineUserDelete />
             <p>Delete Account</p>

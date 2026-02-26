@@ -1,14 +1,22 @@
-import React, { memo, useState } from "react";
-
+import React, { memo, useState, useMemo } from "react";
 import { TbCalendarDue } from "react-icons/tb";
+import { Link } from "react-router-dom";
 
 import styles from "../../styles/notifications.module.css";
 import DeleteButton from "./DeleteButton";
-import { Link } from "react-router-dom";
 
 const SystemNotification = (prop) => {
   const [response, setResponse] = useState(false);
-  const tasks = prop.data.tasks;
+
+  const taskTitles = useMemo(
+    () => prop.data.tasks.map((t) => t.title).join(", "),
+    [prop.data.tasks],
+  );
+
+  const createdAt = useMemo(() => {
+    const date = new Date(prop.createdAt);
+    return `${date.toDateString()} at ${date.toLocaleTimeString()}`;
+  }, [prop.createdAt]);
 
   return (
     <>
@@ -18,16 +26,8 @@ const SystemNotification = (prop) => {
       <div className="w_full">
         <span className={`text_primary ${styles.message}`}>{prop.message}</span>
         <div className={styles.data}>
-          <Link to={`/tasks?dueStatus=Due Today`}>
-            {tasks.map(
-              (task, index) => `${index !== 0 ? "," : ""}${task.title}`
-            )}
-          </Link>
-          <div className="text_secondary">
-            {new Date(prop.createdAt).toDateString() +
-              " at " +
-              new Date(prop.createdAt).toLocaleTimeString()}
-          </div>
+          <Link to={`/tasks?dueStatus=Due Today`}>{taskTitles}</Link>
+          <div className="text_secondary">{createdAt}</div>
         </div>
       </div>
       {response ? (
@@ -45,5 +45,5 @@ const SystemNotification = (prop) => {
 
 export default memo(
   SystemNotification,
-  (prev, next) => prev?.data?.task?._id === next?.data?.task?._id
+  (prev, next) => prev.prop._id === next.prop._id,
 );

@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { memo, useContext, useMemo } from "react";
 
 import styles from "../../styles/users.module.css";
 
@@ -8,20 +8,25 @@ import User from "../../components/User";
 import SearchInput from "./SearchInput";
 
 const Followers = () => {
-  const { authState } = useContext(AuthContext);
-  const [handleChange, users, query] = useSearch(
-    authState?.user?.followers,
-    "name"
-  );
+  const {
+    authState: { user: { followers = [] } = {} },
+  } = useContext(AuthContext);
+
+  const [handleChange, filteredUsers, search] = useSearch(followers, "name");
+
+  const renderedUsers = useMemo(() => {
+    if (!filteredUsers) return null;
+    return filteredUsers.map((user) => <User {...user} key={user._id} />);
+  }, [filteredUsers]);
 
   return (
     <article>
-      <SearchInput handleChange={handleChange} query={query} />
+      <SearchInput handleChange={handleChange} query={search} />
       <div className={styles.container}>
         <div className={`flex gap wrap ${styles.wrapper}`}>
-          {users?.length > 0 ? (
-            users.map((user) => <User {...user} key={user._id} />)
-          ) : users ? (
+          {filteredUsers?.length > 0 ? (
+            renderedUsers
+          ) : filteredUsers ? (
             <div className="text_secondary flex">There is no follower</div>
           ) : (
             <div className="loading"></div>
@@ -32,4 +37,4 @@ const Followers = () => {
   );
 };
 
-export default Followers;
+export default memo(Followers);

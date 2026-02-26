@@ -1,35 +1,46 @@
-import React, { useContext } from "react";
+import React, { useContext, useRef } from "react";
 
 import Task from "./Task";
-
 import styles from "../styles/tasks.module.css";
 import { DragAndDropContext } from "../store/DragAndDropContext";
 
-let newStatus;
-let closestSection;
 const TaskSection = ({ tasks, status }) => {
   const { setStatus } = useContext(DragAndDropContext);
 
+  const sectionRef = useRef(null);
+  const dragStatusRef = useRef(null);
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    dragStatusRef.current = status;
+
+    if (sectionRef.current) {
+      sectionRef.current.classList.add("over");
+    }
+  };
+
+  const handleDragLeave = () => {
+    if (sectionRef.current) {
+      sectionRef.current.classList.remove("over");
+    }
+  };
+
+  const handleDragEndCapture = () => {
+    if (sectionRef.current) {
+      sectionRef.current.classList.remove("over");
+    }
+
+    if (dragStatusRef.current) {
+      setStatus(dragStatusRef.current);
+    }
+  };
+
   return (
     <section
-      onDragLeave={() => {
-        if (closestSection) closestSection.classList.remove("over");
-      }}
-      onDragOver={(e) => {
-        e.preventDefault();
-        newStatus = status;
-        const newClosest = e.target.closest("section");
-        if (newClosest) {
-          closestSection = newClosest;
-          closestSection.classList.add("over");
-        }
-      }}
-      onDragEndCapture={() => {
-        if (closestSection) {
-          closestSection.classList.remove("over");
-        }
-        setStatus(newStatus);
-      }}
+      ref={sectionRef}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDragEndCapture={handleDragEndCapture}
       data-status={status}
       className={`flex col ${styles.wrapper} ${status
         .replaceAll(" ", "")

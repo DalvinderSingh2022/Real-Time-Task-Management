@@ -6,12 +6,17 @@ import Sidebar from "./Sidebar";
 import Toast from "./Toast";
 
 import { AuthContext } from "../store/AuthContext";
+import Response from "./Response";
 
 const Layout = () => {
   const { authState } = useContext(AuthContext);
 
+  if (authState.loading) {
+    return <Response />;
+  }
+
   if (!authState.authenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/login" replace />;
   }
 
   return (

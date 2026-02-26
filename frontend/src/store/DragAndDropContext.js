@@ -34,7 +34,7 @@ const DragAndDropContext = createContext();
 const DragAndDropProvider = ({ children }) => {
   const [dragAndDropState, dispatch] = useReducer(
     dragAndDropReducer,
-    initialState
+    initialState,
   );
   const { addToast } = useContext(AppContext);
   const { authState } = useContext(AuthContext);
@@ -71,31 +71,30 @@ const DragAndDropProvider = ({ children }) => {
 
         setResponse(true);
         try {
-          const { data } = await tasks.update(oldTask._id, {
+          const { task } = await tasks.update(oldTask._id, {
             ...oldTask,
             status: dragAndDropState.status,
           });
-          const { task } = data;
 
-          const { data: notificationData } = await notifications.updateTask({
+          const notificationData = await notifications.updateTask({
             changes,
             task,
             oldTask,
           });
           const notification = notificationData.notifications.find(
-            (n) => n.user === authState.user._id
+            (n) => n.user === authState.user._id,
           );
           socket.emit(
             "task_updated",
             task,
             authState.user,
             notification,
-            oldTask
+            oldTask,
           );
         } catch (error) {
           addToast({
             type: "error",
-            message: error?.response?.data?.message || error?.message,
+            message: error?.message,
           });
           console.log(".....API ERROR.....", error);
         } finally {

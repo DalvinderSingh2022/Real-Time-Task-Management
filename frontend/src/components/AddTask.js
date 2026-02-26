@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState } from "react";
+import React, { useContext, useState, useMemo, useEffect } from "react";
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -9,47 +9,60 @@ import { socket } from "../hooks/useSocket";
 import { notifications, tasks } from "../utils/apiendpoints";
 import Response from "./Response";
 
-const AddTask = ({ remove, initialAssignedTo }) => {
+const AddTask = ({ remove, initialAssignedTo = [] }) => {
   const { authState } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
   const [response, setResponse] = useState(false);
-  const [assignedTo, setAssignedTo] = useState(
-    initialAssignedTo?.length ? initialAssignedTo : []
+  const [assignedTo, setAssignedTo] = useState(initialAssignedTo);
+
+  useEffect(() => {
+    setAssignedTo(initialAssignedTo);
+  }, [initialAssignedTo]);
+
+  const assignableUsers = useMemo(
+    () => [...authState.user.followers, authState.user],
+    [authState.user],
   );
 
   const handleAssignedToToggle = (userId) => {
     setAssignedTo((prev) =>
       prev.includes(userId)
         ? prev.filter((id) => id !== userId)
-        : [...prev, userId]
+        : [...prev, userId],
     );
   };
 
   const handlesubmit = async (e) => {
     e.preventDefault();
+
     const body = {
       title: e.target.title.value,
       description: e.target.description.value,
       dueDate: e.target.dueDate.value,
       assignedBy: authState.user._id,
-      assignedTo,
+      assignedTo: [...new Set(assignedTo)],
     };
 
     setResponse(true);
-    try {
-      const { data: taskData } = await tasks.create(body);
-      const { task } = taskData;
 
-      const { data: notificationData } = await notifications.assignTask(task);
+    try {
+      const { task } = await tasks.create(body);
+
+      const notificationData = await notifications.assignTask(task);
+
       const [notification] = notificationData.notifications;
-      socket.emit("task_created", task, notification);
+
+      await new Promise((resolve) => {
+        socket.emit("task_created", task, notification, resolve);
+      });
+
       remove();
     } catch (error) {
       addToast({
         type: "error",
-        message: error?.response?.data?.message || error?.message,
+        message: error?.message,
       });
-      console.log(".....TASK API ERROR.....", error);
+      console.log(".....API ERROR.....", error);
     } finally {
       setResponse(false);
     }
@@ -60,7 +73,7 @@ const AddTask = ({ remove, initialAssignedTo }) => {
       {response && <Response />}
       <div className="modal flex full_container" onClick={remove}>
         <div
-          className={` flex col ${authStyles.container} ${modalStyles.container}`}
+          className={`flex col ${authStyles.container} ${modalStyles.container}`}
           onClick={(e) => e.stopPropagation()}
         >
           <div>
@@ -118,7 +131,7 @@ const AddTask = ({ remove, initialAssignedTo }) => {
                 Assign To
               </label>
               <div className={`flex wrap ${modalStyles.check_container}`}>
-                {[...authState.user.followers, authState.user].map((user) => (
+                {assignableUsers.map((user) => (
                   <label
                     key={user._id}
                     htmlFor={user._id}
@@ -142,8 +155,10 @@ const AddTask = ({ remove, initialAssignedTo }) => {
               <button
                 type="submit"
                 className={`button primary flex gap2 ${authStyles.submit_button}`}
+                disabled={response}
               >
-                Add{response && <div className="loading"></div>}
+                Add
+                {response && <div className="loading"></div>}
               </button>
               <button
                 type="button"
@@ -160,8 +175,4 @@ const AddTask = ({ remove, initialAssignedTo }) => {
   );
 };
 
-export default memo(
-  AddTask,
-  (prev, next) =>
-    JSON.stringify(prev?.assignedTo) === JSON.stringify(next?.assignedTo)
-);
+export default AddTask;

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { memo } from "react";
 import { NavLink } from "react-router-dom";
 
 import tasksStyles from "../../styles/tasks.module.css";
@@ -17,7 +17,7 @@ const SearchInput = ({ handleChange, query }) => {
         onChange={handleChange}
       />
       <div className="flex gap2">
-        <NavLink end={true} to="/users" className="button flex gap2 link">
+        <NavLink end to="/users" className="button flex gap2 link">
           All
         </NavLink>
         <NavLink to="/users/followers" className="button flex gap2 link">
@@ -31,4 +31,4 @@ const SearchInput = ({ handleChange, query }) => {
   );
 };
 
-export default SearchInput;
+export default memo(SearchInput);

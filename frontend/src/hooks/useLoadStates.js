@@ -1,45 +1,71 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 
-import { AppContext } from "../store/AppContext";
 import { TasksContext } from "../store/TasksContext";
 import { UsersContext } from "../store/UsersContext";
 import { NotificationsContext } from "../store/NotificationContext";
 import { notifications, tasks, users } from "../utils/apiendpoints";
 
 const useLoadStates = () => {
-  const token = localStorage.getItem("jwt");
-  const { addToast } = useContext(AppContext);
-  const { loadTasks, tasksState } = useContext(TasksContext);
-  const { loadUsers, usersState } = useContext(UsersContext);
-  const { loadNotifications, notificationsState } =
-    useContext(NotificationsContext);
+  const tokenRef = useRef(localStorage.getItem("jwt"));
+
+  const { loadTasks } = useContext(TasksContext);
+  const { loadUsers } = useContext(UsersContext);
+  const { loadNotifications } = useContext(NotificationsContext);
+
+  const hasLoadedUsers = useRef(false);
+  const hasLoadedTasks = useRef(false);
+  const hasLoadedNotifications = useRef(false);
 
   useEffect(() => {
-    if (!usersState.loaded && token) {
-      users
-        .all()
-        .then(({ data }) => loadUsers(data.users))
-        .catch((error) => console.log(".....API ERROR.....", error));
-    }
-  }, [loadUsers, usersState, addToast, token]);
+    if (!tokenRef.current || hasLoadedUsers.current) return;
+
+    hasLoadedUsers.current = true;
+
+    const fetchUsers = async () => {
+      try {
+        const data = await users.all();
+        loadUsers(data.users);
+      } catch (error) {
+        console.log(".....API ERROR.....", error);
+      }
+    };
+
+    fetchUsers();
+  }, [loadUsers]);
 
   useEffect(() => {
-    if (!notificationsState.loaded && token) {
-      notifications
-        .all()
-        .then(({ data }) => loadNotifications(data.notifications))
-        .catch((error) => console.log(".....API ERROR.....", error));
-    }
-  }, [loadNotifications, notificationsState, addToast, token]);
+    if (!tokenRef.current || hasLoadedNotifications.current) return;
+
+    hasLoadedNotifications.current = true;
+
+    const fetchNotifications = async () => {
+      try {
+        const data = await notifications.all();
+        loadNotifications(data.notifications);
+      } catch (error) {
+        console.log(".....API ERROR.....", error);
+      }
+    };
+
+    fetchNotifications();
+  }, [loadNotifications]);
 
   useEffect(() => {
-    if (!tasksState.loaded && token) {
-      tasks
-        .all()
-        .then(({ data }) => loadTasks(data.tasks))
-        .catch((error) => console.log(".....API ERROR.....", error));
-    }
-  }, [loadTasks, tasksState, addToast, token]);
+    if (!tokenRef.current || hasLoadedTasks.current) return;
+
+    hasLoadedTasks.current = true;
+
+    const fetchTasks = async () => {
+      try {
+        const data = await tasks.all();
+        loadTasks(data.tasks);
+      } catch (error) {
+        console.log(".....API ERROR.....", error);
+      }
+    };
+
+    fetchTasks();
+  }, [loadTasks]);
 };
 
 export default useLoadStates;

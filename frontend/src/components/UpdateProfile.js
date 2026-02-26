@@ -1,10 +1,4 @@
-import React, {
-  memo,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { memo, useContext, useMemo, useState } from "react";
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -16,6 +10,7 @@ import { socket } from "../hooks/useSocket";
 import Response from "./Response";
 
 const baseUrl = "https://api.dicebear.com/9.x/fun-emoji/svg?radius=50&scale=75";
+
 const options = {
   mouth: [
     "plain",
@@ -67,96 +62,90 @@ const UpdateProfile = ({ remove }) => {
   const { authState, login } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
   const [response, setResponse] = useState(false);
-  const [profile, setProfile] = useState({
-    name: authState.user.name,
-    avatar: authState.user.avatar,
+  const [profile, setProfile] = useState(() => {
+    const avatar = authState.user.avatar;
+    const params = avatar.split("?")[1];
+    const pairs = params?.split("&") || [];
+
+    const parsed = { name: authState.user.name };
+
+    pairs.forEach((pair) => {
+      const [key, value] = pair.split("=");
+      if (options[key]) parsed[key] = value;
+    });
+
+    return parsed;
   });
 
-  const getAvatar = useCallback(
-    ({ mouth, eyes, backgroundColor }) => {
-      let avatar = `${baseUrl}&seed=${profile.name}`;
-
-      if (mouth) avatar += `&mouth=${mouth}`;
-      if (eyes) avatar += `&eyes=${eyes}`;
-      if (backgroundColor) avatar += `&backgroundColor=${backgroundColor}`;
-
-      return avatar;
-    },
-    [profile.name]
-  );
+  const avatarUrl = useMemo(() => {
+    let avatar = `${baseUrl}&seed=${profile.name}`;
+    if (profile.mouth) avatar += `&mouth=${profile.mouth}`;
+    if (profile.eyes) avatar += `&eyes=${profile.eyes}`;
+    if (profile.backgroundColor)
+      avatar += `&backgroundColor=${profile.backgroundColor}`;
+    return avatar;
+  }, [profile]);
 
   const handlesubmit = async (e) => {
     e.preventDefault();
-    const user = {
-      name: profile.name,
-      avatar: getAvatar(profile),
-    };
 
     if (
-      user.name === authState.user.name &&
-      user.avatar === authState.user.avatar
+      profile.name === authState.user.name &&
+      avatarUrl === authState.user.avatar
     ) {
       return addToast({ type: "error", message: "No changes made to save" });
     }
 
     setResponse(true);
+
     try {
-      const { data: userData } = await users.update(user);
+      const userData = await users.update({
+        name: profile.name,
+        avatar: avatarUrl,
+      });
+
       socket.emit("user_update", userData.user);
       login(userData.user);
       addToast({ type: "success", message: userData.message });
       remove();
 
-      const { data: taskData } = await tasks.all();
+      const taskData = await tasks.all();
+
       taskData.tasks.forEach((task) => {
-        let updatedTask = task;
+        let updated = false;
+        const updatedTask = { ...task };
 
-        if (updatedTask.assignedBy._id === userData.user._id) {
-          updatedTask = {
-            ...updatedTask,
-            assignedBy: {
-              ...updatedTask.assignedBy,
-              avatar: userData.user.avatar,
-            },
+        if (task.assignedBy._id === userData.user._id) {
+          updatedTask.assignedBy = {
+            ...task.assignedBy,
+            avatar: userData.user.avatar,
           };
-        }
-        if (
-          updatedTask.assignedTo.some((user) => user._id === userData.user._id)
-        ) {
-          updatedTask = {
-            ...updatedTask,
-            assignedTo: updatedTask.assignedTo.map((user) =>
-              user._id === userData.user._id
-                ? { ...user, avatar: userData.user.avatar }
-                : user
-            ),
-          };
+          updated = true;
         }
 
-        socket.emit("task_updated", updatedTask);
+        const newAssignedTo = task.assignedTo.map((u) => {
+          if (u._id === userData.user._id) {
+            updated = true;
+            return { ...u, avatar: userData.user.avatar };
+          }
+          return u;
+        });
+
+        if (updated) {
+          updatedTask.assignedTo = newAssignedTo;
+          socket.emit("task_updated", updatedTask);
+        }
       });
     } catch (error) {
       addToast({
         type: "error",
-        message: error?.response?.data?.message || error?.message,
+        message: error?.message,
       });
       console.log(".....API ERROR.....", error);
     } finally {
       setResponse(false);
     }
   };
-
-  useEffect(() => {
-    const params = authState.user.avatar.split("?")[1];
-    const pairs = params.split("&");
-
-    pairs.forEach((pair) => {
-      const [key, value] = pair.split("=");
-      if (key === "mouth" || key === "eyes" || key === "backgroundColor") {
-        setProfile((prev) => ({ ...prev, [key]: value }));
-      }
-    });
-  }, [authState.user.avatar, getAvatar]);
 
   return (
     <>
@@ -166,18 +155,15 @@ const UpdateProfile = ({ remove }) => {
         onClick={remove}
       >
         <div
-          className={` flex col ${authStyles.container} ${modalStyles.container}`}
+          className={`flex col ${authStyles.container} ${modalStyles.container}`}
           onClick={(e) => e.stopPropagation()}
         >
           <form
-            className={`flex col gap w_full modal_child`}
+            className="flex col gap w_full modal_child"
             onSubmit={handlesubmit}
           >
-            <img
-              src={getAvatar(profile) || authState.user.avatar}
-              alt="User Avatar"
-              className="profile_avatar"
-            />
+            <img src={avatarUrl} alt="User Avatar" className="profile_avatar" />
+
             <div className={`flex col w_full ${authStyles.group}`}>
               <input
                 type="text"
@@ -201,28 +187,17 @@ const UpdateProfile = ({ remove }) => {
                 <div className={`flex col w_full ${authStyles.group}`}>
                   <div className={`${modalStyles.check_container} flex`}>
                     {value.map((option) => (
-                      <label
-                        key={option}
-                        htmlFor={key + option}
-                        className={modalStyles.checkbox}
-                      >
+                      <label key={option} className={modalStyles.checkbox}>
                         <input
                           type="checkbox"
-                          id={key + option}
                           checked={profile[key] === option}
                           onChange={() =>
-                            setProfile((prev) => ({ ...prev, [key]: option }))
+                            setProfile((p) => ({ ...p, [key]: option }))
                           }
                         />
                         <img
-                          onError={(e) => {
-                            e.target.src =
-                              "https://png.pngtree.com/png-clipart/20231120/original/pngtree-not-allowed-sign-icon-photo-png-image_13656884.png";
-                            e.target.style.cursor = "not-allowed";
-                            e.target.previousSibling.disabled = true;
-                          }}
-                          className={`flex avatar ${modalStyles.check_label}`}
-                          src={getAvatar({ ...profile, [key]: option })}
+                          className={`avatar ${modalStyles.check_label}`}
+                          src={`${baseUrl}&seed=${profile.name}&${key}=${option}`}
                           alt={option}
                           title={option}
                         />

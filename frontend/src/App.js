@@ -1,4 +1,4 @@
-import React, { lazy, Suspense, useContext, useEffect, useState } from "react";
+import React, { lazy, Suspense, useContext, useEffect } from "react";
 import { Routes, Route } from "react-router-dom";
 
 import Layout from "./components/Layout";
@@ -25,33 +25,40 @@ const Notifications = lazy(() => import("./pages/Notifications.js"));
 const MagicLogin = lazy(() => import("./pages/MagicLogin.js"));
 
 const App = () => {
-  const [loadingMsg, setLoadingMsg] = useState("");
-  const { authState, login, verify } = useContext(AuthContext);
+  const { authState, login, logout, authCheckComplete } =
+    useContext(AuthContext);
+
   const { addToast } = useContext(AppContext);
   useLoadStates(authState.user);
   useSocket();
 
   useEffect(() => {
-    if (authState.verified) return;
+    if (!authState.checkingAuth) return;
 
-    setLoadingMsg("Fetching user details, please wait...");
+    const verifyUser = async () => {
+      try {
+        const data= await users.current();
+        login(data.user);
+      } catch (error) {
+        logout();
 
-    users
-      .current()
-      .then(({ data }) => login(data.user))
-      .catch((error) => {
-        verify();
-        addToast({
-          type: "error",
-          message: error?.response?.data?.message || error?.message,
-        });
-        console.log(".....API ERROR.....", error);
-      })
-      .finally(() => setLoadingMsg(""));
-  }, [addToast, authState.verified, login, verify]);
+        if (error?.response?.status !== 401) {
+          addToast({
+            type: "error",
+            message: error?.message,
+          });
+          console.log(".....API ERROR.....", error);
+        }
+      } finally {
+        authCheckComplete();
+      }
+    };
 
-  if (loadingMsg || !authState.verified) {
-    return <Loading message={loadingMsg} />;
+    verifyUser();
+  }, [authState.checkingAuth, login, logout, authCheckComplete, addToast]);
+
+  if (authState.checkingAuth) {
+    return <Loading message="Fetching user details, please wait..." />;
   }
 
   return (
@@ -60,8 +67,10 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/magic-login/:token/:userId" element={<MagicLogin />} />
+
         <Route path="/" element={<Layout />}>
           <Route index element={<Home />} />
+
           <Route path="tasks">
             <Route
               index
@@ -73,11 +82,13 @@ const App = () => {
             />
             <Route path=":id" element={<TaskDetails />} />
           </Route>
+
           <Route path="users">
             <Route index element={<Users />} />
             <Route path="followers" element={<Followers />} />
             <Route path="following" element={<Following />} />
           </Route>
+
           <Route path="notifications" element={<Notifications />} />
           <Route path="*" element={<Notfound />} />
         </Route>

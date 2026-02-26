@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { memo, useContext, useMemo } from "react";
 
 import styles from "../../styles/users.module.css";
 
@@ -8,17 +8,25 @@ import User from "../../components/User";
 import SearchInput from "./SearchInput";
 
 const AllUsers = () => {
-  const { usersState } = useContext(UsersContext);
-  const [handleChange, users, query] = useSearch(usersState.users, "name");
+  const {
+    usersState: { users: allUsers },
+  } = useContext(UsersContext);
+
+  const [handleChange, filteredUsers, search] = useSearch(allUsers, "name");
+
+  const renderedUsers = useMemo(() => {
+    if (!filteredUsers) return null;
+    return filteredUsers.map((user) => <User {...user} key={user._id} />);
+  }, [filteredUsers]);
 
   return (
     <article>
-      <SearchInput handleChange={handleChange} query={query} />
+      <SearchInput handleChange={handleChange} query={search} />
       <div className={styles.container}>
         <div className={`flex gap wrap ${styles.wrapper}`}>
-          {users?.length > 0 ? (
-            users.map((user) => <User {...user} key={user._id} />)
-          ) : users ? (
+          {filteredUsers?.length > 0 ? (
+            renderedUsers
+          ) : filteredUsers ? (
             <div className="text_secondary flex">There is no user</div>
           ) : (
             <div className="loading"></div>
@@ -29,4 +37,4 @@ const AllUsers = () => {
   );
 };
 
-export default AllUsers;
+export default memo(AllUsers);

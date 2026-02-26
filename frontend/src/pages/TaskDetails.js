@@ -9,28 +9,61 @@ import { tasks } from "../utils/apiendpoints";
 import NotFound from "../pages/NotFound";
 import ViewTasks from "../components/ViewTasks";
 import TaskComments from "../components/TaskComments";
+import Response from "../components/Response";
 
 const TaskDetails = () => {
   const { addToast } = useContext(AppContext);
+
   const [task, setTask] = useState(null);
-  const [invalidId, setInvalidId] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
   const { id } = useParams();
 
   useEffect(() => {
-    tasks
-      .get(id)
-      .then(({ data }) => setTask(data.task))
-      .catch((error) => {
-        setInvalidId(true);
-        addToast({
-          type: "error",
-          message: error?.response?.data?.message || error?.message,
-        });
-        console.log(".....API ERROR.....", error);
-      });
+    let isMounted = true;
+
+    const fetchTask = async () => {
+      try {
+        setIsLoading(true);
+        setNotFound(false);
+
+        const data = await tasks.get(id);
+
+        if (isMounted) {
+          setTask(data.task);
+        }
+      } catch (error) {
+        if (!isMounted) return;
+
+        if (error?.status === 404) {
+          setNotFound(true);
+        } else {
+          addToast({
+            type: "error",
+            message: error?.message,
+          });
+          console.log(".....API ERROR.....", error);
+        }
+      } finally {
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchTask();
+
+    return () => {
+      isMounted = false;
+    };
   }, [id, addToast]);
 
-  if (invalidId) return <NotFound />;
+  if (isLoading) return <Response />;
+
+  if (notFound) return <NotFound />;
+
+  if (!task) return null;
 
   return (
     <div className={`${styles.container} ${homeStyles.article}`}>

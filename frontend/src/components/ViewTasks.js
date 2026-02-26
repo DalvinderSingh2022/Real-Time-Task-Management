@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import homeStyles from "../styles/home.module.css";
@@ -21,6 +21,16 @@ const ViewTask = (prop) => {
   const { id } = useParams();
   const navigate = useNavigate();
 
+  const isOwner = useMemo(
+    () => authState.user._id === task?.assignedBy?._id,
+    [authState.user._id, task?.assignedBy?._id],
+  );
+
+  const isAssigned = useMemo(() => {
+    if (!task) return false;
+    return task.assignedTo.some((u) => u._id === authState.user._id);
+  }, [authState.user._id, task]);
+
   useEffect(() => {
     if (task && originalTask) return;
 
@@ -29,14 +39,16 @@ const ViewTask = (prop) => {
   }, [prop, task, originalTask]);
 
   const handleAssignedToToggle = (user) => {
-    let newAssignedTo = task.assignedTo;
-    const userIndex = newAssignedTo.findIndex((u) => u._id === user._id);
+    setTask((prev) => {
+      const exists = prev.assignedTo.some((u) => u._id === user._id);
 
-    userIndex > -1
-      ? newAssignedTo.splice(userIndex, 1)
-      : newAssignedTo.push(user);
-
-    setTask((prev) => ({ ...prev, assignedTo: newAssignedTo }));
+      return {
+        ...prev,
+        assignedTo: exists
+          ? prev.assignedTo.filter((u) => u._id !== user._id)
+          : [...prev.assignedTo, user],
+      };
+    });
   };
 
   const handlechange = (e) => {
@@ -49,42 +61,77 @@ const ViewTask = (prop) => {
     e.preventDefault();
 
     const changes = {};
-    Object.keys(originalTask).forEach((key) => {
-      if (originalTask[key] !== task[key]) {
-        changes[key] = {
-          field: key,
-          oldValue: originalTask[key],
-          newValue: task[key],
-        };
-      }
-    });
+
+    if (originalTask.title !== task.title)
+      changes.title = {
+        field: "title",
+        oldValue: originalTask.title,
+        newValue: task.title,
+      };
+
+    if (originalTask.description !== task.description)
+      changes.description = {
+        field: "description",
+        oldValue: originalTask.description,
+        newValue: task.description,
+      };
+
+    if (originalTask.status !== task.status)
+      changes.status = {
+        field: "status",
+        oldValue: originalTask.status,
+        newValue: task.status,
+      };
+
+    if (originalTask.dueDate !== task.dueDate)
+      changes.dueDate = {
+        field: "dueDate",
+        oldValue: originalTask.dueDate,
+        newValue: task.dueDate,
+      };
+
+    const originalIds = originalTask.assignedTo
+      .map((u) => u._id)
+      .sort()
+      .join(",");
+    const newIds = task.assignedTo
+      .map((u) => u._id)
+      .sort()
+      .join(",");
+
+    if (originalIds !== newIds)
+      changes.assignedTo = {
+        field: "assignedTo",
+        oldValue: originalTask.assignedTo,
+        newValue: task.assignedTo,
+      };
 
     if (Object.keys(changes).length) {
       setResponse("save");
       try {
-        const { data } = await tasks.update(id, task);
+        const data = await tasks.update(id, task);
         setTask(data.task);
         setOriginalTask(data.task);
 
-        const { data: notificationData } = await notifications.updateTask({
+        const notificationData = await notifications.updateTask({
           changes,
           task: data.task,
           oldTask: originalTask,
         });
         const notification = notificationData.notifications.find(
-          (n) => n.user === authState.user._id
+          (n) => n.user === authState.user._id,
         );
         socket.emit(
           "task_updated",
           data.task,
           authState.user,
           notification,
-          originalTask
+          originalTask,
         );
       } catch (error) {
         addToast({
           type: "error",
-          message: error?.response?.data?.message || error?.message,
+          message: error?.message,
         });
         console.log(".....API ERROR.....", error);
       } finally {
@@ -99,23 +146,23 @@ const ViewTask = (prop) => {
     setResponse("delete");
     try {
       await tasks.delete(id);
-      const { data: notificationData } = await notifications.deleteTask(task);
+      const notificationData = await notifications.deleteTask(task);
 
       const notification = notificationData.notifications.find(
-        (n) => n.user === authState.user._id
+        (n) => n.user === authState.user._id,
       );
       socket.emit(
         "task_deleted",
         { _id: id, ...task },
         task.assignedTo,
         task.assignedBy,
-        notification
+        notification,
       );
       navigate("/tasks");
     } catch (error) {
       addToast({
         type: "error",
-        message: error?.response?.data?.message || error?.message,
+        message: error?.message,
       });
       console.log(".....API ERROR.....", error);
     } finally {
@@ -274,7 +321,7 @@ const ViewTask = (prop) => {
                         type="checkbox"
                         id={user._id}
                         checked={task.assignedTo.some(
-                          (u) => user._id === u._id
+                          (u) => user._id === u._id,
                         )}
                         onChange={() => handleAssignedToToggle(user)}
                       />
@@ -288,7 +335,7 @@ const ViewTask = (prop) => {
             )}
 
             <div className={`flex gap w_full`}>
-              {authState.user._id === task.assignedBy._id && (
+              {isOwner && (
                 <button
                   type="button"
                   className={`button flex gap2 ${authStyles.submit_button} ${modalStyles.delete_button}`}
@@ -303,10 +350,7 @@ const ViewTask = (prop) => {
                   )}
                 </button>
               )}
-              {(authState.user._id === task.assignedBy._id ||
-                task.assignedTo.some(
-                  (user) => user._id === authState.user._id
-                )) && (
+              {(isOwner || isAssigned) && (
                 <button
                   className={`button primary flex gap2 ${authStyles.submit_button}`}
                 >

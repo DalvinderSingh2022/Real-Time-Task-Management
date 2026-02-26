@@ -4,15 +4,16 @@ import tasksStyles from "../styles/tasks.module.css";
 import styles from "../styles/notifications.module.css";
 
 import { NotificationsContext } from "../store/NotificationContext";
-import SystemNotifiaction from "../components/Notifications/SystemNotifiaction";
+import SystemNotification from "../components/Notifications/SystemNotification";
 import TaskNotification from "../components/Notifications/TaskNotification";
 import UserNotification from "../components/Notifications/UserNotification";
+
 import useSearch from "../hooks/useSearch";
 
-const NOTIFICATION = {
-  TASK: (prop) => <TaskNotification {...prop} />,
-  USER: (prop) => <UserNotification {...prop} />,
-  SYSTEM: (prop) => <SystemNotifiaction {...prop} />,
+const TYPE_COMPONENT_MAP = {
+  task: TaskNotification,
+  user: UserNotification,
+  system: SystemNotification,
 };
 
 const NotificationTypes = [
@@ -26,35 +27,53 @@ const NotificationTypes = [
 
 const Notifications = () => {
   const { notificationsState } = useContext(NotificationsContext);
-  const [handleChange, notifications, query] = useSearch(
+
+  const [handleChange, filteredNotifications, query] = useSearch(
     notificationsState.notifications,
     "message",
-    "type"
+    "type",
   );
+
+  const notifications = filteredNotifications || [];
+
+  const getComponentByType = (type) => {
+    if (!type) return null;
+
+    const normalized = type.toLowerCase();
+
+    if (normalized.includes("task")) return TYPE_COMPONENT_MAP.task;
+    if (normalized.includes("user")) return TYPE_COMPONENT_MAP.user;
+    if (normalized.includes("due")) return TYPE_COMPONENT_MAP.system;
+
+    return null;
+  };
 
   return (
     <article>
       <SearchInput handleChange={handleChange} query={query} />
       <div className="flex col gap">
-        {notifications?.length ? (
-          notifications.map((notification) => (
-            <div
-              className={`${styles.notification} ${
-                notification.read ? "" : styles.unread
-              } flex gap`}
-              title={notification.type}
-              key={notification._id}
-            >
-              {notification.type.startsWith("Task") &&
-                NOTIFICATION.TASK(notification)}
-              {notification.type.startsWith("User") &&
-                NOTIFICATION.USER(notification)}
-              {notification.type.startsWith("Due") &&
-                NOTIFICATION.SYSTEM(notification)}
+        {notificationsState.loaded ? (
+          notifications.length > 0 ? (
+            notifications.map((notification) => {
+              const Component = getComponentByType(notification.type);
+
+              return (
+                <div
+                  key={notification._id}
+                  className={`${styles.notification} ${
+                    notification.read ? "" : styles.unread
+                  } flex gap`}
+                  title={notification.type}
+                >
+                  {Component ? <Component {...notification} /> : null}
+                </div>
+              );
+            })
+          ) : (
+            <div className="text_secondary flex">
+              There are no notifications
             </div>
-          ))
-        ) : notificationsState ? (
-          <div className="text_secondary flex">There is no Notifications</div>
+          )
         ) : (
           <div className="loading"></div>
         )}
@@ -77,15 +96,15 @@ const SearchInput = ({ handleChange, query }) => {
         onChange={handleChange}
       />
       <select
-        defaultValue={query.get("type") || ""}
-        onChange={handleChange}
         name="type"
+        value={query.get("type") || ""}
+        onChange={handleChange}
         className="button primary"
       >
         <option value="">All</option>
-        {NotificationTypes.map((notification) => (
-          <option key={notification} value={notification}>
-            {notification}
+        {NotificationTypes.map((type) => (
+          <option key={type} value={type}>
+            {type}
           </option>
         ))}
       </select>

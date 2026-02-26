@@ -1,4 +1,4 @@
-import React, { memo, useContext, useEffect } from "react";
+import React, { memo, useContext, useEffect, useMemo } from "react";
 
 import { IoCloseSharp } from "react-icons/io5";
 
@@ -12,39 +12,49 @@ const DeleteButton = ({ response, setResponse, prop }) => {
     useContext(NotificationsContext);
   const { addToast } = useContext(AppContext);
 
-  useEffect(() => {
-    const notification = notificationsState.notifications.find(
-      (notification) => notification._id === prop._id
-    );
+  const notification = useMemo(
+    () =>
+      notificationsState.notifications.find(
+        (notification) => notification._id === prop._id,
+      ),
+    [notificationsState, prop._id],
+  );
 
-    const handleNotification = () => {
+  useEffect(() => {
+    const handleNotification = async () => {
       if (notification && !notification.read) {
-        notifications
-          .update(prop._id, { ...notification, read: true })
-          .then(({ data }) => readNotification(data.notification._id))
-          .catch((error) => console.log(".....API ERROR.....", error));
+        try {
+          const data = await notifications.update(prop._id, {
+            ...notification,
+            read: true,
+          });
+          readNotification(data.notification._id);
+        } catch (error) {
+          console.log(".....API ERROR.....", error);
+        }
       }
     };
 
     return () => handleNotification();
-  }, [notificationsState, readNotification, prop]);
+  }, [notification, readNotification, prop]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setResponse(true);
-    notifications
-      .delete(prop._id)
-      .then(() => {
-        addToast({ type: "success", message: "Notification deleted" });
-        deleteNotification(prop._id);
-      })
-      .catch((error) => {
-        addToast({
-          type: "error",
-          message: error?.response?.data?.message || error?.message,
-        });
-        console.log(".....API ERROR.....", error);
-      })
-      .finally(() => setResponse(false));
+
+    try {
+      await notifications.delete(prop._id);
+
+      addToast({ type: "success", message: "Notification deleted" });
+      deleteNotification(prop._id);
+    } catch (error) {
+      addToast({
+        type: "error",
+        message: error?.message,
+      });
+      console.log(".....API ERROR.....", error);
+    } finally {
+      setResponse(false);
+    }
   };
 
   return (
@@ -63,5 +73,5 @@ const DeleteButton = ({ response, setResponse, prop }) => {
 
 export default memo(
   DeleteButton,
-  (prev, next) => prev?.prop?._id && prev?.prop?._id === next?.prop?._id
+  (prev, next) => prev?.prop?._id === next?.prop?._id,
 );

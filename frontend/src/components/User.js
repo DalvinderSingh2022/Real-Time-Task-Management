@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { memo, useCallback, useContext, useMemo, useState } from "react";
 
 import styles from "../styles/users.module.css";
 
@@ -12,68 +12,79 @@ import Response from "./Response";
 const User = ({ name, followers, _id, avatar }) => {
   const { authState } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
-  const [following, setFollowing] = useState(false);
   const [response, setResponse] = useState(false);
   const [show, setShow] = useState(false);
 
-  useEffect(() => {
-    if (authState.authenticated) {
-      setFollowing(authState.user.following.some((user) => user._id === _id));
-    }
-  }, [authState, _id]);
+  const isSelf = authState.user._id === _id;
 
-  const handleFollow = async () => {
+  const following = useMemo(() => {
+    if (!authState.authenticated) return false;
+    return authState.user.following.some((u) => u._id === _id);
+  }, [authState.user.following, authState.authenticated, _id]);
+
+  const handleFollow = useCallback(async () => {
     setResponse(true);
     try {
-      const { data } = await users.follow(_id);
+      const data = await users.follow(_id);
       const { authUser, userToFollow } = data;
 
-      const { data: notificationData } = await notifications.followUser({
+      const notificationData = await notifications.followUser({
         authUser,
         userToFollow,
       });
-      const [notification] = notificationData.notifications;
-      socket.emit("user_followed", authUser, userToFollow, notification);
+
+      socket.emit(
+        "user_followed",
+        authUser,
+        userToFollow,
+        notificationData.notifications[0],
+      );
     } catch (error) {
       addToast({
         type: "error",
-        message: error?.response?.data?.message || error?.message,
+        message: error?.message,
       });
       console.log(".....API ERROR.....", error);
     } finally {
       setResponse(false);
     }
-  };
+  }, [_id, addToast]);
 
-  const handleUnfollow = async () => {
+  const handleUnfollow = useCallback(async () => {
     setResponse(true);
     try {
-      const { data } = await users.unfollow(_id);
+      const data = await users.unfollow(_id);
       const { authUser, userToUnfollow } = data;
 
-      const { data: notificationData } = await notifications.unfollowUser({
+      const notificationData = await notifications.unfollowUser({
         authUser,
         userToUnfollow,
       });
-      const [notification] = notificationData.notifications;
-      socket.emit("user_unfollowed", authUser, userToUnfollow, notification);
+
+      socket.emit(
+        "user_unfollowed",
+        authUser,
+        userToUnfollow,
+        notificationData.notifications[0],
+      );
     } catch (error) {
       addToast({
         type: "error",
-        message: error?.response?.data?.message || error?.message,
+        message: error?.message,
       });
       console.log(".....API ERROR.....", error);
     } finally {
       setResponse(false);
     }
-  };
+  }, [_id, addToast]);
 
-  const handleClick = () => {
-    authState.user._id === _id ||
-    authState.user.followers.some((follower) => follower._id === _id)
-      ? setShow(true)
-      : addToast({ type: "warning", message: `${name} doesn't follow You` });
-  };
+  const handleClick = useCallback(() => {
+    if (isSelf || authState.user.followers.some((f) => f._id === _id)) {
+      setShow(true);
+    } else {
+      addToast({ type: "warning", message: `${name} doesn't follow You` });
+    }
+  }, [authState.user.followers, _id, isSelf, addToast, name]);
 
   return (
     <>
@@ -94,7 +105,7 @@ const User = ({ name, followers, _id, avatar }) => {
             <div className="text_secondary">Followers: {followers.length}</div>
           </div>
         </div>
-        {authState.user._id !== _id &&
+        {!isSelf &&
           (following ? (
             <button
               className="button secondary flex gap2"
@@ -104,7 +115,7 @@ const User = ({ name, followers, _id, avatar }) => {
             </button>
           ) : (
             <button className="button primary flex gap2" onClick={handleFollow}>
-              Follow{response && <div className="loading"></div>}
+              Follow {response && <div className="loading"></div>}
             </button>
           ))}
       </div>
@@ -112,4 +123,4 @@ const User = ({ name, followers, _id, avatar }) => {
   );
 };
 
-export default User;
+export default memo(User);

@@ -18,16 +18,22 @@ axiosInstance.interceptors.request.use((config) => {
 });
 
 axiosInstance.interceptors.response.use(
-  (response) => response,
+  (response) => response.data,
   (error) => {
-    const token = localStorage.getItem("jwt");
+    const status = error.response?.status;
+    const message =
+      error.response?.data?.message || error.message || "Something went wrong";
 
-    if (token && error.response && error.response.status === 401) {
+    if (status === 401) {
       localStorage.removeItem("jwt");
-      window.location.href = "/login";
+      window.location.replace("/login");
     }
-    return Promise.reject(error);
-  }
+
+    return Promise.reject({
+      status,
+      message,
+    });
+  },
 );
 
 export const users = {
