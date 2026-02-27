@@ -26,16 +26,14 @@ const Sidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
 
   const handleLogout = async () => {
-    localStorage.removeItem("jwt");
-
-    await new Promise((resolve) => {
-      socket.emit("user_left", authState.user._id, resolve);
-    });
-
     resetTasks();
     resetUsers();
     resetNotifications();
     logout();
+
+    await new Promise((resolve) => {
+      socket.emit("user_left", authState.user._id, resolve);
+    });
   };
 
   useEffect(() => {

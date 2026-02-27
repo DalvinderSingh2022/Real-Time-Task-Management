@@ -47,6 +47,7 @@ const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem("user");
+    localStorage.removeItem("jwt");
     dispatch({ type: "LOGOUT" });
   };
 

@@ -27,9 +27,9 @@ const MagicLogin = lazy(() => import("./pages/MagicLogin.js"));
 const App = () => {
   const { authState, login, logout, authCheckComplete } =
     useContext(AuthContext);
-
   const { addToast } = useContext(AppContext);
-  useLoadStates(authState.user);
+
+  useLoadStates();
   useSocket();
 
   useEffect(() => {
@@ -37,7 +37,7 @@ const App = () => {
 
     const verifyUser = async () => {
       try {
-        const data= await users.current();
+        const data = await users.current();
         login(data.user);
       } catch (error) {
         logout();

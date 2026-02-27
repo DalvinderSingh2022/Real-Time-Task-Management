@@ -6,7 +6,6 @@ import styles from "./../styles/auth.module.css";
 
 import Toast from "../components/Toast";
 import Response from "../components/Response";
-import useLoadStates from "../hooks/useLoadStates";
 
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
@@ -20,7 +19,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-  useLoadStates(authState.user);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

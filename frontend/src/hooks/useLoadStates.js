@@ -8,18 +8,12 @@ import { notifications, tasks, users } from "../utils/apiendpoints";
 const useLoadStates = () => {
   const tokenRef = useRef(localStorage.getItem("jwt"));
 
-  const { loadTasks } = useContext(TasksContext);
-  const { loadUsers } = useContext(UsersContext);
-  const { loadNotifications } = useContext(NotificationsContext);
-
-  const hasLoadedUsers = useRef(false);
-  const hasLoadedTasks = useRef(false);
-  const hasLoadedNotifications = useRef(false);
+  const { loadTasks, tasksState } = useContext(TasksContext);
+  const { loadUsers, usersState } = useContext(UsersContext);
+  const { loadNotifications, notificationsState } = useContext(NotificationsContext);
 
   useEffect(() => {
-    if (!tokenRef.current || hasLoadedUsers.current) return;
-
-    hasLoadedUsers.current = true;
+    if (!tokenRef.current || usersState.loaded) return;
 
     const fetchUsers = async () => {
       try {
@@ -31,12 +25,10 @@ const useLoadStates = () => {
     };
 
     fetchUsers();
-  }, [loadUsers]);
+  }, [loadUsers, usersState.loaded]);
 
   useEffect(() => {
-    if (!tokenRef.current || hasLoadedNotifications.current) return;
-
-    hasLoadedNotifications.current = true;
+    if (!tokenRef.current || notificationsState.loaded) return;
 
     const fetchNotifications = async () => {
       try {
@@ -48,12 +40,10 @@ const useLoadStates = () => {
     };
 
     fetchNotifications();
-  }, [loadNotifications]);
+  }, [loadNotifications, notificationsState.loaded]);
 
   useEffect(() => {
-    if (!tokenRef.current || hasLoadedTasks.current) return;
-
-    hasLoadedTasks.current = true;
+    if (!tokenRef.current || tasksState.loaded) return;
 
     const fetchTasks = async () => {
       try {
@@ -65,7 +55,7 @@ const useLoadStates = () => {
     };
 
     fetchTasks();
-  }, [loadTasks]);
+  }, [loadTasks, tasksState.loaded]);
 };
 
 export default useLoadStates;

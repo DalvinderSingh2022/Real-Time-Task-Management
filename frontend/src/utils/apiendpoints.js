@@ -20,11 +20,12 @@ axiosInstance.interceptors.request.use((config) => {
 axiosInstance.interceptors.response.use(
   (response) => response.data,
   (error) => {
+    const token = localStorage.getItem("jwt");
     const status = error.response?.status;
     const message =
       error.response?.data?.message || error.message || "Something went wrong";
 
-    if (status === 401) {
+    if (token && status === 401) {
       localStorage.removeItem("jwt");
       window.location.replace("/login");
     }

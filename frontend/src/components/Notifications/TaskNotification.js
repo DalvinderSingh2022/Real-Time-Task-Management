@@ -110,5 +110,5 @@ const TaskNotification = (prop) => {
 
 export default memo(
   TaskNotification,
-  (prev, next) => prev.prop._id === next.prop._id,
+  (prev, next) => prev._id === next._id,
 );
