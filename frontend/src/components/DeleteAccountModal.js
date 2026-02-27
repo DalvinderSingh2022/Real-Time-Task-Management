@@ -22,9 +22,7 @@ const DeleteAccountModal = ({ remove, handleLogout }) => {
     try {
       await users.delete();
 
-      await new Promise((resolve) => {
-        socket.emit("user_left", authState.user._id, resolve);
-      });
+      socket.emit("user_left", authState.user._id);
 
       handleLogout();
     } catch (error) {

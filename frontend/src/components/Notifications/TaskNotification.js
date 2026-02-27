@@ -1,4 +1,4 @@
-import React, { memo, useContext, useState, useMemo } from "react";
+import React, { useContext, useState, useMemo } from "react";
 import { Link } from "react-router-dom";
 
 import { MdOutlineNoteAdd } from "react-icons/md";
@@ -108,7 +108,4 @@ const TaskNotification = (prop) => {
   );
 };
 
-export default memo(
-  TaskNotification,
-  (prev, next) => prev._id === next._id,
-);
+export default TaskNotification
