@@ -22,7 +22,10 @@ const TaskNotification = (prop) => {
   const formattedChange = useMemo(() => {
     if (prop.type !== "Task update") return null;
 
-    let { field, oldValue, newValue } = prop.data.changes || {};
+    const changes = prop.data.changes || {};
+    const firstChange = Object.values(changes)[0] || {};
+
+    let { field, oldValue, newValue } = firstChange;
 
     if (field === "dueDate") {
       oldValue = new Date(oldValue).toDateString();
@@ -108,4 +111,4 @@ const TaskNotification = (prop) => {
   );
 };
 
-export default TaskNotification
+export default TaskNotification;
