@@ -1,4 +1,4 @@
-import React, { memo, useContext, useMemo, useState } from "react";
+import React, { memo, useCallback, useContext, useMemo, useState } from "react";
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -77,14 +77,23 @@ const UpdateProfile = ({ remove }) => {
     return parsed;
   });
 
-  const avatarUrl = useMemo(() => {
-    let avatar = `${baseUrl}&seed=${profile.name}`;
-    if (profile.mouth) avatar += `&mouth=${profile.mouth}`;
-    if (profile.eyes) avatar += `&eyes=${profile.eyes}`;
-    if (profile.backgroundColor)
-      avatar += `&backgroundColor=${profile.backgroundColor}`;
-    return avatar;
-  }, [profile]);
+  const getAvatarUrl = useCallback(
+    (avatar = {}) => {
+      let url = `${baseUrl}&seed=${authState.user.name}`;
+      if (avatar.mouth) url += `&mouth=${avatar.mouth}`;
+      if (avatar.eyes) url += `&eyes=${avatar.eyes}`;
+      if (avatar.backgroundColor)
+        url += `&backgroundColor=${avatar.backgroundColor}`;
+
+      return url;
+    },
+    [authState.user.name],
+  );
+
+  const avatarUrl = useMemo(
+    () => getAvatarUrl(profile),
+    [profile, getAvatarUrl],
+  );
 
   const handlesubmit = async (e) => {
     e.preventDefault();
@@ -162,7 +171,12 @@ const UpdateProfile = ({ remove }) => {
             className="flex col gap w_full modal_child"
             onSubmit={handlesubmit}
           >
-            <img src={avatarUrl} alt="User Avatar" className="profile_avatar" />
+            <img
+              rel="prefetch"
+              src={avatarUrl}
+              alt="User Avatar"
+              className="profile_avatar"
+            />
 
             <div className={`flex col w_full ${authStyles.group}`}>
               <input
@@ -178,7 +192,7 @@ const UpdateProfile = ({ remove }) => {
 
             {Object.entries(options).map(([key, value]) => (
               <div
-                key={value}
+                key={key}
                 className={`flex col w_full profile_group ${authStyles.group}`}
               >
                 <label htmlFor="status" className="text_primary">
@@ -197,7 +211,7 @@ const UpdateProfile = ({ remove }) => {
                         />
                         <img
                           className={`avatar ${modalStyles.check_label}`}
-                          src={`${baseUrl}&seed=${profile.name}&${key}=${option}`}
+                          src={getAvatarUrl({ ...profile, [key]: option })}
                           alt={option}
                           title={option}
                         />

@@ -41,6 +41,7 @@ const TaskComments = ({ task }) => {
   const { id } = useParams();
   const messagesRef = useRef(null);
   const textAreaRef = useRef(null);
+  const mentionTimeoutRef = useRef(null);
 
   const currentUserIdRef = useRef(authState.user._id);
 
@@ -96,12 +97,27 @@ const TaskComments = ({ task }) => {
   }, [addToast, task]);
 
   useEffect(() => {
+    let timeout;
     if (messagesRef.current) {
-      setTimeout(() => {
+      timeout = setTimeout(() => {
         messagesRef.current.scrollTop = messagesRef.current.scrollHeight;
       }, 0);
     }
+
+    return () => {
+      if (timeout) {
+        clearTimeout(timeout);
+      }
+    };
   }, [allComments]);
+
+  useEffect(() => {
+    return () => {
+      if (mentionTimeoutRef.current) {
+        clearTimeout(mentionTimeoutRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (textAreaRef.current) {
@@ -141,7 +157,7 @@ const TaskComments = ({ task }) => {
     setComment(newValue);
     setShowMentions(false);
 
-    setTimeout(() => {
+    mentionTimeoutRef.current = setTimeout(() => {
       textAreaRef.current.focus();
       const newCursor = (before + "@" + user.name + " ").length;
       textAreaRef.current.selectionStart = textAreaRef.current.selectionEnd =
@@ -157,7 +173,7 @@ const TaskComments = ({ task }) => {
 
     try {
       const data = await comments.create(id, { comment });
-      
+
       socket.emit("send_comment", data.comment, id);
       setComment("");
     } catch (error) {
