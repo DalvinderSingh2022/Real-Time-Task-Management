@@ -46,6 +46,10 @@ const userSchema = new mongoose.Schema(
         ref: "User",
       },
     ],
+    approvedAt: {
+      type: Date,
+      default: null,
+    },
   },
   {
     timestamps: true,

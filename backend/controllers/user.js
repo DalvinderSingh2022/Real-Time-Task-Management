@@ -259,6 +259,8 @@ const approveUser = async (req, res) => {
 
     if (action === "approve") {
       user.isApproved = true;
+      user.approvedAt = new Date();
+
       await user.save();
 
       await sendMail({
@@ -296,53 +298,7 @@ const getPendingUsers = async (req, res) => {
         .json({ message: "Only admins can view pending users" });
     }
 
-    const users = await User.aggregate([
-      { $match: { orgId: admin.orgId } },
-      {
-        $lookup: {
-          from: "tasks",
-          localField: "_id",
-          foreignField: "assignedTo",
-          as: "tasks",
-        },
-      },
-      {
-        $addFields: {
-          taskStats: {
-            "Not Started": {
-              $size: {
-                $filter: {
-                  input: "$tasks",
-                  cond: { $eq: ["$$this.status", "Not Started"] },
-                },
-              },
-            },
-            "In Progress": {
-              $size: {
-                $filter: {
-                  input: "$tasks",
-                  cond: { $eq: ["$$this.status", "In Progress"] },
-                },
-              },
-            },
-            Completed: {
-              $size: {
-                $filter: {
-                  input: "$tasks",
-                  cond: { $eq: ["$$this.status", "Completed"] },
-                },
-              },
-            },
-          },
-        },
-      },
-      {
-        $project: {
-          password: 0,
-          tasks: 0,
-        },
-      },
-    ]);
+    const users = await User.find({ orgId: admin.orgId });
     res.status(200).json({ users: users });
   } catch (error) {
     res.status(500).json({ message: error.message || "Internal Server Error" });
