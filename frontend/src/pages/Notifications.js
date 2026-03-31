@@ -50,34 +50,45 @@ const Notifications = () => {
 
   return (
     <article>
-      <SearchInput handleChange={handleChange} query={query} />
-      <div className="flex col gap">
-        {notificationsState.loaded ? (
-          notifications.length > 0 ? (
-            notifications.map((notification) => {
-              const Component = getComponentByType(notification.type);
-
-              return (
-                <div
-                  key={notification._id}
-                  className={`${styles.notification} ${
-                    notification.read ? "" : styles.unread
-                  } flex gap`}
-                  title={notification.type}
-                >
-                  {Component ? <Component {...notification} /> : null}
-                </div>
-              );
-            })
-          ) : (
-            <div className="text_secondary flex">
-              There are no notifications
+      {notifications.length === 0 ? (
+        <div className={`flex col gap2 ${styles.container}`}>
+          <div className={`flex col gap ${styles.header}`}>
+            <div className="text_primary heading">Notifications</div>
+            <div className="text_secondary">
+              Stay updated with task changes and important activity.
             </div>
-          )
-        ) : (
-          <div className="loading"></div>
-        )}
-      </div>
+          </div>
+
+          <div className="text_secondary">
+            You're all caught up! No new notifications.
+          </div>
+        </div>
+      ) : (
+        <>
+          <SearchInput handleChange={handleChange} query={query} />
+          <div className="flex col gap">
+            {notificationsState.loaded ? (
+              notifications.map((notification) => {
+                const Component = getComponentByType(notification.type);
+
+                return (
+                  <div
+                    key={notification._id}
+                    className={`${styles.notification} ${
+                      notification.read ? "" : styles.unread
+                    } flex gap`}
+                    title={notification.type}
+                  >
+                    {Component ? <Component {...notification} /> : null}
+                  </div>
+                );
+              })
+            ) : (
+              <div className="loading"></div>
+            )}
+          </div>
+        </>
+      )}
     </article>
   );
 };

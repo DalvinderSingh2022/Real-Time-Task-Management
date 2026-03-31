@@ -51,7 +51,7 @@ const TaskSection = ({ tasks, status }) => {
         <h3>{tasks?.length || 0}</h3>
       </header>
       <div
-        className={`flex wrap gap2 tasks_container ${styles.tasks_container}`}
+        className={`flex wrap gap2 tasks_container items-stretch ${styles.tasks_container}`}
       >
         {tasks?.length > 0 ? (
           tasks.map((task) => <Task {...task} key={task._id} />)

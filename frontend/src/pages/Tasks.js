@@ -47,23 +47,40 @@ const Tasks = () => {
 
   return (
     <article>
-      <SearchInput handleChange={handleChange} query={query} />
-      <div className={styles.container}>
-        {TaskStatusTypes.map((status) => {
-          const key = normalizeStatus(status);
+      {tasksState.tasks.length === 0 ? (
+        <div className={`flex col gap2`}>
+          <div className={`flex col gap ${styles.header}`}>
+            <div className="text_primary heading">Tasks</div>
+            <div className="text_secondary">
+              Manage and track your tasks efficiently.
+            </div>
+          </div>
 
-          if (query.get("status") && query.get("status") !== status)
-            return null;
+          <div className="text_secondary">
+            No tasks found. Start by creating a new task.
+          </div>
+        </div>
+      ) : (
+        <>
+          <SearchInput handleChange={handleChange} query={query} />
+          <div className={styles.container}>
+            {TaskStatusTypes.map((status) => {
+              const key = normalizeStatus(status);
 
-          return (
-            <TaskSection
-              key={status}
-              tasks={taskGroups[key] || []}
-              status={status}
-            />
-          );
-        })}
-      </div>
+              if (query.get("status") && query.get("status") !== status)
+                return null;
+
+              return (
+                <TaskSection
+                  key={status}
+                  tasks={taskGroups[key] || []}
+                  status={status}
+                />
+              );
+            })}
+          </div>
+        </>
+      )}
     </article>
   );
 };

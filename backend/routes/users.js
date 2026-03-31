@@ -9,6 +9,8 @@ const {
   followUser,
   unfolloweUser,
   updateUser,
+  approveUser,
+  getPendingUsers,
 } = require("../controllers/user");
 const authMiddleware = require("../middleware/auth");
 
@@ -25,5 +27,7 @@ router.get("/all", allUsers);
 router.post("/follow/:userId", followUser);
 router.post("/unfollow/:userId", unfolloweUser);
 router.route("/").put(updateUser).delete(removeUser);
+router.put("/approve/:userId", approveUser);
+router.get("/pending", getPendingUsers);
 
 module.exports = router;

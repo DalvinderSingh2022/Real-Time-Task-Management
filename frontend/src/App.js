@@ -14,6 +14,7 @@ import useLoadStates from "./hooks/useLoadStates.js";
 
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const CreateOrg = lazy(() => import("./pages/CreateOrg"));
 const Home = lazy(() => import("./pages/Home"));
 const Tasks = lazy(() => import("./pages/Tasks"));
 const Users = lazy(() => import("./pages/Users/AllUsers"));
@@ -23,6 +24,7 @@ const Notfound = lazy(() => import("./pages/NotFound"));
 const TaskDetails = lazy(() => import("./pages/TaskDetails"));
 const Notifications = lazy(() => import("./pages/Notifications.js"));
 const MagicLogin = lazy(() => import("./pages/MagicLogin.js"));
+const Admin = lazy(() => import("./pages/Admin.js"));
 
 const App = () => {
   const { authState, login, logout, authCheckComplete } =
@@ -66,6 +68,7 @@ const App = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/create-org" element={<CreateOrg />} />
         <Route path="/magic-login/:token/:userId" element={<MagicLogin />} />
 
         <Route path="/" element={<Layout />}>
@@ -90,6 +93,7 @@ const App = () => {
           </Route>
 
           <Route path="notifications" element={<Notifications />} />
+          <Route path="admin" element={<Admin />} />
           <Route path="*" element={<Notfound />} />
         </Route>
       </Routes>

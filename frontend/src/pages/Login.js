@@ -91,7 +91,7 @@ const Login = () => {
             className={`flex col gap w_full ${styles.form}`}
             onSubmit={handleSubmit}
           >
-            <div className={`flex col w_full ${styles.group}`}>
+            <div className={`flex col w_full items-stretch ${styles.group}`}>
               <label htmlFor="email" className="text_primary">
                 Email
               </label>
@@ -104,7 +104,7 @@ const Login = () => {
                 required
               />
             </div>
-            <div className={`flex col w_full ${styles.group}`}>
+            <div className={`flex col w_full items-stretch ${styles.group}`}>
               <label htmlFor="password" className="text_primary">
                 Password
               </label>
@@ -124,7 +124,7 @@ const Login = () => {
               </span>
             </div>
 
-            <div className={`flex col w_full ${styles.group}`}>
+            <div className={`flex col w_full items-stretch ${styles.group}`}>
               <button
                 type="submit"
                 disabled={isLoading}
@@ -141,10 +141,13 @@ const Login = () => {
               </button>
             </div>
 
-            <div className={styles.link}>
-              Don’t have an account?
+            <div className={`flex col ${styles.link}`}>
               <Link to="/register" className={styles.submit_button}>
-                Register
+                Don’t have an account?
+              </Link>
+
+              <Link to="/create-org" className={styles.submit_button}>
+                Want to create an organization?
               </Link>
             </div>
           </form>

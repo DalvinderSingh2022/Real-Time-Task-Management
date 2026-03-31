@@ -47,7 +47,4 @@ const UserNotification = (prop) => {
   );
 };
 
-export default memo(
-  UserNotification,
-  (prev, next) => prev.prop._id === next.prop._id,
-);
+export default memo(UserNotification);

@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const User = require("../models/user.model");
+const Organization = require("../models/organization.model");
 const { Task } = require("../models/task.model");
 const Comment = require("../models/comment.model");
 const { Notification } = require("../models/notification.model");
@@ -9,6 +10,9 @@ const {
   registrationTemplate,
   onFollowTemplate,
   onUnfollowTemplate,
+  userApprovalRequestTemplate,
+  userApprovedTemplate,
+  userRejectedTemplate,
 } = require("../emailTemplates");
 require("dotenv").config();
 
@@ -75,7 +79,7 @@ const getAvatar = (name) => {
     baseUrl +
     Object.entries(url).reduce(
       (acc, [option, value]) => acc + `&${option}=${value}`,
-      ""
+      "",
     )
   );
 };
@@ -114,14 +118,27 @@ const magicLogin = async (req, res) => {
 
 // Register a new user
 const register = async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, orgCode } = req.body;
 
   // Input validation
-  if (!email?.trim() || !password?.trim() || !name?.trim()) {
+  if (
+    !email?.trim() ||
+    !password?.trim() ||
+    !name?.trim() ||
+    !orgCode?.trim()
+  ) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
   try {
+    // Check if organization exists
+    const organization = await Organization.findOne({
+      code: orgCode.toUpperCase(),
+    });
+    if (!organization) {
+      return res.status(404).json({ message: "Invalid organization code" });
+    }
+
     // Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -138,18 +155,33 @@ const register = async (req, res) => {
       email: email.toLowerCase().trim(),
       avatar,
       password: hashedPassword,
+      orgId: organization._id,
+      isApproved: false,
+      role: "user",
     });
 
     // Save the user to the database
     await user.save();
 
-    await sendMail({
-      to: user.email,
-      subject: "🎉 Welcome to Task Manager",
-      html: registrationTemplate(user._id, user.name),
-    });
+    // Send email to admin for approval
+    const admin = await User.findById(organization.adminUserId);
+    if (admin) {
+      await sendMail({
+        to: admin.email,
+        subject: "🔔 New User Registration Request",
+        html: userApprovalRequestTemplate(
+          admin._id,
+          admin.name,
+          user.name,
+          user.email,
+          user._id,
+        ),
+      });
+    }
 
-    res.status(200).json({ message: "User Registered successfully", user });
+    res.status(200).json({
+      message: "Registration request submitted. Waiting for admin approval.",
+    });
   } catch (error) {
     res.status(500).json({ message: error.message || "Internal Server Error" });
   }
@@ -176,6 +208,11 @@ const login = async (req, res) => {
       return res.status(401).json({ message: "Invalid username or password" });
     }
 
+    // Check if user is approved
+    if (!user.isApproved) {
+      return res.status(403).json({ message: "Account pending approval" });
+    }
+
     // Compare the provided password with the stored password
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
@@ -197,6 +234,118 @@ const login = async (req, res) => {
     return res
       .status(500)
       .json({ message: error.message || "Internal Server Error" });
+  }
+};
+
+// Approve or reject user registration
+const approveUser = async (req, res) => {
+  const { userId } = req.params;
+  const { action, reason } = req.body; // action: 'approve' or 'reject'
+
+  try {
+    const admin = await User.findById(req.userId);
+    if (!admin || admin.role !== "admin") {
+      return res.status(403).json({ message: "Only admins can approve users" });
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.orgId.toString() !== admin.orgId.toString()) {
+      return res.status(403).json({ message: "User not in your organization" });
+    }
+
+    if (action === "approve") {
+      user.isApproved = true;
+      await user.save();
+
+      await sendMail({
+        to: user.email,
+        subject: "🎉 Account Approved - Welcome to Task Manager",
+        html: userApprovedTemplate(user._id, user.name),
+      });
+
+      res.status(200).json({ message: "User approved successfully" });
+    } else if (action === "reject") {
+      await User.findByIdAndDelete(userId);
+
+      await sendMail({
+        to: user.email,
+        subject: "❌ Account Rejected",
+        html: userRejectedTemplate(user.name, reason || "No reason provided"),
+      });
+
+      res.status(200).json({ message: "User rejected and removed" });
+    } else {
+      res.status(400).json({ message: "Invalid action" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
+  }
+};
+
+// Get pending users for admin
+const getPendingUsers = async (req, res) => {
+  try {
+    const admin = await User.findById(req.userId);
+    if (!admin || admin.role !== "admin") {
+      return res
+        .status(403)
+        .json({ message: "Only admins can view pending users" });
+    }
+
+    const users = await User.aggregate([
+      { $match: { orgId: admin.orgId } },
+      {
+        $lookup: {
+          from: "tasks",
+          localField: "_id",
+          foreignField: "assignedTo",
+          as: "tasks",
+        },
+      },
+      {
+        $addFields: {
+          taskStats: {
+            "Not Started": {
+              $size: {
+                $filter: {
+                  input: "$tasks",
+                  cond: { $eq: ["$$this.status", "Not Started"] },
+                },
+              },
+            },
+            "In Progress": {
+              $size: {
+                $filter: {
+                  input: "$tasks",
+                  cond: { $eq: ["$$this.status", "In Progress"] },
+                },
+              },
+            },
+            Completed: {
+              $size: {
+                $filter: {
+                  input: "$tasks",
+                  cond: { $eq: ["$$this.status", "Completed"] },
+                },
+              },
+            },
+          },
+        },
+      },
+      {
+        $project: {
+          password: 0,
+          tasks: 0,
+        },
+      },
+    ]);
+    res.status(200).json({ users: users });
+  } catch (error) {
+    res.status(500).json({ message: error.message || "Internal Server Error" });
   }
 };
 
@@ -249,7 +398,7 @@ const removeUser = async (req, res) => {
       tasksAssignedByUser.map(async (task) => {
         await Task.findByIdAndDelete(task._id);
         await Comment.deleteMany({ task: task._id });
-      })
+      }),
     );
 
     // Reassign tasks assigned to the user
@@ -259,25 +408,25 @@ const removeUser = async (req, res) => {
     await Promise.all(
       tasksAssignedToUser.map(async (task) => {
         task.assignedTo = task.assignedTo.filter(
-          (id) => id.toString() !== user._id.toString()
+          (id) => id.toString() !== user._id.toString(),
         );
         if (task.assignedTo.length === 0) {
           task.assignedTo.push(task.assignedBy);
         }
         await task.save();
-      })
+      }),
     );
 
     // Remove the user from all followers
     await User.updateMany(
       { followers: user._id },
-      { $pull: { followers: user._id } }
+      { $pull: { followers: user._id } },
     );
 
     // Remove the user from all following
     await User.updateMany(
       { following: user._id },
-      { $pull: { following: user._id } }
+      { $pull: { following: user._id } },
     );
 
     // Delete all notifications of user
@@ -297,9 +446,16 @@ const removeUser = async (req, res) => {
 // Get all users
 const allUsers = async (req, res) => {
   try {
-    // Find all users
-    // and Populate the followers and following fields with the corresponding users data
-    const users = await User.find()
+    const currentUser = await User.findById(req.userId);
+    if (!currentUser) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    // Find all approved users in the same organization
+    const users = await User.find({
+      orgId: currentUser.orgId,
+      isApproved: true,
+    })
       .select("-password")
       .sort({ updatedAt: "desc" })
       .populate([
@@ -309,7 +465,7 @@ const allUsers = async (req, res) => {
 
     res
       .status(200)
-      .json({ message: "All users Data fteched succesfully", users });
+      .json({ message: "All users Data fetched successfully", users });
   } catch (error) {
     return res
       .status(500)
@@ -401,6 +557,16 @@ const followUser = async (req, res) => {
       return res.status(404).json({ message: "Auth user not found" });
     }
 
+    if (userToFollow.orgId.toString() !== authUser.orgId.toString()) {
+      return res
+        .status(403)
+        .json({ message: "Cannot follow users outside your organization" });
+    }
+
+    if (authUser.following.includes(userId)) {
+      return res.status(400).json({ message: "Already following user" });
+    }
+
     // Push the userToFollow to the authUser's following
     authUser.following.push(userToFollow);
     await authUser.save();
@@ -480,7 +646,7 @@ const unfolloweUser = async (req, res) => {
       html: onUnfollowTemplate(
         userToUnfollow._id,
         userToUnfollow.name,
-        authUser.name
+        authUser.name,
       ),
     });
 
@@ -506,4 +672,7 @@ module.exports = {
   followUser,
   unfolloweUser,
   updateUser,
+  approveUser,
+  getPendingUsers,
+  getAvatar,
 };

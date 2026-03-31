@@ -20,6 +20,20 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Avatar is required"],
     },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: [true, "Organization is required"],
+    },
+    isApproved: {
+      type: Boolean,
+      default: false,
+    },
+    role: {
+      type: String,
+      enum: ["admin", "user"],
+      default: "user",
+    },
     followers: [
       {
         type: mongoose.Schema.Types.ObjectId,

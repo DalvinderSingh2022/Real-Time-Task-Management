@@ -200,7 +200,7 @@ const TaskComments = ({ task }) => {
 
         {task ? (
           <>
-            <div className={`flex col ${styles.messages}`} ref={messagesRef}>
+            <div className={`flex col items-stretch ${styles.messages}`} ref={messagesRef}>
               {allComments?.length > 0 ? (
                 allComments.map((com) => (
                   <Comment
@@ -217,7 +217,7 @@ const TaskComments = ({ task }) => {
             </div>
 
             <form className={`flex col gap w_full`} onSubmit={handleSubmit}>
-              <div className={`flex col w_full ${authStyles.group} relative`}>
+              <div className={`flex col w_full items-stretch ${authStyles.group} relative`}>
                 <div className={`flex gap2`}>
                   <textarea
                     ref={textAreaRef}

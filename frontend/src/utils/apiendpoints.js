@@ -47,6 +47,8 @@ export const users = {
   unfollow: (userId) => axiosInstance.post(`/users/unfollow/${userId}`),
   update: (data) => axiosInstance.put(`/users`, data),
   delete: () => axiosInstance.delete(`/users`),
+  approve: (userId, data) => axiosInstance.put(`/users/approve/${userId}`, data),
+  pending: () => axiosInstance.get("/users/pending"),
 };
 
 export const tasks = {
@@ -72,4 +74,9 @@ export const notifications = {
   followUser: (data) => axiosInstance.post("/notifications/follow-user", data),
   unfollowUser: (data) =>
     axiosInstance.post("/notifications/unfollow-user", data),
+};
+
+export const organizations = {
+  create: (data) => axiosInstance.post("/organizations/create", data),
+  getByCode: (code) => axiosInstance.get(`/organizations/${code}`),
 };

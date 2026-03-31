@@ -186,8 +186,8 @@ const ViewTask = (prop) => {
               <h3 className="text_primary">{task.title}</h3>
             </header>
 
-            <div className={`flex gap w_full ${authStyles.group}`}>
-              <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex gap w_full items-stretch ${authStyles.group}`}>
+              <div className={`flex col w_full items-stretch ${authStyles.group}`}>
                 <label htmlFor="title" className="text_primary">
                   Title
                 </label>
@@ -205,7 +205,7 @@ const ViewTask = (prop) => {
                   />
                 </div>
               </div>
-              <div className={`flex col ${authStyles.group}`}>
+              <div className={`flex col items-stretch ${authStyles.group}`}>
                 <label htmlFor="dueDate" className="text_primary">
                   DueDate
                 </label>
@@ -225,7 +225,7 @@ const ViewTask = (prop) => {
               </div>
             </div>
 
-            <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
               <label htmlFor="description" className="text_primary">
                 Description
               </label>
@@ -245,8 +245,8 @@ const ViewTask = (prop) => {
               </div>
             </div>
 
-            <div className={`flex gap w_full ${authStyles.group}`}>
-              <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex gap w_full items-stretch ${authStyles.group}`}>
+              <div className={`flex col w_full items-stretch ${authStyles.group}`}>
                 <label htmlFor="status" className="text_primary">
                   Status
                 </label>
@@ -277,7 +277,7 @@ const ViewTask = (prop) => {
                 </div>
               </div>
 
-              <div className={`flex col w_full ${authStyles.group}`}>
+              <div className={`flex col w_full items-stretch ${authStyles.group}`}>
                 <label htmlFor="assignedBy" className="text_primary">
                   Assign By
                 </label>
@@ -289,7 +289,7 @@ const ViewTask = (prop) => {
               </div>
             </div>
 
-            <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
               <label htmlFor="assignedTo" className="text_primary">
                 Assign To
               </label>
@@ -306,7 +306,7 @@ const ViewTask = (prop) => {
             </div>
 
             {task.assignedBy._id === authState.user._id && (
-              <div className={`flex col w_full ${authStyles.group}`}>
+              <div className={`flex col w_full items-stretch ${authStyles.group}`}>
                 <label htmlFor="assignedTo" className="text_primary">
                   Assign task to more users
                 </label>

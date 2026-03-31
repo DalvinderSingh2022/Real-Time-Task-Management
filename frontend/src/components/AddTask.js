@@ -85,8 +85,12 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
             className={`flex col gap w_full modal_child`}
             onSubmit={handlesubmit}
           >
-            <div className={`flex gap2 w_full ${authStyles.group}`}>
-              <div className={`flex col w_full ${authStyles.group}`}>
+            <div
+              className={`flex gap2 w_full items-stretch ${authStyles.group}`}
+            >
+              <div
+                className={`flex col w_full items-stretch ${authStyles.group}`}
+              >
                 <label htmlFor="title" className="text_primary">
                   Title
                 </label>
@@ -97,7 +101,7 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
                   placeholder="title"
                 />
               </div>
-              <div className={`flex col ${authStyles.group}`}>
+              <div className={`flex col items-stretch ${authStyles.group}`}>
                 <label htmlFor="dueDate" className="text_primary">
                   DueDate
                 </label>
@@ -113,7 +117,7 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
               </div>
             </div>
 
-            <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
               <label htmlFor="description" className="text_primary">
                 Description
               </label>
@@ -126,7 +130,7 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
               />
             </div>
 
-            <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
               <label htmlFor="assignedTo" className="text_primary">
                 Assign To
               </label>

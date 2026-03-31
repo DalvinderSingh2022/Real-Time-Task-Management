@@ -46,7 +46,7 @@ const Home = () => {
           <h2 className="text_primary">Tasks</h2>
           <h4 className="text_secondary">Tasks Allocated by Current Status</h4>
         </header>
-        <div className={`flex col gap ${styles.graph_wrapper}`}>
+        <div className={`flex items-start col gap ${styles.graph_wrapper}`}>
           <div className="total">
             <span className={styles.graph_total}>{tasks.length}</span>
             <h4>Tasks</h4>
@@ -105,7 +105,7 @@ const Home = () => {
           <h2 className="text_primary">Users</h2>
           <h4 className="text_secondary">Connected Users by Relation</h4>
         </header>
-        <div className={`flex col gap ${styles.graph_wrapper}`}>
+        <div className={`flex items-start col gap ${styles.graph_wrapper}`}>
           <div className="total">
             <span className={styles.graph_total}>{totalConnections}</span>
             <h4>Connections</h4>
@@ -151,7 +151,7 @@ const Home = () => {
           <h3 className="text_primary">Recent Tasks</h3>
         </header>
         <div
-          className={`flex col gap2 ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}
+          className={`flex col gap2 items-stretch ${tasksStyles.tasks_container} ${styles.tasks_wrapper}`}
         >
           {tasks.length ? (
             tasks.slice(0, 3).map((task) => <Task {...task} key={task._id} />)

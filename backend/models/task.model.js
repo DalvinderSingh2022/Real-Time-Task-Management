@@ -48,6 +48,11 @@ const taskSchema = new mongoose.Schema(
       default: "Not Started",
       required: [true, "Status is required"],
     },
+    orgId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      required: [true, "Organization is required"],
+    },
     dueStatus: {
       type: String,
       enum: {

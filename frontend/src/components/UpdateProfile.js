@@ -178,7 +178,7 @@ const UpdateProfile = ({ remove }) => {
               className="profile_avatar"
             />
 
-            <div className={`flex col w_full ${authStyles.group}`}>
+            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
               <input
                 type="text"
                 placeholder="Name"
@@ -193,12 +193,12 @@ const UpdateProfile = ({ remove }) => {
             {Object.entries(options).map(([key, value]) => (
               <div
                 key={key}
-                className={`flex col w_full profile_group ${authStyles.group}`}
+                className={`flex col w_full profile_group items-stretch ${authStyles.group}`}
               >
                 <label htmlFor="status" className="text_primary">
                   {key.slice(0, 1).toUpperCase() + key.slice(1)}
                 </label>
-                <div className={`flex col w_full ${authStyles.group}`}>
+                <div className={`flex col w_full items-stretch ${authStyles.group}`}>
                   <div className={`${modalStyles.check_container} flex`}>
                     {value.map((option) => (
                       <label key={option} className={modalStyles.checkbox}>

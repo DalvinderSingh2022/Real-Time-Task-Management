@@ -225,6 +225,41 @@ const onUnfollowTemplate = (userId, userName, unfollowerName) =>
     null
   );
 
+const userApprovalRequestTemplate = (adminId, adminName, userName, userEmail, userId) =>
+  baseEmailTemplate(
+    adminId,
+    "🔔 New User Registration Request",
+    `Hi <strong>${adminName}</strong>,<br><br>A new user <strong>${userName}</strong> (${userEmail}) has requested to join your organization.`,
+    "Review Request",
+    `/admin/pending-users`,
+    `<div style="background-color:#f3e8ff;border-left:4px solid #7c3aed;padding:14px 18px;border-radius:8px;margin:20px 0;">
+       <strong>User Details:</strong><br>
+       Name: ${userName}<br>
+       Email: ${userEmail}
+     </div>`
+  );
+
+const userApprovedTemplate = (userId, userName) =>
+  baseEmailTemplate(
+    userId,
+    "🎉 Account Approved - Welcome to Task Manager",
+    `Hi <strong>${userName}</strong>,<br><br>Your account has been approved! You can now log in to your Task Manager account.`,
+    "Log In",
+    `/login`
+  );
+
+const userRejectedTemplate = (userName, reason) =>
+  baseEmailTemplate(
+    null,
+    "❌ Account Rejected",
+    `Hi <strong>${userName}</strong>,<br><br>Unfortunately, your registration request has been rejected.`,
+    null,
+    null,
+    `<div style="background-color:#ffe8e8;border-left:4px solid #ff4848;padding:14px 18px;border-radius:8px;margin:20px 0;">
+       <strong>Reason:</strong> ${reason}
+     </div>`
+  );
+
 module.exports = {
   taskCreatedTemplate,
   taskUpdatedTemplate,
@@ -232,4 +267,7 @@ module.exports = {
   registrationTemplate,
   onFollowTemplate,
   onUnfollowTemplate,
+  userApprovalRequestTemplate,
+  userApprovedTemplate,
+  userRejectedTemplate,
 };

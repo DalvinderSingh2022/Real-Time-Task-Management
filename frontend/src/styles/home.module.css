@@ -1,109 +1,107 @@
 .article {
-    display: grid;
-    grid-auto-rows: min-content;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1em;
+  display: grid;
+  grid-auto-rows: min-content;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1em;
 }
 
 .article section {
-    border-radius: 8px;
-    background-color: var(--white);
-    padding: 1em;
-    box-shadow: none;
+  border-radius: 8px;
+  background-color: var(--white);
+  padding: 1em;
+  box-shadow: none;
 }
 
 section .header {
-    justify-content: space-between;
-    align-self: stretch;
+  justify-content: space-between;
+  align-self: stretch;
 }
 
 .article .graph {
-    grid-column: span 3;
+  grid-column: span 3;
 }
 
 .graph .graph_wrapper {
-    padding: 1em;
-    align-items: flex-start;
+  padding: 1em;
 }
 
 .graph .graph_bar {
-    align-self: stretch;
-    background-color: var(--background-color);
-    height: 16px;
-    border-radius: 40px;
-    justify-content: flex-start;
+  align-self: stretch;
+  background-color: var(--background-color);
+  height: 16px;
+  border-radius: 40px;
+  justify-content: flex-start;
 }
 
 .graph .bar_child {
-    transition: 150ms ease-in-out;
-    height: 100%;
-    width: 0%;
+  transition: 150ms ease-in-out;
+  height: 100%;
+  width: 0%;
 }
 
 .graph .bar_child:first-child {
-    border-radius: 40px 0 0 40px;
+  border-radius: 40px 0 0 40px;
 }
 
 .graph .bar_child:last-child {
-    border-radius: 0 40px 40px 0;
+  border-radius: 0 40px 40px 0;
 }
 
 .graph .bar_child:hover {
-    scale: 1.1 1.25;
-    cursor: pointer;
-    z-index: 9;
+  scale: 1.1 1.25;
+  cursor: pointer;
+  z-index: 9;
 }
 
 .graph_bar:hover .bar_child:not(:hover) {
-    scale: 1 .8;
+  scale: 1 0.8;
 }
 
 .graph .graph_wrapper .graph_total {
-    font-size: 2.8em;
-    font-weight: bold;
-    line-height: .9em;
+  font-size: 2.8em;
+  font-weight: bold;
+  line-height: 0.9em;
 }
 
 .graph .graph_wrapper .legend div {
-    width: 20px;
-    height: 20px;
-    border-radius: 20px;
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
 }
 
 .graph .graph_wrapper .legend {
-    justify-content: flex-start;
-    align-self: flex-start;
+  justify-content: flex-start;
+  align-self: flex-start;
 }
 
 .article .tasks {
-    grid-column: span 2;
+  grid-column: span 2;
 }
 
 .article .tasks .tasks_wrapper {
-    align-items: stretch;
-    padding-top: 1em;
+  padding-top: 1em;
 }
 
 .article .tasks .tasks_wrapper div {
-    cursor: default;
+  cursor: default;
 }
 
 .article .followers {
-    grid-column: span 4;
+  grid-column: span 4;
 }
 
-@media screen and (max-width:1200px) {
-    .article .followers {
-        grid-column: span 6;
-    }
+@media screen and (max-width: 1200px) {
+  .article .followers {
+    grid-column: span 6;
+  }
 
-    .article .tasks {
-        grid-column: span 6;
-    }
+  .article .tasks {
+    grid-column: span 6;
+  }
 }
 
-@media screen and (max-width:720px) {
-    .article .graph {
-        grid-column: span 6;
-    }
+@media screen and (max-width: 720px) {
+  .article .graph {
+    grid-column: span 6;
+  }
 }

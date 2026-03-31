@@ -3,10 +3,12 @@ const usersRouter = require("./users");
 const taskRouter = require("./tasks");
 const commentRouter = require("./comments");
 const notificationRouter = require("./notifications");
+const organizationRouter = require("./organizations");
 const authMiddleware = require("../middleware/auth");
 
 const router = express.Router();
 
+router.use("/organizations", organizationRouter);
 router.use("/users", usersRouter);
 
 router.use(authMiddleware);

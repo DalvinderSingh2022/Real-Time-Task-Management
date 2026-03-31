@@ -10,9 +10,9 @@ import Response from "../components/Response";
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
 import { socket } from "../hooks/useSocket";
-import { users } from "../utils/apiendpoints";
+import { organizations } from "../utils/apiendpoints";
 
-const Register = () => {
+const CreateOrg = () => {
   const { authState } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
 
@@ -28,25 +28,17 @@ const Register = () => {
 
     const form = e.target;
 
-    const user = {
-      name: form.name.value.trim(),
+    const orgData = {
+      name: form.orgName.value.trim(),
       email: form.email.value.trim(),
       password: form.password.value,
-      orgCode: form.orgCode.value.trim().toUpperCase(),
+      orgName: form.orgName.value.trim(),
     };
-
-    if (!user.name || !user.email || !user.password || !user.orgCode) {
-      addToast({
-        type: "error",
-        message: "All fields are required",
-      });
-      return;
-    }
 
     try {
       setIsLoading(true);
 
-      const data = await users.register(user);
+      const data = await organizations.create(orgData);
 
       if (socket?.connected) {
         socket.emit("user_join", data.user);
@@ -54,7 +46,7 @@ const Register = () => {
 
       addToast({
         type: "success",
-        message: data.message,
+        message: `Organization created successfully! Code: ${data.organization.code}`,
       });
 
       navigate("/login");
@@ -81,10 +73,10 @@ const Register = () => {
         <section className={`flex col gap ${styles.container}`}>
           <div>
             <div className={`w_full text_primary ${styles.heading}`}>
-              Welcome
+              Create Organization
             </div>
             <div className={`w_full text_secondary ${styles.sub_heading}`}>
-              Please enter your details.
+              Create your organization and become the admin.
             </div>
           </div>
           <form
@@ -92,15 +84,28 @@ const Register = () => {
             onSubmit={handleSubmit}
           >
             <div className={`flex col w_full items-stretch ${styles.group}`}>
+              <label htmlFor="orgName" className="text_primary">
+                Organization Name
+              </label>
+              <input
+                type="text"
+                id="orgName"
+                name="orgName"
+                placeholder="My Company"
+                autoComplete="organization"
+                required
+              />
+            </div>
+            <div className={`flex col w_full items-stretch ${styles.group}`}>
               <label htmlFor="name" className="text_primary">
-                Name
+                Your Name
               </label>
               <input
                 type="text"
                 id="name"
                 name="name"
-                placeholder="batman"
-                autoComplete="username"
+                placeholder="John Doe"
+                autoComplete="name"
                 required
               />
             </div>
@@ -112,21 +117,8 @@ const Register = () => {
                 type="email"
                 id="email"
                 name="email"
-                placeholder="example@domain.com"
+                placeholder="admin@company.com"
                 autoComplete="email"
-                required
-              />
-            </div>
-            <div className={`flex col w_full items-stretch ${styles.group}`}>
-              <label htmlFor="orgCode" className="text_primary">
-                Organization Code
-              </label>
-              <input
-                type="text"
-                id="orgCode"
-                name="orgCode"
-                placeholder="Enter organization code"
-                autoComplete="off"
                 required
               />
             </div>
@@ -157,11 +149,11 @@ const Register = () => {
               >
                 {isLoading ? (
                   <>
-                    Registering
+                    Creating
                     <div className="loading"></div>
                   </>
                 ) : (
-                  "Register"
+                  "Create Organization"
                 )}
               </button>
             </div>
@@ -178,4 +170,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default CreateOrg;

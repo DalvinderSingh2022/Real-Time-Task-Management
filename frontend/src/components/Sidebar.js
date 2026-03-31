@@ -7,6 +7,7 @@ import { RiTodoFill, RiCloseLine } from "react-icons/ri";
 import { TbLogout } from "react-icons/tb";
 import { AiOutlineUserDelete } from "react-icons/ai";
 import { IoNotificationsSharp } from "react-icons/io5";
+import { MdAdminPanelSettings } from "react-icons/md";
 
 import Logo from "../assects/logo.png";
 
@@ -92,6 +93,12 @@ const Sidebar = () => {
               </span>
             )}
           </NavLink>
+          {authState.user?.role === 'admin' && (
+            <NavLink to="/admin" className="button flex link gap2" title="Admin">
+              <MdAdminPanelSettings />
+              <p>Admin</p>
+            </NavLink>
+          )}
         </div>
         <div className="flex col gap2 w_full">
           <button className="button flex gap2 link" onClick={handleLogout}>

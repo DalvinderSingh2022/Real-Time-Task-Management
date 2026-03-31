@@ -1,5 +1,6 @@
 const { Task, getdueStatus } = require("../models/task.model");
 const Comment = require("../models/comment.model");
+const User = require("../models/user.model");
 const {
   taskCreatedTemplate,
   taskDeletedTemplate,
@@ -9,23 +10,40 @@ const { sendMail } = require("../config/MailService");
 
 // Create a new task
 const addTask = async (req, res) => {
-  const { title, description, dueDate, assignedBy, assignedTo } = req.body;
+  const { title, description, dueDate, assignedTo } = req.body;
+  const assignedBy = req.userId;
 
-  // Return an error response if either title, description, dueDate, assignedBy or assignedTo is not provided
-  if (!title || !description || !dueDate || !assignedBy || !assignedTo) {
+  // Return an error response if either title, description, dueDate, or assignedTo is not provided
+  if (!title || !description || !dueDate || !assignedTo) {
     return res.status(400).json({ message: "All fields are required" });
   }
 
-  // Create a new Task instance
-  const newTask = new Task({
-    title,
-    description,
-    dueDate,
-    assignedTo,
-    assignedBy,
-  });
-
   try {
+    const user = await User.findById(assignedBy);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const users = await User.find({
+      _id: { $in: assignedTo },
+      orgId: user.orgId,
+      isApproved: true,
+    });
+
+    if (users.length !== assignedTo.length) {
+      return res.status(400).json({ message: "Invalid assigned users" });
+    }
+
+    // Create a new Task instance
+    const newTask = new Task({
+      title,
+      description,
+      dueDate,
+      assignedTo,
+      assignedBy,
+      orgId: user.orgId,
+    });
+
     // Save the new task to the database
     // and Populate the assignedBy and assignedTo fields with the corresponding user data
     await getdueStatus([newTask]);
@@ -34,20 +52,26 @@ const addTask = async (req, res) => {
       { path: "assignedBy", select: "_id name avatar" },
     ]);
 
-    for (const user of task.assignedTo) {
-      await sendMail({
-        to: user.email,
-        subject: "🆕 New Task Assigned",
-        html: taskCreatedTemplate(
-          user._id,
-          user.name,
-          task.assignedBy.name,
-          title,
-          task._id,
-          dueDate
-        ),
-      });
-    }
+    const assignedUsers = Array.isArray(task.assignedTo)
+      ? task.assignedTo
+      : [task.assignedTo];
+
+    await Promise.all(
+      assignedUsers.map((assignedUser) =>
+        sendMail({
+          to: assignedUser.email,
+          subject: "🆕 New Task Assigned",
+          html: taskCreatedTemplate(
+            assignedUser._id,
+            assignedUser.name,
+            task.assignedBy.name,
+            title,
+            task._id,
+            dueDate,
+          ),
+        }),
+      ),
+    );
 
     return res.status(201).json({ message: "Task created successfully", task });
   } catch (error) {
@@ -66,11 +90,26 @@ const allTasks = async (req, res) => {
   }
 
   try {
-    // Find all tasks that are assignedTo or assignedBy the current user (authState.user)
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    let query;
+    if (user.role === "admin") {
+      // Admins see all tasks in their org
+      query = { orgId: user.orgId };
+    } else {
+      // Users see tasks assigned to them or assigned by them
+      query = {
+        orgId: user.orgId,
+        $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }],
+      };
+    }
+
+    // Find tasks based on query
     // and Populate the assignedBy and assignedTo fields with the corresponding user data
-    let tasks = await Task.find({
-      $or: [{ assignedTo: { $in: [userId] } }, { assignedBy: userId }],
-    })
+    let tasks = await Task.find(query)
       .sort({ updatedAt: "desc" })
       .populate([
         { path: "assignedTo", select: "_id name avatar" },
@@ -91,6 +130,7 @@ const allTasks = async (req, res) => {
 // Retrieve a task
 const getTask = async (req, res) => {
   const taskId = req.params.id;
+  const userId = req.userId;
 
   if (!taskId) {
     return res
@@ -99,9 +139,17 @@ const getTask = async (req, res) => {
   }
 
   try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     // Retrieve the task with the given _id
     // and Populate the assignedBy and assignedTo fields with the corresponding user data
-    const task = await Task.findById(taskId).populate([
+    const task = await Task.findOne({
+      _id: taskId,
+      orgId: user.orgId,
+    }).populate([
       { path: "assignedTo", select: "_id name avatar" },
       { path: "assignedBy", select: "_id name avatar" },
     ]);
@@ -121,6 +169,7 @@ const getTask = async (req, res) => {
 // Delete a task
 const removeTask = async (req, res) => {
   const taskId = req.params.id;
+  const userId = req.userId;
 
   if (!taskId) {
     return res
@@ -129,9 +178,33 @@ const removeTask = async (req, res) => {
   }
 
   try {
-    const task = await Task.findById(taskId)
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const task = await Task.findOne({
+      _id: taskId,
+      orgId: user.orgId,
+    })
       .populate("assignedTo", "name email")
       .populate("assignedBy", "name");
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Check permissions
+    const canDelete =
+      user.role === "admin" ||
+      task.assignedBy.toString() === userId ||
+      task.assignedTo.some((id) => id.toString() === userId);
+
+    if (!canDelete) {
+      return res
+        .status(403)
+        .json({ message: "You don't have permission to delete this task" });
+    }
 
     // Delete the task with the given _id
     const [deletedTask] = await Promise.all([
@@ -144,20 +217,26 @@ const removeTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    for (const user of task.assignedTo) {
-      await sendMail({
-        to: user.email,
-        subject: "❌ Task Deleted",
-        html: taskDeletedTemplate(
-          user._id,
-          user.name,
-          task.assignedBy.name,
-          task.title
-        ),
-      });
-    }
+    const assignedUsers = Array.isArray(task.assignedTo)
+      ? task.assignedTo
+      : [task.assignedTo];
 
-    return res.status(201).json({ message: "Task deleted Succesfully" });
+    await Promise.all(
+      assignedUsers.map((assignedUser) =>
+        sendMail({
+          to: assignedUser.email,
+          subject: "❌ Task Deleted",
+          html: taskDeletedTemplate(
+            assignedUser._id,
+            assignedUser.name,
+            task.assignedBy.name,
+            task.title,
+          ),
+        }),
+      ),
+    );
+
+    return res.status(201).json({ message: "Task deleted Successfully" });
   } catch (error) {
     return res
       .status(500)
@@ -169,6 +248,7 @@ const removeTask = async (req, res) => {
 const updateTask = async (req, res) => {
   const taskId = req.params.id;
   const task = req.body;
+  const userId = req.userId;
 
   if (!taskId || !task) {
     return res
@@ -177,6 +257,31 @@ const updateTask = async (req, res) => {
   }
 
   try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    const existingTask = await Task.findOne({
+      _id: taskId,
+      orgId: user.orgId,
+    });
+    if (!existingTask) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+
+    // Check permissions
+    const canEdit =
+      user.role === "admin" ||
+      existingTask.assignedBy.toString() === userId ||
+      existingTask.assignedTo.some((id) => id.toString() === userId);
+
+    if (!canEdit) {
+      return res
+        .status(403)
+        .json({ message: "You don't have permission to edit this task" });
+    }
+
     // Update the task with the new data
     // and Populate the assignedBy and assignedTo fields with the corresponding user data
     const updatedTask = await Task.findByIdAndUpdate(taskId, task, {
@@ -191,22 +296,24 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    for (const user of updatedTask.assignedTo) {
-      await sendMail({
-        to: user.email,
-        subject: "🔄 Task Updated",
-        html: taskUpdatedTemplate(
-          user._id,
-          user.name,
-          updatedTask.assignedBy.name,
-          updatedTask.title,
-          updatedTask._id,
-          updatedTask.status,
-          updatedTask.dueDate,
-          updatedTask.description
-        ),
-      });
-    }
+    await Promise.all(
+      assignedUsers.map((assignedUser) =>
+        sendMail({
+          to: assignedUser.email,
+          subject: "🔄 Task Updated",
+          html: taskUpdatedTemplate(
+            assignedUser._id,
+            assignedUser.name,
+            updatedTask.assignedBy.name,
+            updatedTask.title,
+            updatedTask._id,
+            updatedTask.status,
+            updatedTask.dueDate,
+            updatedTask.description,
+          ),
+        }),
+      ),
+    );
 
     await sendMail({
       to: updatedTask.assignedBy.email,

@@ -25,10 +25,10 @@ const Task = (task) => {
         onDragEnd={() => setDragging(false)}
         title={`Assigned To: ${task.assignedTo
           .map((user) =>
-            user._id !== authState.user._id ? user.name : "(You)"
+            user._id !== authState.user._id ? user.name : "(You)",
           )
           .join(", ")}`}
-        className={`${styles.task} flex col ${task.status
+        className={`${styles.task} items-start flex col ${task.status
           .replaceAll(" ", "")
           .toLowerCase()} ${dragging ? "task over" : ""}`}
       >
