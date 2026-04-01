@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo, useEffect } from "react";
+import React, { useContext, useState, useMemo } from "react";
 
 import authStyles from "../styles/auth.module.css";
 import modalStyles from "../styles/modal.module.css";
@@ -14,10 +14,6 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
   const { addToast } = useContext(AppContext);
   const [response, setResponse] = useState(false);
   const [assignedTo, setAssignedTo] = useState(initialAssignedTo);
-
-  useEffect(() => {
-    setAssignedTo(initialAssignedTo);
-  }, [initialAssignedTo]);
 
   const assignableUsers = useMemo(
     () => [...authState.user.followers, authState.user],
@@ -52,7 +48,7 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
 
       const [notification] = notificationData.notifications;
 
-      await new Promise((resolve) => {
+      new Promise((resolve) => {
         socket.emit("task_created", task, notification, resolve);
       });
 
@@ -117,7 +113,9 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
               </div>
             </div>
 
-            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
+            <div
+              className={`flex col w_full items-stretch ${authStyles.group}`}
+            >
               <label htmlFor="description" className="text_primary">
                 Description
               </label>
@@ -130,7 +128,9 @@ const AddTask = ({ remove, initialAssignedTo = [] }) => {
               />
             </div>
 
-            <div className={`flex col w_full items-stretch ${authStyles.group}`}>
+            <div
+              className={`flex col w_full items-stretch ${authStyles.group}`}
+            >
               <label htmlFor="assignedTo" className="text_primary">
                 Assign To
               </label>
