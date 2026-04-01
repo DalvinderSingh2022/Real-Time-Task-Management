@@ -40,7 +40,7 @@ const App = () => {
     const verifyUser = async () => {
       try {
         const data = await users.current();
-        login(data.user);
+        login(data.user, data.token);
       } catch (error) {
         logout();
 

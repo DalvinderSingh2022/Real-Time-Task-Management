@@ -1,19 +1,22 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 
 import { TasksContext } from "../store/TasksContext";
 import { UsersContext } from "../store/UsersContext";
 import { NotificationsContext } from "../store/NotificationContext";
 import { notifications, tasks, users } from "../utils/apiendpoints";
+import { AdminContext } from "../store/AdminContext";
+import { AuthContext } from "../store/AuthContext";
 
 const useLoadStates = () => {
-  const tokenRef = useRef(localStorage.getItem("jwt"));
-
+  const { authState } = useContext(AuthContext);
   const { loadTasks, tasksState } = useContext(TasksContext);
   const { loadUsers, usersState } = useContext(UsersContext);
-  const { loadNotifications, notificationsState } = useContext(NotificationsContext);
+  const { loadData, adminState } = useContext(AdminContext);
+  const { loadNotifications, notificationsState } =
+    useContext(NotificationsContext);
 
   useEffect(() => {
-    if (!tokenRef.current || usersState.loaded) return;
+    if (!authState.token || usersState.loaded) return;
 
     const fetchUsers = async () => {
       try {
@@ -25,10 +28,10 @@ const useLoadStates = () => {
     };
 
     fetchUsers();
-  }, [loadUsers, usersState.loaded]);
+  }, [loadUsers, usersState.loaded, authState.token]);
 
   useEffect(() => {
-    if (!tokenRef.current || notificationsState.loaded) return;
+    if (!authState.token || notificationsState.loaded) return;
 
     const fetchNotifications = async () => {
       try {
@@ -40,10 +43,10 @@ const useLoadStates = () => {
     };
 
     fetchNotifications();
-  }, [loadNotifications, notificationsState.loaded]);
+  }, [loadNotifications, notificationsState.loaded, authState.token]);
 
   useEffect(() => {
-    if (!tokenRef.current || tasksState.loaded) return;
+    if (!authState.token || tasksState.loaded) return;
 
     const fetchTasks = async () => {
       try {
@@ -55,7 +58,27 @@ const useLoadStates = () => {
     };
 
     fetchTasks();
-  }, [loadTasks, tasksState.loaded]);
+  }, [loadTasks, tasksState.loaded, authState.token]);
+
+  useEffect(() => {
+    if (
+      !authState.token ||
+      adminState.loaded ||
+      authState.user?.role !== "admin"
+    )
+      return;
+
+    const fetchData = async () => {
+      try {
+        const data = await users.pending();
+        loadData(data.users);
+      } catch (error) {
+        console.log(".....API ERROR.....", error);
+      }
+    };
+
+    fetchData();
+  }, [loadData, adminState.loaded, authState.user?.role, authState.token]);
 };
 
 export default useLoadStates;

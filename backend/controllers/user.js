@@ -308,6 +308,7 @@ const getPendingUsers = async (req, res) => {
 // Get the current user
 const currentUser = async (req, res) => {
   const userId = req.userId;
+  const token = req.token;
 
   try {
     const user = await User.findById(userId).select("-password");
@@ -322,7 +323,7 @@ const currentUser = async (req, res) => {
 
     return res
       .status(200)
-      .json({ message: "Current user data fetched successfully", user });
+      .json({ message: "Current user data fetched successfully", user, token });
   } catch (error) {
     return res
       .status(401)

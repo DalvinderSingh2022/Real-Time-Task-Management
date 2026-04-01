@@ -6,7 +6,6 @@ import styles from "./../styles/auth.module.css";
 
 import Toast from "../components/Toast";
 import Response from "../components/Response";
-import useLoadStates from "../hooks/useLoadStates";
 
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
@@ -20,8 +19,6 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const navigate = useNavigate();
-
-  useLoadStates();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,8 +45,7 @@ const Login = () => {
 
       const data = await users.login(user);
 
-      login(data.user);
-      localStorage.setItem("jwt", data.token);
+      login(data.user, data.token);
 
       addToast({
         type: "success",

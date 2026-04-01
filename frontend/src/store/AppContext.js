@@ -10,6 +10,7 @@ import { AuthProvider } from "./AuthContext";
 import { TasksProvider } from "./TasksContext";
 import { UsersProvider } from "./UsersContext";
 import { NotificationsProvider } from "./NotificationContext";
+import { AdminProvider } from "./AdminContext";
 
 const initialState = {
   toasts: [],
@@ -82,11 +83,13 @@ const AppProvider = ({ children }) => {
     <AuthProvider>
       <UsersProvider>
         <TasksProvider>
-          <NotificationsProvider>
-            <AppContext.Provider value={{ appState, addToast, removeToast }}>
-              {children}
-            </AppContext.Provider>
-          </NotificationsProvider>
+          <AdminProvider>
+            <NotificationsProvider>
+              <AppContext.Provider value={{ appState, addToast, removeToast }}>
+                {children}
+              </AppContext.Provider>
+            </NotificationsProvider>
+          </AdminProvider>
         </TasksProvider>
       </UsersProvider>
     </AuthProvider>

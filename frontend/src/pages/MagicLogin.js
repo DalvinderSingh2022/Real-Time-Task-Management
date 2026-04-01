@@ -42,7 +42,7 @@ const MagicLogin = () => {
 
         if (!isMounted) return;
 
-        login(data.user);
+        login(data.user, token);
         navigate(redirect, { replace: true });
       } catch (error) {
         console.log(".....API ERROR.....", error);

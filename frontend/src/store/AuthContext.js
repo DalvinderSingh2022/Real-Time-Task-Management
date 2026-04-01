@@ -2,6 +2,7 @@ import { createContext, useReducer, useEffect } from "react";
 
 const initialState = {
   user: null,
+  token: null,
   authenticated: false,
   checkingAuth: true,
 };
@@ -12,6 +13,7 @@ const authReducer = (state, action) => {
       return {
         ...state,
         user: action.payload.user,
+        token: action.payload.token,
         authenticated: true,
         checkingAuth: false,
       };
@@ -20,6 +22,7 @@ const authReducer = (state, action) => {
       return {
         ...state,
         user: null,
+        token: null,
         authenticated: false,
         checkingAuth: false,
       };
@@ -40,9 +43,10 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [authState, dispatch] = useReducer(authReducer, initialState);
 
-  const login = (user) => {
+  const login = (user, token) => {
     localStorage.setItem("user", JSON.stringify(user));
-    dispatch({ type: "LOGIN", payload: { user } });
+    localStorage.setItem("jwt", token);
+    dispatch({ type: "LOGIN", payload: { user, token } });
   };
 
   const logout = () => {

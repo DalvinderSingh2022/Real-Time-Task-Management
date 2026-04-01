@@ -1,4 +1,4 @@
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 
 import styles from "./../styles/users.module.css";
@@ -7,6 +7,7 @@ import adminStyles from "./../styles/admin.module.css";
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
 import { users } from "../utils/apiendpoints";
+import { AdminContext } from "../store/AdminContext";
 
 const getDaysPending = (dateString) => {
   if (!dateString) return "Unknown";
@@ -62,29 +63,7 @@ const formatDateWithSuffix = (dateString) => {
 const Admin = () => {
   const { authState } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
-
-  const [pendingUsers, setPendingUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-
-  const fetchPendingUsers = useCallback(async () => {
-    try {
-      const data = await users.pending();
-      setPendingUsers(data.users);
-    } catch (error) {
-      addToast({
-        type: "error",
-        message: error?.message,
-      });
-    } finally {
-      setLoading(false);
-    }
-  }, [addToast]);
-
-  useEffect(() => {
-    if (!authState.authenticated || authState.user?.role !== "admin") return;
-
-    fetchPendingUsers();
-  }, [authState, addToast, fetchPendingUsers]);
+  const { adminState } = useContext(AdminContext);
 
   const handleApprove = async (userId, action) => {
     try {
@@ -97,7 +76,7 @@ const Admin = () => {
         message: `User ${action}d successfully`,
       });
 
-      await fetchPendingUsers();
+      // await fetchPendingUsers();
     } catch (error) {
       addToast({
         type: "error",
@@ -114,13 +93,9 @@ const Admin = () => {
     return <Navigate to="/" replace />;
   }
 
-  if (loading) {
-    return <div className="flex center full_container">Loading...</div>;
-  }
-
   return (
     <div className={`flex col gap2 ${styles.container}`}>
-      {pendingUsers.length === 0 ? (
+      {adminState.members.length === 0 ? (
         <>
           <div className={`flex col gap ${styles.header}`}>
             <div className="text_primary heading">Pending Approvals</div>
@@ -143,7 +118,7 @@ const Admin = () => {
           </div>
 
           <div className={`${adminStyles.table_body} w_full`}>
-            {pendingUsers.map((user) => (
+            {adminState.members.map((user) => (
               <div key={user._id} className={adminStyles.row}>
                 <Link
                   to={`/users?q=${user.name}`}

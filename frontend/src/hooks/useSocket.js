@@ -113,13 +113,11 @@ const useSocket = () => {
       updateUser(userToFollow);
 
       if (authState.user._id === authUser._id) {
-        login(authUser);
         addToast({
           type: "success",
           message: `Followed ${userToFollow.name} successfully`,
         });
       } else if (authState.user._id === userToFollow._id) {
-        login(userToFollow);
         addToast({ type: "info", message: `${authUser.name} followed you` });
       }
     });
@@ -133,13 +131,11 @@ const useSocket = () => {
       updateUser(userToUnfollow);
 
       if (authState.user._id === authUser._id) {
-        login(authUser);
         addToast({
           type: "info",
           message: `Unfollowed ${userToUnfollow.name} successfully`,
         });
       } else if (authState.user._id === userToUnfollow._id) {
-        login(userToUnfollow);
         addToast({
           type: "warning",
           message: `${authUser.name} Unfollowed you`,

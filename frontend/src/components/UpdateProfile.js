@@ -59,7 +59,7 @@ const options = {
 };
 
 const UpdateProfile = ({ remove }) => {
-  const { authState, login } = useContext(AuthContext);
+  const { authState } = useContext(AuthContext);
   const { addToast } = useContext(AppContext);
   const [response, setResponse] = useState(false);
   const [profile, setProfile] = useState(() => {
@@ -114,7 +114,6 @@ const UpdateProfile = ({ remove }) => {
       });
 
       socket.emit("user_update", userData.user);
-      login(userData.user);
       addToast({ type: "success", message: userData.message });
       remove();
 
