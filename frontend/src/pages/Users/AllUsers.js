@@ -5,14 +5,16 @@ import styles from "../../styles/users.module.css";
 import { UsersContext } from "../../store/UsersContext";
 import useSearch from "../../hooks/useSearch";
 import User from "../../components/User";
+import EmptyState from "../../components/EmptyStateCompoent";
 import SearchInput from "./SearchInput";
 
 const AllUsers = () => {
-  const {
-    usersState: { users: allUsers },
-  } = useContext(UsersContext);
+  const { usersState } = useContext(UsersContext);
 
-  const [handleChange, filteredUsers, search] = useSearch(allUsers, "name");
+  const [handleChange, filteredUsers, search] = useSearch(
+    usersState.users,
+    "name",
+  );
 
   const renderedUsers = useMemo(() => {
     if (!filteredUsers) return null;
@@ -21,19 +23,13 @@ const AllUsers = () => {
 
   return (
     <article>
-      {allUsers.length === 0 ? (
-        <div className={`flex col gap2 ${styles.container}`}>
-          <div className={`flex col gap ${styles.header}`}>
-            <div className="text_primary heading">Users</div>
-            <div className="text_secondary">
-              View and manage members of your organization.
-            </div>
-          </div>
-
-          <div className="text_secondary">
-            No users available in this organization.
-          </div>
-        </div>
+      {usersState.users.length === 0 ? (
+        <EmptyState
+          isLoaded={usersState.loaded}
+          title="Team Directory"
+          description="A central place to view and manage everyone in your organization."
+          message="It looks like you're the first one here. Invite your teammates to start collaborating!"
+        />
       ) : (
         <>
           <SearchInput handleChange={handleChange} query={search} />

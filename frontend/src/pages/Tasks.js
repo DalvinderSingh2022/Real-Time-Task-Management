@@ -7,6 +7,8 @@ import { DragAndDropContext } from "../store/DragAndDropContext";
 import { TasksContext } from "../store/TasksContext";
 import TaskSection from "../components/TaskSection";
 import AddTask from "../components/AddTask";
+import EmptyState from "../components/EmptyStateCompoent";
+
 import useSearch from "../hooks/useSearch";
 
 const TaskStatusTypes = ["Not Started", "In Progress", "Completed"];
@@ -24,6 +26,7 @@ const TaskDueTypes = [
 const normalizeStatus = (status) => status.toLowerCase().replace(/\s/g, "");
 
 const Tasks = () => {
+  const [addTask, setAddTask] = useState(false);
   const { tasksState } = useContext(TasksContext);
 
   const [handleChange, filteredTasks, query] = useSearch(
@@ -48,21 +51,21 @@ const Tasks = () => {
   return (
     <article>
       {tasksState.tasks.length === 0 ? (
-        <div className={`flex col gap2`}>
-          <div className={`flex col gap ${styles.header}`}>
-            <div className="text_primary heading">Tasks</div>
-            <div className="text_secondary">
-              Manage and track your tasks efficiently.
-            </div>
-          </div>
-
-          <div className="text_secondary">
-            No tasks found. Start by creating a new task.
-          </div>
-        </div>
+        <EmptyState
+          isLoaded={tasksState.loaded}
+          title="Tasks & Projects"
+          description="Organize your workflow, set deadlines, and track your team's progress."
+          message="No tasks found. Ready to get to work? Create your first task to get started."
+        >
+          <CreateTaskButton setAddTask={setAddTask} />
+        </EmptyState>
       ) : (
         <>
-          <SearchInput handleChange={handleChange} query={query} />
+          <SearchInput
+            handleChange={handleChange}
+            query={query}
+            setAddTask={setAddTask}
+          />
           <div className={styles.container}>
             {TaskStatusTypes.map((status) => {
               const key = normalizeStatus(status);
@@ -81,17 +84,16 @@ const Tasks = () => {
           </div>
         </>
       )}
+      {addTask && <AddTask remove={() => setAddTask(false)} />}
     </article>
   );
 };
 
-const SearchInput = ({ handleChange, query }) => {
+const SearchInput = ({ handleChange, query, setAddTask }) => {
   const { response } = useContext(DragAndDropContext);
-  const [addTask, setAddTask] = useState(false);
 
   return (
     <>
-      {addTask && <AddTask remove={() => setAddTask(false)} />}
       <form
         className={`${styles.filters} wrap flex gap2`}
         onSubmit={(e) => e.preventDefault()}
@@ -103,14 +105,9 @@ const SearchInput = ({ handleChange, query }) => {
           value={query.get("q") || ""}
           onChange={handleChange}
         />
-        <button
-          type="button"
-          className={`button primary flex gap2 ${styles.create_btn}`}
-          onClick={() => setAddTask(true)}
-        >
-          <FaPlus />
-          <span>Create</span>
-        </button>
+
+        <CreateTaskButton setAddTask={setAddTask} />
+
         <select
           defaultValue={query.get("dueStatus") || ""}
           onChange={handleChange}
@@ -124,6 +121,7 @@ const SearchInput = ({ handleChange, query }) => {
             </option>
           ))}
         </select>
+
         <select
           defaultValue={query.get("status") || ""}
           onChange={handleChange}
@@ -137,9 +135,24 @@ const SearchInput = ({ handleChange, query }) => {
             </option>
           ))}
         </select>
+
         {response && <div className="loading" style={{ margin: 0 }}></div>}
       </form>
     </>
   );
 };
+
+const CreateTaskButton = ({ setAddTask }) => {
+  return (
+    <button
+      type="button"
+      className={`button primary flex gap2 ${styles.create_btn}`}
+      onClick={() => setAddTask(true)}
+    >
+      <FaPlus />
+      <span>Create</span>
+    </button>
+  );
+};
+
 export default Tasks;

@@ -1,13 +1,13 @@
 import React, { useContext } from "react";
 import { Link, Navigate } from "react-router-dom";
 
-import styles from "./../styles/users.module.css";
 import adminStyles from "./../styles/admin.module.css";
 
 import { AuthContext } from "../store/AuthContext";
 import { AppContext } from "../store/AppContext";
 import { users } from "../utils/apiendpoints";
 import { AdminContext } from "../store/AdminContext";
+import EmptyState from "../components/EmptyStateCompoent";
 
 const getDaysPending = (dateString) => {
   if (!dateString) return "Unknown";
@@ -94,99 +94,108 @@ const Admin = () => {
   }
 
   return (
-    <div className={`flex col gap2 ${styles.container}`}>
+    <article>
       {adminState.members.length === 0 ? (
-        <>
-          <div className={`flex col gap ${styles.header}`}>
-            <div className="text_primary heading">Pending Approvals</div>
-            <div className="text_secondary">
-              Review and approve new user registrations for your organization.
-            </div>
-          </div>
-          <div className="text_secondary">No pending approvals</div>
-        </>
+        <EmptyState
+          isLoaded={adminState.loaded}
+          title="Pending Approvals"
+          description="Manage access requests to keep your organization secure and up to date."
+          message="Your queue is clear! There are no new registration requests to review."
+        />
       ) : (
-        <div className={adminStyles.table_container}>
-          <div
-            className={`${adminStyles.row} ${adminStyles.header} flex items-stretch`}
-          >
-            <div>Name</div>
-            <div>Email</div>
-            <div>Status</div>
-            <div>Joined</div>
-            <div>Tasks</div>
-          </div>
+        <div className={adminStyles.table_wrapper}>
+          <div className={adminStyles.table_container}>
+            <div
+              className={`${adminStyles.row} ${adminStyles.header} flex items-stretch`}
+            >
+              <div className={adminStyles.col_name}>Name</div>
+              <div className={adminStyles.col_email}>Email</div>
+              <div className={adminStyles.col_status}>Status</div>
+              <div className={adminStyles.col_joined}>Joined</div>
+              <div className={adminStyles.col_actions}>Tasks/Actions</div>
+            </div>
 
-          <div className={`${adminStyles.table_body} w_full`}>
-            {adminState.members.map((user) => (
-              <div key={user._id} className={adminStyles.row}>
-                <Link
-                  to={`/users?q=${user.name}`}
-                  className="text_primary font-medium"
-                >
-                  {user.name}
-                </Link>
+            <div className="w_full">
+              {adminState.members.map((user) => (
+                <div key={user._id} className={adminStyles.row}>
+                  <div className={adminStyles.col_name}>
+                    <Link
+                      to={`/users?q=${user.name}`}
+                      className="text_primary font-medium"
+                    >
+                      {user.name}
+                    </Link>
+                  </div>
 
-                <div className="text_secondary truncate">{user.email}</div>
-
-                <div className="flex items-start justify-start">
-                  <span
-                    className={
-                      user.isApproved
-                        ? adminStyles.badge_success
-                        : adminStyles.badge_warning
-                    }
+                  <div
+                    className={`${adminStyles.col_email} text_secondary truncate`}
                   >
-                    {user.isApproved ? "Approved" : "Pending"}
-                  </span>
-                </div>
+                    {user.email}
+                  </div>
 
-                <div className="text_secondary">
-                  {user.isApproved ? (
-                    <span>{formatDateWithSuffix(user.createdAt)}</span>
-                  ) : (
-                    <span className={adminStyles.text_warning}>
-                      {getDaysPending(user.createdAt)}
+                  <div
+                    className={`${adminStyles.col_status} flex items-start justify-start`}
+                  >
+                    <span
+                      className={
+                        user.isApproved
+                          ? adminStyles.badge_success
+                          : adminStyles.badge_warning
+                      }
+                    >
+                      {user.isApproved ? "Approved" : "Pending"}
                     </span>
-                  )}
-                </div>
+                  </div>
 
-                <div className="flex gap justify-start">
-                  {user.isApproved ? (
-                    <>
-                      <span className={adminStyles.badge_neutral}>
-                        🟡 {user.taskStats?.["Not Started"] || 0}
+                  <div className={`${adminStyles.col_joined} text_secondary`}>
+                    {user.isApproved ? (
+                      <span>{formatDateWithSuffix(user.createdAt)}</span>
+                    ) : (
+                      <span className={adminStyles.text_warning}>
+                        {getDaysPending(user.createdAt)}
                       </span>
-                      <span className={adminStyles.badge_info}>
-                        🔵 {user.taskStats?.["In Progress"] || 0}
-                      </span>
-                      <span className={adminStyles.badge_success}>
-                        🟢 {user.taskStats?.["Completed"] || 0}
-                      </span>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        className={`button primary flex gap2`}
-                        onClick={() => handleApprove(user._id, "approve")}
-                      >
-                        Approve
-                      </button>
-                      <button
-                        className={`button secondary flex gap2`}
-                        onClick={() => handleApprove(user._id, "reject")}
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
+                    )}
+                  </div>
+
+                  <div
+                    className={`${adminStyles.col_actions} flex gap justify-start`}
+                  >
+                    {user.isApproved ? (
+                      <>
+                        <span className={adminStyles.badge_neutral}>
+                          🟡 {user.taskStats?.["Not Started"] || 0}
+                        </span>
+                        <span className={adminStyles.badge_info}>
+                          🔵 {user.taskStats?.["In Progress"] || 0}
+                        </span>
+                        <span className={adminStyles.badge_success}>
+                          🟢 {user.taskStats?.["Completed"] || 0}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          className={`button primary flex gap2`}
+                          onClick={() => handleApprove(user._id, "approve")}
+                        >
+                          Approve
+                        </button>
+                        <button
+                          className={`button secondary flex gap2`}
+                          onClick={() => handleApprove(user._id, "reject")}
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
       )}
-    </div>
+    </article>
   );
 };
 

@@ -7,6 +7,7 @@ import { NotificationsContext } from "../store/NotificationContext";
 import SystemNotification from "../components/Notifications/SystemNotification";
 import TaskNotification from "../components/Notifications/TaskNotification";
 import UserNotification from "../components/Notifications/UserNotification";
+import EmptyState from "../components/EmptyStateCompoent";
 
 import useSearch from "../hooks/useSearch";
 
@@ -50,24 +51,18 @@ const Notifications = () => {
 
   return (
     <article>
-      {notifications.length === 0 ? (
-        <div className={`flex col gap2 ${styles.container}`}>
-          <div className={`flex col gap ${styles.header}`}>
-            <div className="text_primary heading">Notifications</div>
-            <div className="text_secondary">
-              Stay updated with task changes and important activity.
-            </div>
-          </div>
-
-          <div className="text_secondary">
-            You're all caught up! No new notifications.
-          </div>
-        </div>
+      {notificationsState.notifications.length === 0 ? (
+        <EmptyState
+          isLoaded={notificationsState.loaded}
+          title="Notifications"
+          description="Stay informed about task assignments, updates, and mentions."
+          message="You're all caught up! There are no new updates for you right now."
+        />
       ) : (
         <>
           <SearchInput handleChange={handleChange} query={query} />
           <div className="flex col gap">
-            {notificationsState.loaded ? (
+            {notifications.length > 0 ? (
               notifications.map((notification) => {
                 const Component = getComponentByType(notification.type);
 
@@ -84,7 +79,9 @@ const Notifications = () => {
                 );
               })
             ) : (
-              <div className="loading"></div>
+              <p className="text_secondary">
+                You're all caught up! There are no new updates
+              </p>
             )}
           </div>
         </>
