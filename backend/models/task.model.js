@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
-const axios = require("axios");
 const cron = require("node-cron");
+const { Notification, NotificationTypes } = require("./notification.model");
 require("dotenv").config();
 
 const DueStatus = {
@@ -65,7 +65,7 @@ const taskSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  }
+  },
 );
 
 const Task = mongoose.model("Task", taskSchema);
@@ -75,14 +75,18 @@ const getdueStatus = async (tasks) => {
   const startOfToday = new Date(
     today.getFullYear(),
     today.getMonth(),
-    today.getDate()
+    today.getDate(),
   );
   const startOfTomorrow = new Date(startOfToday);
   startOfTomorrow.setDate(startOfTomorrow.getDate() + 1);
+  const startOfDayAfterTomorrow = new Date(startOfTomorrow);
+  startOfDayAfterTomorrow.setDate(startOfDayAfterTomorrow.getDate() + 1);
   const startOfYesterday = new Date(startOfToday);
   startOfYesterday.setDate(startOfYesterday.getDate() - 1);
   const startOfWeek = new Date(startOfToday);
   startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(endOfWeek.getDate() + 7);
   const startOfLastWeek = new Date(startOfWeek);
   startOfLastWeek.setDate(startOfLastWeek.getDate() - 7);
   const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
@@ -94,8 +98,7 @@ const getdueStatus = async (tasks) => {
         task.dueStatus = DueStatus.TODAY;
       } else if (
         task.dueDate >= startOfTomorrow &&
-        task.dueDate <
-          new Date(startOfTomorrow).setDate(startOfTomorrow.getDate() + 1)
+        task.dueDate < startOfDayAfterTomorrow
       ) {
         task.dueStatus = DueStatus.TOMORROW;
       } else if (
@@ -103,10 +106,7 @@ const getdueStatus = async (tasks) => {
         task.dueDate < startOfToday
       ) {
         task.dueStatus = DueStatus.YESTERDAY;
-      } else if (
-        task.dueDate >= startOfWeek &&
-        task.dueDate < new Date(startOfWeek).setDate(startOfWeek.getDate() + 7)
-      ) {
+      } else if (task.dueDate >= startOfWeek && task.dueDate < endOfWeek) {
         task.dueStatus = DueStatus.THIS_WEEK;
       } else if (
         task.dueDate >= startOfLastWeek &&
@@ -146,12 +146,20 @@ cron.schedule("0 0 * * *", async () => {
       return acc;
     }, {});
 
-    Object.entries(groupedTasks).forEach(async ([user, tasks]) => {
-      await axios.post(
-        process.env.API_BASE_URL + "notifications/due-date-reminder",
-        { user, tasks }
-      );
-    });
+    // Create the due-date reminder notifications directly. (Previously this
+    // POSTed to an authenticated route with no token and always failed 401.)
+    await Promise.all(
+      Object.entries(groupedTasks).map(([user, userTasks]) =>
+        Notification.create({
+          user,
+          type: NotificationTypes.DUE_DATE_REMINDER,
+          message: `Reminder: You have ${
+            userTasks.length
+          } task(s) due today (${new Date().toDateString()}).`,
+          data: { tasks: userTasks },
+        }),
+      ),
+    );
   } catch (error) {
     console.error(error);
   }

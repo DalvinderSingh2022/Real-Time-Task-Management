@@ -7,7 +7,6 @@ const Comment = require("../models/comment.model");
 const { Notification } = require("../models/notification.model");
 const { sendMail } = require("../config/MailService");
 const {
-  registrationTemplate,
   onFollowTemplate,
   onUnfollowTemplate,
   userApprovalRequestTemplate,
@@ -15,6 +14,12 @@ const {
   userRejectedTemplate,
 } = require("../emailTemplates");
 require("dotenv").config();
+
+// Basic input validators
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const isValidEmail = (email) => EMAIL_REGEX.test(String(email).trim());
+const isValidPassword = (password) =>
+  typeof password === "string" && password.length >= 6;
 
 //helper function to generate avatar
 const getAvatar = (name) => {
@@ -87,7 +92,7 @@ const getAvatar = (name) => {
 const magicLogin = async (req, res) => {
   try {
     const { key } = req.body;
-    const decoded = jwt.verify(key, process.env.JWT_SECRET);
+    const decoded = jwt.verify(key, process.env.SECRET_KEY);
 
     const user = await User.findById(decoded.userId);
 
@@ -128,6 +133,18 @@ const register = async (req, res) => {
     !orgCode?.trim()
   ) {
     return res.status(400).json({ message: "All fields are required" });
+  }
+
+  if (!isValidEmail(email)) {
+    return res
+      .status(400)
+      .json({ message: "Please enter a valid email address" });
+  }
+
+  if (!isValidPassword(password)) {
+    return res
+      .status(400)
+      .json({ message: "Password must be at least 6 characters long" });
   }
 
   try {
@@ -199,7 +216,9 @@ const login = async (req, res) => {
   try {
     // Find the user by email
     // and Populate the followers and following fields with the corresponding users data
-    const user = await User.findOne({ email }).populate([
+    const user = await User.findOne({
+      email: email.toLowerCase().trim(),
+    }).populate([
       { path: "followers", select: "_id name avatar followers" },
       { path: "following", select: "_id name avatar followers" },
     ]);
@@ -298,6 +317,8 @@ const getPendingUsers = async (req, res) => {
         .json({ message: "Only admins can view pending users" });
     }
 
+    // Returns every member of the admin's organization (approved + pending);
+    // the admin UI renders status badges and per-user actions from this list.
     const users = await User.find({ orgId: admin.orgId });
     res.status(200).json({ users: users });
   } catch (error) {
@@ -392,7 +413,7 @@ const removeUser = async (req, res) => {
     // Delete user
     await User.findByIdAndDelete({ _id: userId });
 
-    return res.status(201).json({ message: "Account deleted successfully" });
+    return res.status(200).json({ message: "Account deleted successfully" });
   } catch (error) {
     return res
       .status(500)
@@ -442,9 +463,17 @@ const updateUser = async (req, res) => {
   }
 
   try {
+    // Whitelist updatable fields so a client cannot escalate privileges or
+    // move organizations (e.g. role, isApproved, orgId, email, password).
+    const allowedFields = ["name", "avatar"];
+    const updateData = {};
+    for (const field of allowedFields) {
+      if (field in user) updateData[field] = user[field];
+    }
+
     // Update the User with the new data
     // and Populate the followers and following fields with the corresponding users data
-    const updatedUser = await User.findByIdAndUpdate(userId, user, {
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, {
       new: true,
       runValidators: true,
     })
@@ -547,7 +576,7 @@ const followUser = async (req, res) => {
 };
 
 // Unfollow another user
-const unfolloweUser = async (req, res) => {
+const unfollowUser = async (req, res) => {
   const userId = req.params.userId;
   const authUserId = req.userId;
 
@@ -627,7 +656,7 @@ module.exports = {
   removeUser,
   allUsers,
   followUser,
-  unfolloweUser,
+  unfollowUser,
   updateUser,
   approveUser,
   getPendingUsers,

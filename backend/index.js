@@ -1,3 +1,8 @@
+const nodeBuffer = require("buffer");
+if (typeof nodeBuffer.SlowBuffer === "undefined") {
+  nodeBuffer.SlowBuffer = nodeBuffer.Buffer;
+}
+
 const express = require("express");
 const routes = require("./routes/index");
 const cors = require("cors");
@@ -22,7 +27,7 @@ const io = new Server(server, {
 connectMongo();
 handleSocketEvents(io);
 
-app.use(cors());
+app.use(cors(ORIGIN ? { origin: ORIGIN } : undefined));
 app.use(express.json());
 app.use("/api", routes);
 

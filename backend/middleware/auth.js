@@ -1,7 +1,13 @@
 const jwt = require("jsonwebtoken");
 
 const authMiddleware = (req, res, next) => {
-  const token = req.headers?.Authorization || req.headers?.authorization;
+  const rawToken = req.headers?.Authorization || req.headers?.authorization;
+
+  // Accept both a bare token and an "Authorization: Bearer <token>" header.
+  const token =
+    rawToken && rawToken.startsWith("Bearer ")
+      ? rawToken.slice(7).trim()
+      : rawToken;
 
   // Return an error response if JWT token is missing
   if (!token) {

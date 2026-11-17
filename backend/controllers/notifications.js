@@ -2,6 +2,7 @@ const {
   NotificationTypes,
   Notification,
 } = require("../models/notification.model");
+const User = require("../models/user.model");
 
 // Find all notifications for current user
 const allNotifications = async (req, res) => {
@@ -18,12 +19,10 @@ const allNotifications = async (req, res) => {
       createdAt: -1,
     });
 
-    res
-      .status(200)
-      .json({
-        message: "All Notifications fetched successfully",
-        notifications,
-      });
+    res.status(200).json({
+      message: "All Notifications fetched successfully",
+      notifications,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -47,19 +46,17 @@ const updateNotification = async (req, res) => {
     const updatedNotification = await Notification.findByIdAndUpdate(
       notificationId,
       notification,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedNotification) {
       return res.status(404).json({ message: "Notification not found" });
     }
 
-    return res
-      .status(200)
-      .json({
-        message: "Notification updated successfully",
-        notification: updatedNotification,
-      });
+    return res.status(200).json({
+      message: "Notification updated successfully",
+      notification: updatedNotification,
+    });
   } catch (error) {
     return res
       .status(500)
@@ -209,7 +206,22 @@ const generateNotification = async (req, res) => {
   const { users, message, type, data } = req;
 
   try {
-    const notificationPromises = users.map((user) => {
+    let recipients = users;
+
+    if (req.userId) {
+      const requester = await User.findById(req.userId).select("orgId");
+
+      if (requester) {
+        const orgMembers = await User.find({
+          _id: { $in: users },
+          orgId: requester.orgId,
+        }).select("_id");
+        const allowed = new Set(orgMembers.map((u) => u._id.toString()));
+        recipients = users.filter((u) => allowed.has(u?.toString()));
+      }
+    }
+
+    const notificationPromises = recipients.map((user) => {
       const notification = new Notification({ user, message, type, data });
       return notification.save();
     });

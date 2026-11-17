@@ -61,11 +61,12 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("jwt");
 
-    if (storedUser) {
+    if (storedUser && storedToken) {
       dispatch({
         type: "LOGIN",
-        payload: { user: JSON.parse(storedUser) },
+        payload: { user: JSON.parse(storedUser), token: storedToken },
       });
     } else {
       dispatch({ type: "AUTH_CHECK_COMPLETE" });

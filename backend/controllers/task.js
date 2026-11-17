@@ -194,11 +194,12 @@ const removeTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
-    // Check permissions
+    // Check permissions (assignedBy / assignedTo are populated documents here,
+    // so compare their _id values rather than the document itself)
     const canDelete =
       user.role === "admin" ||
-      task.assignedBy.toString() === userId ||
-      task.assignedTo.some((id) => id.toString() === userId);
+      task.assignedBy._id.toString() === userId ||
+      task.assignedTo.some((u) => u._id.toString() === userId);
 
     if (!canDelete) {
       return res
@@ -282,9 +283,29 @@ const updateTask = async (req, res) => {
         .json({ message: "You don't have permission to edit this task" });
     }
 
+    // Whitelist the fields a client is allowed to change (prevents mass
+    // assignment of orgId / assignedBy / dueStatus / _id, etc.)
+    const allowedFields = [
+      "title",
+      "description",
+      "dueDate",
+      "status",
+      "assignedTo",
+    ];
+    const updateData = {};
+    for (const field of allowedFields) {
+      if (field in task) updateData[field] = task[field];
+    }
+    // assignedTo may arrive as populated user objects; normalize to ids
+    if (Array.isArray(updateData.assignedTo)) {
+      updateData.assignedTo = updateData.assignedTo.map((u) =>
+        u && u._id ? u._id : u,
+      );
+    }
+
     // Update the task with the new data
     // and Populate the assignedBy and assignedTo fields with the corresponding user data
-    const updatedTask = await Task.findByIdAndUpdate(taskId, task, {
+    const updatedTask = await Task.findByIdAndUpdate(taskId, updateData, {
       new: true,
       runValidators: true,
     }).populate([
@@ -296,14 +317,30 @@ const updateTask = async (req, res) => {
       return res.status(404).json({ message: "Task not found" });
     }
 
+    // Notify every assignee plus the task creator, without double-mailing
+    // anyone who happens to be both.
+    const assignedUsers = Array.isArray(updatedTask.assignedTo)
+      ? updatedTask.assignedTo
+      : [updatedTask.assignedTo];
+
+    const recipients = [...assignedUsers];
+    if (
+      updatedTask.assignedBy &&
+      !assignedUsers.some(
+        (u) => u._id.toString() === updatedTask.assignedBy._id.toString(),
+      )
+    ) {
+      recipients.push(updatedTask.assignedBy);
+    }
+
     await Promise.all(
-      assignedUsers.map((assignedUser) =>
+      recipients.map((recipient) =>
         sendMail({
-          to: assignedUser.email,
+          to: recipient.email,
           subject: "🔄 Task Updated",
           html: taskUpdatedTemplate(
-            assignedUser._id,
-            assignedUser.name,
+            recipient._id,
+            recipient.name,
             updatedTask.assignedBy.name,
             updatedTask.title,
             updatedTask._id,
@@ -314,21 +351,6 @@ const updateTask = async (req, res) => {
         }),
       ),
     );
-
-    await sendMail({
-      to: updatedTask.assignedBy.email,
-      subject: "🔄 Task Updated",
-      html: taskUpdatedTemplate(
-        updatedTask.assignedBy._id,
-        updatedTask.assignedBy.name,
-        updatedTask.assignedBy.name,
-        updatedTask.title,
-        updatedTask._id,
-        updatedTask.status,
-        updatedTask.dueDate,
-        updatedTask.description,
-      ),
-    });
 
     return res
       .status(200)
